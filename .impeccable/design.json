@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-26T00:00:00Z",
+  "title": "Design System: Botcentro — Panel de operación",
+  "extensions": {
+    "colorMeta": {
+      "cian-accion": { "role": "primary", "displayName": "Cian de acción", "canonical": "#5cc8f0", "tonalRamp": ["#06161d", "#0d2a37", "#153e51", "#1f5a71", "#2e7c94", "#42a3bd", "#5cc8f0", "#a9e6f8"] },
+      "verde-ok": { "role": "secondary", "displayName": "Verde OK", "canonical": "#5fbf73", "tonalRamp": ["#0c1a0f", "#17301d", "#1f4a29", "#2e6b3b", "#3f8c4e", "#5fbf73", "#8dd89b", "#c3ecc9"] },
+      "ambar-curso": { "role": "secondary", "displayName": "Ámbar en curso", "canonical": "#f2b04a", "tonalRamp": ["#1c1206", "#3a2a11", "#5a3f18", "#835b20", "#ab7a2a", "#d29b3a", "#f2b04a", "#f9d18f"] },
+      "rojo-fallido": { "role": "secondary", "displayName": "Rojo fallido", "canonical": "#ff6b63", "tonalRamp": ["#1f0a09", "#3e1715", "#5e2320", "#87322d", "#b0443c", "#d8574c", "#ff6b63", "#ffa39d"] },
+      "pizarra": { "role": "secondary", "displayName": "Pizarra rayada", "canonical": "#9aa1ab", "tonalRamp": ["#101215", "#22252a", "#33383f", "#484f58", "#5f6773", "#7a8390", "#9aa1ab", "#c4c9d0"] },
+      "marfil": { "role": "neutral", "displayName": "Marfil", "canonical": "#f1ead8", "tonalRamp": ["#1a1712", "#332c22", "#554936", "#7a684f", "#9d8a6b", "#c1ac88", "#e0d4b7", "#f1ead8"] },
+      "tablero-negro": { "role": "neutral", "displayName": "Negro de tablero", "canonical": "#0f0e0c", "tonalRamp": ["#0f0e0c", "#161512", "#23211d", "#2a2823", "#3f3c35", "#5a564c", "#807a6c", "#a9a292"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display / H1 y títulos de página", "purpose": "Títulos de página; también se renderiza como celdas de flap en .flap-title." },
+      "headline": { "displayName": "Headline / cifras grandes", "purpose": "Contadores destacados (FlapCount tamaño lg)." },
+      "title": { "displayName": "Title / H2 y títulos de fila", "purpose": "Encabezados de sección y títulos de fila de tabla." },
+      "body": { "displayName": "Body / prosa", "purpose": "Párrafos de contexto e introducción de sección." },
+      "label": { "displayName": "Label / metadatos", "purpose": "Etiquetas de campo, cabeceras de tabla, navegación, chips." }
+    },
+    "shadows": [
+      { "name": "contacto-celda", "value": "0 1px 1px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.25)", "purpose": "Sombra de contacto mínima bajo cada celda de flap; simula el borde físico de una ficha, no elevación decorativa." },
+      { "name": "costura", "value": "inset horizontal 1px var(--flap-seam) al 50% de alto (::after)", "purpose": "Línea de costura de fabricación de cada paleta/celda; detalle del mundo split-flap, no una sombra proyectada." }
+    ],
+    "motion": [
+      { "name": "voltea", "value": "420ms cubic-bezier(0.16, 1, 0.3, 1); rotateX(88deg)->rotateX(0), brightness(1.6)->brightness(1)", "purpose": "Animación de volteo de celda/paleta; se dispara solo cuando el carácter o la palabra de estado cambia realmente." },
+      { "name": "control-frozen", "value": "[data-frozen=\"true\"] .is-flipping { animation: none; }", "purpose": "El control 'Congelar tablero' detiene solo la animación de volteo, nunca el dato subyacente." }
+    ],
+    "breakpoints": [
+      { "name": "panel-lateral", "value": "1180px" },
+      { "name": "movil", "value": "860px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Paleta de estado (Status)",
+      "kind": "custom",
+      "refersTo": "status-ok",
+      "description": "Estado como paleta completa: fondo de estado + texto de estado + icono + palabra; voltea solo ante cambio real.",
+      "html": "<span class=\"ds-status ds-status--ok\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/></svg><span>En reposo</span></span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 8px; min-width: 10em; height: 1.9rem; padding: 0 12px; border-radius: 3px; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 0.98rem; letter-spacing: 0.06em; text-transform: uppercase; position: relative; box-shadow: 0 1px 1px rgb(0 0 0 / 0.5); } .ds-status::after { content: ''; position: absolute; inset: calc(50% - 0.5px) 0 auto; height: 1px; background: rgb(0 0 0 / 0.45); } .ds-status--ok { background: #17301d; color: #5fbf73; }"
+    },
+    {
+      "name": "Paleta de estado — fallido",
+      "kind": "custom",
+      "refersTo": "status-fail",
+      "description": "Variante roja de la paleta de estado, para fallos.",
+      "html": "<span class=\"ds-status ds-status--fail\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" aria-hidden=\"true\"><path d=\"M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z\"/></svg><span>Con fallos</span></span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 8px; min-width: 10em; height: 1.9rem; padding: 0 12px; border-radius: 3px; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 0.98rem; letter-spacing: 0.06em; text-transform: uppercase; position: relative; box-shadow: 0 1px 1px rgb(0 0 0 / 0.5); } .ds-status::after { content: ''; position: absolute; inset: calc(50% - 0.5px) 0 auto; height: 1px; background: rgb(0 0 0 / 0.45); } .ds-status--fail { background: #3e1715; color: #ff6b63; }"
+    },
+    {
+      "name": "Paleta de estado — pizarra rayada",
+      "kind": "custom",
+      "refersTo": "status-nodata",
+      "description": "Sin datos / no instrumentado / sin acceso; fondo rayado a 45° para distinguir ausencia de medición de un cero real.",
+      "html": "<span class=\"ds-status ds-status--nodata\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke-dasharray=\"3 3\"/></svg><span>Sin datos</span></span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 8px; min-width: 10em; height: 1.9rem; padding: 0 12px; border-radius: 3px; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 0.98rem; letter-spacing: 0.06em; text-transform: uppercase; position: relative; box-shadow: 0 1px 1px rgb(0 0 0 / 0.5); } .ds-status::after { content: ''; position: absolute; inset: calc(50% - 0.5px) 0 auto; height: 1px; background: rgb(0 0 0 / 0.45); } .ds-status--nodata { background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.04) 0 6px, transparent 6px 12px), #22252a; color: #9aa1ab; }"
+    },
+    {
+      "name": "Celda de flap (Flap)",
+      "kind": "custom",
+      "refersTo": "flap-cell",
+      "description": "Texto/cifra en celdas de ancho fijo con costura horizontal; voltea solo cuando el carácter cambia.",
+      "html": "<span class=\"ds-flap\"><span class=\"ds-cell\"><span>S</span></span><span class=\"ds-cell\"><span>A</span></span><span class=\"ds-cell\"><span>L</span></span><span class=\"ds-cell\"><span>I</span></span><span class=\"ds-cell\"><span>D</span></span><span class=\"ds-cell\"><span>A</span></span></span>",
+      "css": ".ds-flap { display: inline-flex; gap: 2px; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; text-transform: uppercase; line-height: 1; font-size: 1.35rem; } .ds-cell { position: relative; display: inline-grid; place-items: center; width: 0.7em; height: 1.28em; border-radius: 2px; background: linear-gradient(#2a2824 0 50%, #23211d 50% 100%); color: #f1ead8; box-shadow: 0 1px 1px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.25); overflow: hidden; } .ds-cell::after { content: ''; position: absolute; inset: calc(50% - 0.5px) 0 auto; height: 1px; background: #0b0a09; }"
+    },
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Único uso de cian sólido en la interfaz; acción principal.",
+      "html": "<button class=\"ds-btn-primary\">Reintentar</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 2.4rem; padding: 0 16px; border: 0; border-radius: 3px; background: #5cc8f0; color: #06161d; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: filter 160ms cubic-bezier(0.16,1,0.3,1), transform 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary:hover { filter: brightness(1.08); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #5cc8f0; outline-offset: 2px; } .ds-btn-primary:disabled { background: #23211d; color: #9d9684; cursor: not-allowed; filter: none; }"
+    },
+    {
+      "name": "Chip de filtro",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filtro de sección; estado activo se marca con cian, nunca con relleno sólido.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"true\">Activas</button>",
+      "css": ".ds-chip { height: 1.9rem; padding: 0 12px; border: 1px solid #2a2823; border-radius: 999px; background: transparent; color: #c9c1ad; font-size: 0.86rem; cursor: pointer; } .ds-chip[aria-pressed=\"true\"] { border-color: #5cc8f0; color: #5cc8f0; background: rgb(92 200 240 / 0.1); } .ds-chip:focus-visible { outline: 2px solid #5cc8f0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo de entrada",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Input de texto estándar; fondo más oscuro que su contenedor, foco cian sin desplazamiento de layout.",
+      "html": "<input class=\"ds-input\" placeholder=\"Buscar fuente…\" />",
+      "css": ".ds-input { height: 2.9rem; padding: 0 12px; border: 1px solid #2a2823; border-radius: 3px; background: #0f0e0c; color: #f1ead8; font-size: 1.05rem; caret-color: #f2b04a; } .ds-input::placeholder { color: #9d9684; } .ds-input:focus-visible { border-color: #5cc8f0; outline-offset: 0; }"
+    },
+    {
+      "name": "Enlace de navegación",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Enlace del riel lateral; estado activo con fondo y acento ámbar en el icono.",
+      "html": "<a href=\"#\" class=\"ds-nav-link\" aria-current=\"page\">Salidas</a>",
+      "css": ".ds-nav-link { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 3px; color: #c9c1ad; text-decoration: none; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 500; font-size: 1.02rem; letter-spacing: 0.04em; text-transform: uppercase; } .ds-nav-link:hover { background: #23211d; color: #f1ead8; } .ds-nav-link[aria-current=\"page\"] { background: #23211d; color: #f1ead8; box-shadow: inset 0 -1px 0 #0b0a09; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El tablero de salidas de una sala de operación nocturna",
+    "overview": "El panel no es un dashboard de tarjetas con sparklines: es un tablero de salidas (split-flap) que un operador lee de un vistazo, a lo largo de una jornada, para saber qué se mueve, qué espera, qué falló y qué no está medido. El negro del tablero (`--board`) es el color de esa sala, no una categoría de severidad: todo lo demás —paletas de estado, dígitos tabulares, condensada en mayúsculas— existe porque así se construye un tablero físico de este tipo, no como decoración retro. El único color con temperatura distinta al carbón y al hueso es el cian (`--action`), reservado en exclusiva a lo accionable; su rareza es el mecanismo, no una preferencia estética.\n\nLa densidad es alta pero legible: tablas con cabeceras fijas, tipografía condensada para lo compacto (etiquetas, celdas, cifras) y Barlow sin condensar para prosa. El sistema rechaza explícitamente kickers/eyebrows decorativos, iconografía sin texto de respaldo y cualquier tipografía \"de sistema\" (San Francisco/Segoe genérica) para títulos: la voz tipográfica es siempre Barlow Condensed autoalojada.",
+    "keyCharacteristics": [
+      "Fondo negro cálido de tablero físico, no un tema oscuro genérico.",
+      "Paletas de estado (color + fondo emparejado) en vez de badges planos; cada paleta se parte por una costura horizontal como una ficha física.",
+      "Dígitos y letras en celdas de ancho fijo (tabular-nums, condensada) que solo voltean ante un cambio real de valor.",
+      "Un único cian reservado a la acción; todo lo demás es carbón, hueso o color de estado.",
+      "Estado siempre expresado en texto + icono + color, nunca solo color."
+    ],
+    "rules": [
+      { "name": "The One Cyan Rule", "body": "El cian (--action) es el único color fuera de la gama carbón/hueso/estado permitido en la interfaz. Si un elemento no es accionable, no lleva cian.", "section": "colors" },
+      { "name": "The Palette-Not-Badge Rule", "body": "Los estados nunca son un punto de color aislado: son una paleta completa (fondo de estado + texto de estado + costura) igual que en .status y .flap.", "section": "colors" },
+      { "name": "The Tabular Digits Rule", "body": "Toda cifra que puede cambiar en vivo usa font-variant-numeric: tabular-nums y celdas de ancho fijo (FlapCount), para que el ancho no salte al actualizarse.", "section": "typography" },
+      { "name": "The Dash-Not-Zero Rule", "body": "Cuando no hay medición, la celda muestra guiones (–) repetidos, nunca 0. Un cero es un valor medido; un guión es la ausencia de medición.", "section": "typography" },
+      { "name": "The Seam-Not-Shadow Rule", "body": "La costura horizontal de las paletas (.status::after, .cell::after) es un detalle de construcción del mundo split-flap, no un efecto decorativo genérico; se reproduce en toda paleta o celda nueva, nunca como sombra proyectada arbitraria.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reservar el cian (--action, #5cc8f0) exclusivamente para lo accionable (botones, enlaces, foco, chips activos, cursor de input).",
+      "Do expresar todo estado como paleta completa: fondo de estado + texto de estado + icono Lucide + palabra, nunca color aislado.",
+      "Do usar guiones (–) en vez de 0 cuando no hay medición, con una etiqueta accesible que explique la ausencia (sin datos / no instrumentado / sin acceso / vencido).",
+      "Do voltear una celda o paleta solo cuando su valor visible cambia realmente; un control como \"Congelar tablero\" detiene la animación, no el dato.",
+      "Do usar Barlow Condensed en mayúsculas para todo lo estructural (títulos, etiquetas, celdas, botones, navegación) y Barlow sin condensar para prosa."
+    ],
+    "donts": [
+      "Don't introducir un segundo color de acento fuera del cian; cualquier otro color saturado pertenece a una paleta de estado, no a la decoración.",
+      "Don't usar sombras proyectadas de elevación genéricas (drop shadows ambientales); la profundidad se transmite por capas de negro y por la costura horizontal de las paletas.",
+      "Don't mostrar una cifra en cero cuando en realidad no hay medición o no hay acceso; eso es un valor inventado disfrazado de dato real.",
+      "Don't animar el volteo de una celda que no cambió de valor, ni en el render inicial."
+    ]
+  }
+}
