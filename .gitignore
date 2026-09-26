@@ -24,3 +24,7 @@ var/
 .roo
 .trae
 .windsurf
+
+# Capturas locales de revisión visual (datos sintéticos)
+.impeccable/review/
+.impeccable/build/

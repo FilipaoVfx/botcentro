@@ -98,6 +98,22 @@ Restricciones de InsForge:
 4. **Descubrimiento (H0) por fuente:** completar la ficha, registrar el perfil de uso (`admin_add_source_policy`) y la cobertura, y activar (`admin_set_source_state`).
 5. **Despliegue** de la API y los workers con `insforge compute`, y registro del webhook de Telegram con `secret_token`.
 
+## Panel de operación
+
+Panel web de solo lectura (hito P-H2 de [`prd-panel-web.md`](prd-panel-web.md) y [`srs-panel-web.md`](srs-panel-web.md)). Es un tablero de salidas: cada etapa, fuente, ejecución y cola es una fila con su estado, su cifra medida y la hora en que se observó.
+
+- **Acceso:** código de 6 dígitos por email (InsForge Auth). El primer administrador se registra en `pending_role_grants` y reclama su rol al entrar con el email verificado.
+- **Lectura:** todas las lecturas usan el JWT del operador (RPC `ops_*` SECURITY INVOKER), así que RLS decide qué ve. Una sección sin permiso muestra «sin acceso», no ceros.
+- **Estados honestos:** se distingue «sin datos», «no instrumentado» (workers, intentos, alertas, incidentes, logs), «vencido» y «desconectado».
+- **Actualización:** resumen en vivo por SSE, con respaldo de consulta periódica. «Congelar tablero» detiene solo la animación.
+- **Acciones:** se muestran deshabilitadas con su motivo hasta el hito P-H3.
+
+```bash
+cd panel && npm install && npm run build        # compila la SPA en panel/dist
+BOTCENTRO_INSFORGE_URL=https://tbv7i4p3.us-east.insforge.app \
+  .venv/bin/uvicorn botcentro.panel.server:app --port 8710
+```
+
 ## Seguridad
 
 - Invariantes verificadas en el proyecto remoto:
