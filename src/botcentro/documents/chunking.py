@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 import uuid
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -160,10 +160,19 @@ def _sections(text: str, start: int, end: int) -> list[_Section]:
     for i, match in enumerate(headers):
         sec_end = headers[i + 1].start() if i + 1 < len(headers) else len(body)
         line_end = body.find("\n", match.start())
-        heading = body[match.start(): line_end if 0 <= line_end < sec_end else sec_end].strip()
+        heading = _clip_heading(body[match.start(): line_end if 0 <= line_end < sec_end else sec_end])
         label = " ".join(match["label"].split()).upper()
         sections.append(_Section(start + match.start(), start + sec_end, label, heading))
     return sections
+
+
+def _clip_heading(line: str, limit: int = 120) -> str:
+    """Rótulo de la sección y su título, sin arrastrar el cuerpo cuando todo va en una línea."""
+    line = " ".join(line.split())
+    if len(line) <= limit:
+        return line
+    cut = line.rfind(" ", 0, limit)
+    return line[: cut if cut > 0 else limit] + "…"
 
 
 def _tokens(text: str, start: int, end: int) -> list[tuple[int, int]]:
@@ -171,7 +180,13 @@ def _tokens(text: str, start: int, end: int) -> list[tuple[int, int]]:
 
 
 def chunk_extraction(extraction_id: UUID, pages: Sequence[PageText], *, segments: Sequence[SegmentSpec] = (),
-                     recipe: ChunkRecipe = ChunkRecipe()) -> list[Chunk]:
+                     recipe: ChunkRecipe = ChunkRecipe(), measure: Callable[[str], int] | None = None,
+                     max_measure: int | None = None) -> list[Chunk]:
+    """Segmenta una extracción.
+
+    Con `measure` y `max_measure` (p. ej. el tokenizador del modelo de embeddings y su límite), todo
+    fragmento que los supere se subdivide hasta cumplirlos: el límite se garantiza, no se estima.
+    """
     doc = ExtractedText(pages)
     pieces: list[tuple[int, int, int, str | None, str | None, UUID | None]] = []
 
@@ -202,6 +217,9 @@ def chunk_extraction(extraction_id: UUID, pages: Sequence[PageText], *, segments
                 flush()
             pending.append((tokens[0][0], tokens[-1][1], count, section))
         flush()
+
+    if measure is not None and max_measure is not None:
+        pieces = _enforce_measure(doc.text, pieces, measure, max_measure)
 
     chunks = []
     for ordinal, (start, end, count, label, heading, segment_id) in enumerate(pieces):
@@ -247,3 +265,27 @@ def _split(text: str, tokens: list[tuple[int, int]], recipe: ChunkRecipe) -> lis
             break
         start = max(end - recipe.overlap_tokens, start + 1)
     return pieces
+
+
+def _enforce_measure(text: str, pieces: list[tuple[int, int, int, str | None, str | None, UUID | None]],
+                     measure: Callable[[str], int], limit: int):
+    """Subdivide por la mitad (en límites de token) los fragmentos que exceden `limit`."""
+    result = []
+    for piece in pieces:
+        start, end, _count, label, heading, segment_id = piece
+        body = text[start:end]
+        # Se mide exactamente lo que se embebe (Chunk.embedding_input: encabezado + texto).
+        embedded = f"{heading}\n{body}" if heading and not body.lstrip().startswith(heading) else body
+        if measure(embedded) <= limit:
+            result.append(piece)
+            continue
+        tokens = _tokens(text, start, end)
+        if len(tokens) < 2:
+            raise ValueError("un único token excede el límite del modelo")
+        mid = len(tokens) // 2
+        halves = [
+            (tokens[0][0], tokens[mid - 1][1], mid, label, heading, segment_id),
+            (tokens[mid][0], tokens[-1][1], len(tokens) - mid, label, heading, segment_id),
+        ]
+        result.extend(_enforce_measure(text, halves, measure, limit))
+    return result

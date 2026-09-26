@@ -1,0 +1,6491 @@
+[
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8603",
+  "plenary_created_at": "2026-09-01",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8604",
+  "plenary_created_at": "2026-09-02",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8605",
+  "plenary_created_at": "2026-09-08",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8606",
+  "plenary_created_at": "2026-09-09",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8607",
+  "plenary_created_at": "2026-09-15",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8608",
+  "plenary_created_at": "2026-09-16",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8609",
+  "plenary_created_at": "2026-09-22",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8610",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1194",
+  "senator": "Agudelo Garcia Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1195",
+  "senator": "Ahumada Garcia Laura Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1196",
+  "senator": "Amaya Rodriguez John Edickson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1197",
+  "senator": "Amin Saleme Fabio Raul",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1284",
+  "senator": "Arana Cano Selmen David",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1198",
+  "senator": "Arias Castillo Wilson Neber",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1199",
+  "senator": "Avella Esquivel Aida Yolanda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1200",
+  "senator": "Ávila Martínez Ariel Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1201",
+  "senator": "Barguil Assis David Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1202",
+  "senator": "Barrera Rodríguez Josué Alirio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1204",
+  "senator": "Barreto Castillo Miguel Angel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1205",
+  "senator": "Barreto Triana Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1207",
+  "senator": "Benavides Mora Carlos Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1208",
+  "senator": "Benavides Solarte Diela Liliana",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1285",
+  "senator": "Bermeo Rodriguez John Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1209",
+  "senator": "Bernal Rincon Zandra Maria",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1210",
+  "senator": "Besaile Fayad John Moises",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1211",
+  "senator": "Blel Scaff Nadia Georgette",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1212",
+  "senator": "Cabrales Baquero Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1213",
+  "senator": "Cadavid Marquez Hernan Dario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1214",
+  "senator": "Caicedo Callejas Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1215",
+  "senator": "Caicedo Carabali Martin Alonso",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1216",
+  "senator": "Caicedo Omar Carmen Patricia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1217",
+  "senator": "Carrillo Mendoza Wilmer Ramiro",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1218",
+  "senator": "Castellanos Rodriguez Sara Jimena",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1219",
+  "senator": "Cepeda Castro Ivan",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1220",
+  "senator": "Chindoy Jamioy Sandra Claudia",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1222",
+  "senator": "Contreras Jimenez Yaini Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1193",
+  "senator": "Corcho Mejia Diana Carolina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1223",
+  "senator": "Correa Jimenez Antonio Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1224",
+  "senator": "Correa Nuttin Julia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1291",
+  "senator": "Cuasapud Chaspuengal Jesus Omero",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1225",
+  "senator": "De La Hoz Garcia Orlando Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1226",
+  "senator": "Deluque Zuleta Alfredo Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1227",
+  "senator": "Diaz Mateus Luis Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1228",
+  "senator": "Enriquez Caicedo Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1229",
+  "senator": "Escaf Tijerino Agmeth Jose",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1230",
+  "senator": "Escobar Ortiz Wilder Iberson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1231",
+  "senator": "Espinal Ramirez Juan Fernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1232",
+  "senator": "Espinosa Oliver Hector Olimpo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1286",
+  "senator": "Espitia Cabrales Edgardo Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1233",
+  "senator": "Farelo Daza Carlos Mario",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1234",
+  "senator": "Florez Hernández Alex Xavier",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1235",
+  "senator": "Florez Porras Pedro Hernando",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1236",
+  "senator": "Forero Molina Andres Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1237",
+  "senator": "Fortich Sanchez Laura Ester",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1238",
+  "senator": "Gallego Arroyave Leonardo de Jesus",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1239",
+  "senator": "Garces Aljure Christian Munir",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1240",
+  "senator": "Garces Rojas Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1241",
+  "senator": "Garcia Gomez Juan Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1292",
+  "senator": "Garcia Soto Ana Paola",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1242",
+  "senator": "Garcia Turbay Lidio Arturo",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1244",
+  "senator": "Gómez Martínez Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1287",
+  "senator": "Gómez Medina José Nicolas",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1243",
+  "senator": "Gomez Paz Cristian Kevin",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1293",
+  "senator": "Gonzalo Dimas Baute Gonzalez",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1296",
+  "senator": "Guerra López María Angelica",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1245",
+  "senator": "Guevara Villabon Carlos Eduardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1190",
+  "senator": "Henriquez Pinedo Honorio Miguel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1246",
+  "senator": "Hernández Silva Esmeralda",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1247",
+  "senator": "Hurtado Sánchez Norma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1248",
+  "senator": "Jurado Palomino Mary",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1192",
+  "senator": "Lobo Chinchilla Didier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1249",
+  "senator": "Londoño Ocampo Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1250",
+  "senator": "Lopera Monsalve Maria Eugenia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1288",
+  "senator": "López Rodríguez Nelson Javier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1251",
+  "senator": "Macea Gomez Jose Gutemberg",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1294",
+  "senator": "Manzur Imbett Wadith Alberto",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1252",
+  "senator": "Meisel Vergara Carlos Manuel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1253",
+  "senator": "Mejia Nuñez Luis Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1254",
+  "senator": "Monedero Rivera Alvaro Henry",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1255",
+  "senator": "Montoya Montoya Santiago",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1256",
+  "senator": "Moreno Hurtado Gustavo Adolfo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1257",
+  "senator": "Nieto Loaiza Rafael",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1258",
+  "senator": "Noreña Arboleda María Irma",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1259",
+  "senator": "Ocampo Giraldo Jorge Alejandro",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1260",
+  "senator": "Omaña Ortiz Deyci Alejandra",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1261",
+  "senator": "Osorio Márquez Deisy Johana",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1262",
+  "senator": "Padilla Villarraga Andrea",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1289",
+  "senator": "Pedraza Sandoval Jennifer Dalley",
+  "attended": "No"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1263",
+  "senator": "Peralta Epieyu Martha Isabel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1264",
+  "senator": "Pineda García Marcos Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1265",
+  "senator": "Posada Caicedo Maria Clara",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1266",
+  "senator": "Pulgar Daza Yessid Enrique",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1267",
+  "senator": "Pulido Hernandez Jonathan Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1268",
+  "senator": "Quintero Cardona Esteban",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1269",
+  "senator": "Racero Mayorca David Ricardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1270",
+  "senator": "Restrepo Carmona Daniel",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1271",
+  "senator": "Rodriguez Chaparro Walter Alfonso",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1272",
+  "senator": "Rodríguez Prieto Germán Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1273",
+  "senator": "Rua Sánchez Luis Carlos",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1274",
+  "senator": "Sánchez Arango Duvalier",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1295",
+  "senator": "Sánchez León Oscar Hernán",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1275",
+  "senator": "Silva Idrobo Ferney",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1276",
+  "senator": "Torres Villalba Camilo Andrés",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1277",
+  "senator": "Vargas Torrado Alix Yirley",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1278",
+  "senator": "Vargas Valdeleon Gersson",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1290",
+  "senator": "Villalba Gómez María Lucia",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1279",
+  "senator": "Villamizar Meneses Oscar Leonardo",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1280",
+  "senator": "Virguez Piraquive Manuel Antonio",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1281",
+  "senator": "Zuleta López Isabel Cristina",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1282",
+  "senator": "Zuleta Murgas Claudia Margarita",
+  "attended": "Si"
+ },
+ {
+  "plenary_id": "8611",
+  "plenary_created_at": "2026-09-23",
+  "senator_id": "1283",
+  "senator": "Zuluaga Navarro Kamelia Edith",
+  "attended": "Si"
+ }
+]

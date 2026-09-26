@@ -1,0 +1,620 @@
+[
+ {
+  "id": 1194,
+  "name": "Agudelo Garcia Ana Paola",
+  "party_name": "MIRA",
+  "commission_id": "7"
+ },
+ {
+  "id": 1195,
+  "name": "Ahumada Garcia Laura Cristina",
+  "party_name": "Pacto Histórico",
+  "commission_id": "4"
+ },
+ {
+  "id": 1196,
+  "name": "Amaya Rodriguez John Edickson",
+  "party_name": "Coalición Alianza Verde - En Marcha",
+  "commission_id": "6"
+ },
+ {
+  "id": 1197,
+  "name": "Amin Saleme Fabio Raul",
+  "party_name": "Liberal",
+  "commission_id": "1"
+ },
+ {
+  "id": 1284,
+  "name": "Arana Cano Selmen David",
+  "party_name": "Coalición Cambio Radical - ALMA",
+  "commission_id": "7"
+ },
+ {
+  "id": 1198,
+  "name": "Arias Castillo Wilson Neber",
+  "party_name": "Pacto Histórico",
+  "commission_id": "4"
+ },
+ {
+  "id": 1199,
+  "name": "Avella Esquivel Aida Yolanda",
+  "party_name": "Pacto Histórico",
+  "commission_id": "4"
+ },
+ {
+  "id": 1200,
+  "name": "Ávila Martínez Ariel Fernando",
+  "party_name": "Alianza Verde",
+  "commission_id": "8"
+ },
+ {
+  "id": 1201,
+  "name": "Barguil Assis David Alejandro",
+  "party_name": "Conservador",
+  "commission_id": "3"
+ },
+ {
+  "id": 1202,
+  "name": "Barrera Rodríguez Josué Alirio",
+  "party_name": "Centro Democrático",
+  "commission_id": "2"
+ },
+ {
+  "id": 1204,
+  "name": "Barreto Castillo Miguel Angel",
+  "party_name": "Conservador",
+  "commission_id": "5"
+ },
+ {
+  "id": 1205,
+  "name": "Barreto Triana Santiago",
+  "party_name": "Conservador",
+  "commission_id": "1"
+ },
+ {
+  "id": 1207,
+  "name": "Benavides Mora Carlos Alberto",
+  "party_name": "Pacto Histórico",
+  "commission_id": "3055"
+ },
+ {
+  "id": 1208,
+  "name": "Benavides Solarte Diela Liliana",
+  "party_name": "Conservador",
+  "commission_id": "4"
+ },
+ {
+  "id": 1285,
+  "name": "Bermeo Rodriguez John Alejandro",
+  "party_name": "Salvación Nacional",
+  "commission_id": "4"
+ },
+ {
+  "id": 1209,
+  "name": "Bernal Rincon Zandra Maria",
+  "party_name": "Centro Democrático",
+  "commission_id": "7"
+ },
+ {
+  "id": 1210,
+  "name": "Besaile Fayad John Moises",
+  "party_name": "Partido de la U",
+  "commission_id": "5"
+ },
+ {
+  "id": 1211,
+  "name": "Blel Scaff Nadia Georgette",
+  "party_name": "Conservador",
+  "commission_id": "7"
+ },
+ {
+  "id": 1212,
+  "name": "Cabrales Baquero Enrique",
+  "party_name": "Centro Democrático",
+  "commission_id": "4"
+ },
+ {
+  "id": 1213,
+  "name": "Cadavid Marquez Hernan Dario",
+  "party_name": "Centro Democrático",
+  "commission_id": "1"
+ },
+ {
+  "id": 1214,
+  "name": "Caicedo Callejas Juan Fernando",
+  "party_name": "Centro Democrático",
+  "commission_id": "3"
+ },
+ {
+  "id": 1215,
+  "name": "Caicedo Carabali Martin Alonso",
+  "party_name": "Pacto Histórico",
+  "commission_id": "3040"
+ },
+ {
+  "id": 1216,
+  "name": "Caicedo Omar Carmen Patricia",
+  "party_name": "Pacto Histórico",
+  "commission_id": "5"
+ },
+ {
+  "id": 1217,
+  "name": "Carrillo Mendoza Wilmer Ramiro",
+  "party_name": "Partido de la U",
+  "commission_id": "4"
+ },
+ {
+  "id": 1218,
+  "name": "Castellanos Rodriguez Sara Jimena",
+  "party_name": "Salvación Nacional",
+  "commission_id": "3"
+ },
+ {
+  "id": 1219,
+  "name": "Cepeda Castro Ivan",
+  "party_name": "Pacto Histórico",
+  "commission_id": "2018"
+ },
+ {
+  "id": 1220,
+  "name": "Chindoy Jamioy Sandra Claudia",
+  "party_name": "Pacto Histórico",
+  "commission_id": "7"
+ },
+ {
+  "id": 1222,
+  "name": "Contreras Jimenez Yaini Isabel",
+  "party_name": "Pacto Histórico",
+  "commission_id": "5"
+ },
+ {
+  "id": 1193,
+  "name": "Corcho Mejia Diana Carolina",
+  "party_name": "Pacto Histórico",
+  "commission_id": "1"
+ },
+ {
+  "id": 1223,
+  "name": "Correa Jimenez Antonio Jose",
+  "party_name": "Partido de la U",
+  "commission_id": "2"
+ },
+ {
+  "id": 1224,
+  "name": "Correa Nuttin Julia",
+  "party_name": "Centro Democrático",
+  "commission_id": "6"
+ },
+ {
+  "id": 1291,
+  "name": "Cuasapud Chaspuengal Jesus Omero",
+  "party_name": "AICO - Autoridades Indígenas de Colombia",
+  "commission_id": "2"
+ },
+ {
+  "id": 1225,
+  "name": "De La Hoz Garcia Orlando Miguel",
+  "party_name": "Pacto Histórico",
+  "commission_id": "7"
+ },
+ {
+  "id": 1226,
+  "name": "Deluque Zuleta Alfredo Rafael",
+  "party_name": "Partido de la U",
+  "commission_id": "1"
+ },
+ {
+  "id": 1227,
+  "name": "Diaz Mateus Luis Eduardo",
+  "party_name": "Conservador",
+  "commission_id": "4"
+ },
+ {
+  "id": 1228,
+  "name": "Enriquez Caicedo Carlos Eduardo",
+  "party_name": "Coalición Alianza Verde - En Marcha",
+  "commission_id": "4"
+ },
+ {
+  "id": 1229,
+  "name": "Escaf Tijerino Agmeth Jose",
+  "party_name": "Pacto Histórico",
+  "commission_id": "2"
+ },
+ {
+  "id": 1230,
+  "name": "Escobar Ortiz Wilder Iberson",
+  "party_name": "Alianza Social Independiente - ASI",
+  "commission_id": "4"
+ },
+ {
+  "id": 1231,
+  "name": "Espinal Ramirez Juan Fernando",
+  "party_name": "Centro Democrático",
+  "commission_id": "5"
+ },
+ {
+  "id": 1232,
+  "name": "Espinosa Oliver Hector Olimpo",
+  "party_name": "Liberal",
+  "commission_id": "1"
+ },
+ {
+  "id": 1286,
+  "name": "Espitia Cabrales Edgardo Miguel",
+  "party_name": "Coalición Cambio Radical - ALMA",
+  "commission_id": "3"
+ },
+ {
+  "id": 1233,
+  "name": "Farelo Daza Carlos Mario",
+  "party_name": "Cambio Radical",
+  "commission_id": "4"
+ },
+ {
+  "id": 1234,
+  "name": "Florez Hernández Alex Xavier",
+  "party_name": "Coalición Pacto Histórico - Colombia Humana",
+  "commission_id": "1"
+ },
+ {
+  "id": 1235,
+  "name": "Florez Porras Pedro Hernando",
+  "party_name": "Pacto Histórico",
+  "commission_id": "6"
+ },
+ {
+  "id": 1236,
+  "name": "Forero Molina Andres Eduardo",
+  "party_name": "Centro Democrático",
+  "commission_id": "7"
+ },
+ {
+  "id": 1237,
+  "name": "Fortich Sanchez Laura Ester",
+  "party_name": "Liberal",
+  "commission_id": "4"
+ },
+ {
+  "id": 1238,
+  "name": "Gallego Arroyave Leonardo de Jesus",
+  "party_name": "Liberal",
+  "commission_id": "7"
+ },
+ {
+  "id": 1239,
+  "name": "Garces Aljure Christian Munir",
+  "party_name": "Centro Democrático",
+  "commission_id": "3"
+ },
+ {
+  "id": 1240,
+  "name": "Garces Rojas Juan Carlos",
+  "party_name": "Partido de la U",
+  "commission_id": "3"
+ },
+ {
+  "id": 1241,
+  "name": "Garcia Gomez Juan Carlos",
+  "party_name": "Conservador",
+  "commission_id": "1"
+ },
+ {
+  "id": 1292,
+  "name": "Garcia Soto Ana Paola",
+  "party_name": "Partido de la U",
+  "commission_id": "6"
+ },
+ {
+  "id": 1242,
+  "name": "Garcia Turbay Lidio Arturo",
+  "party_name": "Liberal",
+  "commission_id": "3057"
+ },
+ {
+  "id": 1244,
+  "name": "Gómez Martínez Enrique",
+  "party_name": "Salvación Nacional",
+  "commission_id": "1"
+ },
+ {
+  "id": 1287,
+  "name": "Gómez Medina José Nicolas",
+  "party_name": "Coalición Cambio Radical - ALMA",
+  "commission_id": "1"
+ },
+ {
+  "id": 1243,
+  "name": "Gomez Paz Cristian Kevin",
+  "party_name": "Pacto Histórico",
+  "commission_id": "5"
+ },
+ {
+  "id": 1293,
+  "name": "Gonzalo Dimas Baute Gonzalez",
+  "party_name": "Cambio Radical",
+  "commission_id": "5"
+ },
+ {
+  "id": 1296,
+  "name": "Guerra López María Angelica",
+  "party_name": "Centro Democrático",
+  "commission_id": "3"
+ },
+ {
+  "id": 1245,
+  "name": "Guevara Villabon Carlos Eduardo",
+  "party_name": "MIRA",
+  "commission_id": "6"
+ },
+ {
+  "id": 1190,
+  "name": "Henriquez Pinedo Honorio Miguel",
+  "party_name": "Centro Democrático",
+  "commission_id": "3041"
+ },
+ {
+  "id": 1246,
+  "name": "Hernández Silva Esmeralda",
+  "party_name": "Pacto Histórico",
+  "commission_id": "1"
+ },
+ {
+  "id": 1247,
+  "name": "Hurtado Sánchez Norma",
+  "party_name": "Partido de la U",
+  "commission_id": "7"
+ },
+ {
+  "id": 1248,
+  "name": "Jurado Palomino Mary",
+  "party_name": "Pacto Histórico",
+  "commission_id": "2"
+ },
+ {
+  "id": 1192,
+  "name": "Lobo Chinchilla Didier",
+  "party_name": "Cambio Radical",
+  "commission_id": "5"
+ },
+ {
+  "id": 1249,
+  "name": "Londoño Ocampo Maria Eugenia",
+  "party_name": "Pacto Histórico",
+  "commission_id": "6"
+ },
+ {
+  "id": 1250,
+  "name": "Lopera Monsalve Maria Eugenia",
+  "party_name": "Liberal",
+  "commission_id": "5"
+ },
+ {
+  "id": 1288,
+  "name": "López Rodríguez Nelson Javier",
+  "party_name": "Coalición Cambio Radical - ALMA",
+  "commission_id": "6"
+ },
+ {
+  "id": 1251,
+  "name": "Macea Gomez Jose Gutemberg",
+  "party_name": "Alianza por Colombia",
+  "commission_id": "6"
+ },
+ {
+  "id": 1294,
+  "name": "Manzur Imbett Wadith Alberto",
+  "party_name": "Conservador",
+  "commission_id": "2"
+ },
+ {
+  "id": 1252,
+  "name": "Meisel Vergara Carlos Manuel",
+  "party_name": "Centro Democrático",
+  "commission_id": "4"
+ },
+ {
+  "id": 1253,
+  "name": "Mejia Nuñez Luis Alfonso",
+  "party_name": "Alianza Verde",
+  "commission_id": "2"
+ },
+ {
+  "id": 1254,
+  "name": "Monedero Rivera Alvaro Henry",
+  "party_name": "Liberal",
+  "commission_id": "4"
+ },
+ {
+  "id": 1255,
+  "name": "Montoya Montoya Santiago",
+  "party_name": "Liberal",
+  "commission_id": "7"
+ },
+ {
+  "id": 1256,
+  "name": "Moreno Hurtado Gustavo Adolfo",
+  "party_name": "Alianza Verde",
+  "commission_id": "3"
+ },
+ {
+  "id": 1257,
+  "name": "Nieto Loaiza Rafael",
+  "party_name": "Centro Democrático",
+  "commission_id": "1"
+ },
+ {
+  "id": 1258,
+  "name": "Noreña Arboleda María Irma",
+  "party_name": "Partido de la U",
+  "commission_id": "2"
+ },
+ {
+  "id": 1259,
+  "name": "Ocampo Giraldo Jorge Alejandro",
+  "party_name": "Pacto Histórico",
+  "commission_id": "3"
+ },
+ {
+  "id": 1260,
+  "name": "Omaña Ortiz Deyci Alejandra",
+  "party_name": "Pacto Histórico",
+  "commission_id": "2"
+ },
+ {
+  "id": 1261,
+  "name": "Osorio Márquez Deisy Johana",
+  "party_name": "Pacto Histórico",
+  "commission_id": "3"
+ },
+ {
+  "id": 1262,
+  "name": "Padilla Villarraga Andrea",
+  "party_name": "Alianza Verde",
+  "commission_id": "1016"
+ },
+ {
+  "id": 1289,
+  "name": "Pedraza Sandoval Jennifer Dalley",
+  "party_name": "Dignidad",
+  "commission_id": "2"
+ },
+ {
+  "id": 1263,
+  "name": "Peralta Epieyu Martha Isabel",
+  "party_name": "Movimiento Alternativo Indígena y Social - Mais",
+  "commission_id": "7"
+ },
+ {
+  "id": 1264,
+  "name": "Pineda García Marcos Daniel",
+  "party_name": "Conservador",
+  "commission_id": "5"
+ },
+ {
+  "id": 1265,
+  "name": "Posada Caicedo Maria Clara",
+  "party_name": "Centro Democrático",
+  "commission_id": "1"
+ },
+ {
+  "id": 1266,
+  "name": "Pulgar Daza Yessid Enrique",
+  "party_name": "Liberal",
+  "commission_id": "3"
+ },
+ {
+  "id": 1267,
+  "name": "Pulido Hernandez Jonathan Ferney",
+  "party_name": "Alianza Verde",
+  "commission_id": "1"
+ },
+ {
+  "id": 1268,
+  "name": "Quintero Cardona Esteban",
+  "party_name": "Centro Democrático",
+  "commission_id": "3048"
+ },
+ {
+  "id": 1269,
+  "name": "Racero Mayorca David Ricardo",
+  "party_name": "Pacto Histórico",
+  "commission_id": "3"
+ },
+ {
+  "id": 1270,
+  "name": "Restrepo Carmona Daniel",
+  "party_name": "Conservador",
+  "commission_id": "6"
+ },
+ {
+  "id": 1271,
+  "name": "Rodriguez Chaparro Walter Alfonso",
+  "party_name": "Pacto Histórico",
+  "commission_id": "6"
+ },
+ {
+  "id": 1272,
+  "name": "Rodríguez Prieto Germán Andrés",
+  "party_name": "Salvación Nacional",
+  "commission_id": "2"
+ },
+ {
+  "id": 1273,
+  "name": "Rua Sánchez Luis Carlos",
+  "party_name": "Coalición Alianza Verde - En Marcha",
+  "commission_id": "1"
+ },
+ {
+  "id": 1274,
+  "name": "Sánchez Arango Duvalier",
+  "party_name": "Coalición Alianza Verde - En Marcha",
+  "commission_id": "7"
+ },
+ {
+  "id": 1295,
+  "name": "Sánchez León Oscar Hernán",
+  "party_name": "Liberal",
+  "commission_id": "1"
+ },
+ {
+  "id": 1275,
+  "name": "Silva Idrobo Ferney",
+  "party_name": "Pacto Histórico",
+  "commission_id": "3030"
+ },
+ {
+  "id": 1276,
+  "name": "Torres Villalba Camilo Andrés",
+  "party_name": "Liberal",
+  "commission_id": "5"
+ },
+ {
+  "id": 1277,
+  "name": "Vargas Torrado Alix Yirley",
+  "party_name": "Liberal",
+  "commission_id": "3"
+ },
+ {
+  "id": 1278,
+  "name": "Vargas Valdeleon Gersson",
+  "party_name": "Liberal",
+  "commission_id": "6"
+ },
+ {
+  "id": 1290,
+  "name": "Villalba Gómez María Lucia",
+  "party_name": "Nuevo Liberalismo",
+  "commission_id": "6"
+ },
+ {
+  "id": 1279,
+  "name": "Villamizar Meneses Oscar Leonardo",
+  "party_name": "Centro Democrático",
+  "commission_id": "5"
+ },
+ {
+  "id": 1280,
+  "name": "Virguez Piraquive Manuel Antonio",
+  "party_name": "MIRA",
+  "commission_id": "1"
+ },
+ {
+  "id": 1281,
+  "name": "Zuleta López Isabel Cristina",
+  "party_name": "Coalición Pacto Histórico - Colombia Humana",
+  "commission_id": "3062"
+ },
+ {
+  "id": 1282,
+  "name": "Zuleta Murgas Claudia Margarita",
+  "party_name": "Centro Democrático",
+  "commission_id": "7"
+ },
+ {
+  "id": 1283,
+  "name": "Zuluaga Navarro Kamelia Edith",
+  "party_name": "Pacto Histórico",
+  "commission_id": "4"
+ }
+]

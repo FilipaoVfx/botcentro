@@ -153,6 +153,8 @@ def test_lexical_and_vector_search_exclude_withdrawn_and_low_quality(db: Db) -> 
                                           pdf_page_start, pdf_page_end, char_start, char_end, quality_status)
                values (gen_random_uuid(), %s, 0, %s, repeat('e', 64), 'v1', 8, 1, 1, 0, 10, %s) returning id""",
             (extraction, text, quality))[0]["id"]
+    db.execute("insert into public.embedding_models (model_id, model_version, dimensions, max_input_tokens, "
+               "chunker_version, runtime) values ('m', '1', 3, 512, 'v1', 'prueba') on conflict do nothing")
     for key, vector in (("a", "[1,0,0]"), ("b", "[0.9,0.1,0]"), ("c", "[1,0,0]")):
         db.execute("insert into public.chunk_embeddings (chunk_id, model_id, model_version, dimensions, index_namespace, "
                    "embedding, state, indexed_at) values (%s, 'm', '1', 3, 'ns', %s::vector, 'indexed', now())",

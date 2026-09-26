@@ -99,3 +99,11 @@ def test_document_quality_aggregation() -> None:
     assert assess_document([ok, ok]) is QualityStatus.ACCEPTED
     assert assess_document([ok, bad]) is QualityStatus.REVIEW_REQUIRED
     assert assess_document([bad]) is QualityStatus.FAILED
+
+
+def test_measure_limit_is_guaranteed_by_subdividing() -> None:
+    # Con un contador que penaliza los dígitos (texto denso), ningún chunk supera el límite.
+    measure = lambda text: sum(3 if ch.isdigit() else 1 for ch in text if not ch.isspace())  # noqa: E731
+    dense = "ARTÍCULO 1°. Teléfonos 601 382 3000 601 382 3001 extensión 3456 " * 30
+    chunks = chunk_extraction(EXTRACTION, [PageText(1, dense)], recipe=SMALL, measure=measure, max_measure=300)
+    assert chunks and all(measure(c.embedding_input) <= 300 for c in chunks)
