@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "botcentro"
+version = "0.1.0"
+description = "Plataforma de inteligencia legislativa de Colombia y bot de consulta (ver prd.md y srs.md)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "httpcore>=1.0",
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "uvicorn>=0.30",
+    # Solo pruebas de integración: ejecutan las funciones SQL contra un PostgreSQL local que
+    # replica el entorno de InsForge. Los servicios hablan con InsForge por HTTP (REST/RPC).
+    "psycopg[binary]>=3.2",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+botcentro = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "db: pruebas de integración que requieren PostgreSQL local (BOTCENTRO_TEST_PG_*)",
+]
+addopts = "-ra"
