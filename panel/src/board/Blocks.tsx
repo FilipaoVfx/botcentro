@@ -3,6 +3,7 @@ import { CircleDashed, CircleSlash, Ban, TriangleAlert } from "lucide-react";
 import type { ApiError, ViewState } from "../lib/api";
 import { formatRelative, formatSeconds } from "../lib/time";
 import { Status, PRESETS } from "./Status";
+import { Flap } from "./Flap";
 
 export function PageHead({ title, intro, asOf, now, staleAfterMs, children }: {
   title: string;
@@ -16,7 +17,12 @@ export function PageHead({ title, intro, asOf, now, staleAfterMs, children }: {
   return (
     <header className="page-head">
       <div>
-        <h1>{title}</h1>
+        <h1 className="flap-title">
+          <span className="visually-hidden">{title}</span>
+          {title.split(/\s+/).map((word, i) => (
+            <span key={`${word}-${i}`} aria-hidden="true"><Flap text={word} size="md" label="" /></span>
+          ))}
+        </h1>
         {intro ? <p>{intro}</p> : null}
       </div>
       <div className="observed" aria-live="polite">

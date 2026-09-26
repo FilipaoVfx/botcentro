@@ -342,6 +342,18 @@ h2 {
   color: var(--ink-3);
 }
 
+.observed-top {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.observed-top strong {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 .topbar__spacer {
   flex: 1;
 }
@@ -441,6 +453,12 @@ h2 {
   gap: var(--space-5);
   margin-bottom: var(--space-5);
   flex-wrap: wrap;
+}
+
+.flap-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) 0.55em;
 }
 
 .page-head p {
@@ -1026,7 +1044,19 @@ h2 {
     min-width: 0;
   }
 
-  .topbar__spacer {
+  .observed-top {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.observed-top strong {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.topbar__spacer {
     display: none;
   }
 

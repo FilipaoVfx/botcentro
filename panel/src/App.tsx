@@ -18,7 +18,7 @@ import { StateBlock } from "./board/Blocks";
 import { ApiError, getJSON, onUnauthorized, postJSON } from "./lib/api";
 import { Link, useRoute } from "./lib/router";
 import { useOverviewStream, type Connection } from "./lib/stream";
-import { formatClock, formatRelative, useNow } from "./lib/time";
+import { formatClock, formatRelative, formatSeconds, useNow } from "./lib/time";
 import type { Capabilities } from "./lib/types";
 import { Departures } from "./views/Departures";
 import { Login } from "./views/Login";
@@ -135,6 +135,11 @@ function Shell({ caps, onSignedOut }: { caps: Capabilities; onSignedOut: () => v
           <span className="clock__label">Bogotá</span>
         </div>
         <div className="topbar__spacer" />
+        <div className="observed-top">
+          <span className="clock__label">Observado a</span>{" "}
+          {shownOverview?.as_of ? <strong>{formatSeconds(shownOverview.as_of)}</strong> : <span className="muted">sin observación</span>}
+          {frozen ? <span className="muted"> · congelado</span> : null}
+        </div>
         <div className={`signal signal--${connection}`} role="status" aria-live="polite">
           <span className="signal__dot" aria-hidden="true" />
           <span>

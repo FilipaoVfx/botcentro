@@ -43,7 +43,12 @@ export function Flap({ text, cells, align = "left", size = "md", dim = false, la
   const flipped = useFlipped(chars);
 
   return (
-    <span className={`flap flap--${size}${dim ? " flap--dim" : ""}`} role="img" aria-label={label ?? text}>
+    <span
+      className={`flap flap--${size}${dim ? " flap--dim" : ""}`}
+      role={label === "" ? undefined : "img"}
+      aria-label={label === "" ? undefined : label ?? text}
+      aria-hidden={label === "" ? true : undefined}
+    >
       {chars.map((c, i) => (
         <span key={i} className={`cell${flipped.has(i) ? " is-flipping" : ""}`} aria-hidden="true">
           <span>{c === " " ? " " : c}</span>
