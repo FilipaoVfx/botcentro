@@ -223,12 +223,18 @@ class SafeFetcher:
         if status == 304:
             return NotModified(requested, final, resp_etag, resp_last_modified, now)
         if status >= 400:
+            body = bytearray()
+            for chunk in response.iter_bytes():
+                body.extend(chunk)
+                if len(body) >= 4096:
+                    break
             raise FetchError(
                 f"HTTP_{status}",
                 f"respuesta {status} de {final}",
                 kind=classify_http_status(status),
                 retry_after=parse_retry_after(response.headers.get("retry-after"), now),
                 status=status,
+                body=bytes(body[:4096]),
             )
         if status != 200:
             raise FetchError(f"HTTP_{status}", f"estado inesperado {status}", kind=FailureKind.INVALID_CONTENT, status=status)

@@ -66,6 +66,8 @@ def test_senators_drop_contact_data(connector) -> None:
 def test_votes_are_nominal_with_one_voting_act_and_explicit_links(connector) -> None:
     result = parse_fixture(connector, "votes")
     votes = [c for c in result.candidates if c.predicate == "nominal_vote"]
+    seen = {c.subject_ref: c.value["name"] for c in result.candidates if c.predicate == "senator_seen"}
+    assert seen and all(ref.startswith("senado-od:senator:") for ref in seen)
     votings = [c for c in result.candidates if c.predicate == "voting_subject"]
     assert len(votes) == 400 and not result.issues
     assert {c.value["vote"] for c in votes} <= {"yes", "no"}
@@ -78,7 +80,7 @@ def test_votes_are_nominal_with_one_voting_act_and_explicit_links(connector) -> 
 
 def test_attendance_no_is_explicit_absence(connector) -> None:
     result = parse_fixture(connector, "assistances")
-    statuses = {c.value["status_raw"]: c.value["status"] for c in result.candidates}
+    statuses = {c.value["status_raw"]: c.value["status"] for c in result.candidates if c.predicate == "attendance"}
     assert statuses == {"Si": "present", "No": "absent"}
 
 
@@ -111,3 +113,38 @@ def test_future_dates_are_never_requested() -> None:
             break
         cursor = page.next_cursor
     assert last == {"from": "2026-09-22", "to": "2026-09-28"}
+
+
+def test_empty_week_is_valid_not_a_schema_change(connector) -> None:
+    page = connector.discover(Cursor(connector.version, SCOPE, {"page": 1}))
+    result = connector.parse(page.items[0], snapshot(b"[]"))
+    assert result.empty_source and not result.is_empty_mapping and not result.schema_changed
+
+
+def test_empty_range_400_is_a_valid_empty_capture() -> None:
+    from botcentro.errors import FailureKind, FetchError
+
+    body = '{"error":"No existen asistencias relacionadas en el rango de fechas seleccionados"}'.encode()
+
+    class EmptyRange:
+        def fetch(self, url, **kwargs):
+            raise FetchError("HTTP_400", "400", kind=FailureKind.INVALID_CONTENT, status=400, body=body)
+
+    connector = SenadoOpenDataConnector(EmptyRange(), today=lambda: date(2026, 10, 1))  # type: ignore[arg-type]
+    item = connector.discover(Cursor(connector.version, SCOPE, {"page": 1})).items[2]
+    fetched = connector.fetch(item)
+    assert fetched.status == 400 and fetched.content == body
+    assert connector.parse(item, fetched).empty_source
+
+
+def test_other_400_errors_still_fail() -> None:
+    from botcentro.errors import FailureKind, FetchError
+
+    class Broken:
+        def fetch(self, url, **kwargs):
+            raise FetchError("HTTP_400", "400", kind=FailureKind.INVALID_CONTENT, status=400, body=b'{"error":"fecha invalida"}')
+
+    connector = SenadoOpenDataConnector(Broken(), today=lambda: date(2026, 10, 1))  # type: ignore[arg-type]
+    item = connector.discover(Cursor(connector.version, SCOPE, {"page": 1})).items[0]
+    with pytest.raises(FetchError):
+        connector.fetch(item)

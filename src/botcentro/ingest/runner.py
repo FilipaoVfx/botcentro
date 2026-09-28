@@ -49,12 +49,14 @@ class RunSummary:
 
 class IngestionRunner:
     def __init__(self, *, source_id: UUID, connector: Connector, store: IngestStore, objects: ObjectStore,
-                 profile: UsageProfile) -> None:
+                 profile: UsageProfile, reparse: bool = False) -> None:
         self.source_id = source_id
         self.connector = connector
         self.store = store
         self.objects = objects
         self.profile = profile
+        # Reinterpretar capturas sin cambios (nueva versión del parser). Idempotente.
+        self.reparse = reparse
 
     def run(self, *, mode: str, scope: Mapping[str, Any], previous_cursor: Mapping[str, Any] | None = None,
             coverage_scope_id: UUID | None = None, max_pages: int = 1000) -> RunSummary:
@@ -114,8 +116,10 @@ class IngestionRunner:
                                                  adapter_version=self.connector.version)
         if not registration.content_changed:
             summary.unchanged += 1
-            return
-        summary.new_snapshots += 1
+            if not self.reparse:
+                return
+        else:
+            summary.new_snapshots += 1
 
         parsed = self.connector.parse(item, fetched)
         schema_problem = None

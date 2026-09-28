@@ -33,6 +33,7 @@ class BotcentroError(Exception):
         kind: FailureKind | None = None,
         retry_after: float | None = None,
         status: int | None = None,
+        body: bytes | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
@@ -41,6 +42,7 @@ class BotcentroError(Exception):
             self.kind = kind
         self.retry_after = retry_after
         self.status = status
+        self.body = body  # primeros bytes de una respuesta de error, para diagnóstico
 
     @property
     def retryable(self) -> bool:

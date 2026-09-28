@@ -120,6 +120,8 @@ class ParseResult:
     candidates: Sequence[NormalizedCandidate] = ()
     document_links: Sequence[DocumentLink] = ()
     issues: Sequence[Issue] = ()
+    # La fuente respondió con un conjunto vacío válido (p. ej. una semana de receso).
+    empty_source: bool = False
 
     @property
     def schema_changed(self) -> bool:
@@ -127,8 +129,8 @@ class ParseResult:
 
     @property
     def is_empty_mapping(self) -> bool:
-        """Sin candidatos ni enlaces: nunca se acepta como carga exitosa (SRS-F05)."""
-        return not self.candidates and not self.document_links
+        """Sin candidatos ni enlaces sin que la fuente declarara vacío: nunca es carga exitosa (SRS-F05)."""
+        return not self.candidates and not self.document_links and not self.empty_source
 
 
 @dataclass(frozen=True)

@@ -71,7 +71,21 @@ def _profile(policy: dict[str, Any]) -> UsageProfile:
                         reviewer=policy.get("reviewer"))
 
 
-def ingest(code: str, start: str, end: str, window_days: int) -> None:
+def _resumable_cursor(client: InsForgeClient, source_id: str, version: str, scope: dict[str, Any]) -> dict[str, Any] | None:
+    """Último cursor confirmado de una ejecución no completada con el mismo alcance y versión."""
+    runs = client.select("ingestion_runs", {
+        "source_id": f"eq.{source_id}", "select": "status,cursor_after", "order": "started_at.desc", "limit": "5",
+    })
+    for run in runs:
+        cursor = run.get("cursor_after")
+        if run["status"] == "succeeded":
+            return None
+        if cursor and cursor.get("connector_version") == version and cursor.get("scope") == scope:
+            return cursor
+    return None
+
+
+def ingest(code: str, start: str, end: str, window_days: int, reparse: bool = False) -> None:
     client = account_client("ingest")
     source = client.select("sources", {"code": f"eq.{code}", "select": "*"})
     if not source:
@@ -92,9 +106,25 @@ def ingest(code: str, start: str, end: str, window_days: int) -> None:
             store=IngestStore(client),
             objects=LocalObjectStore(os.environ.get("BOTCENTRO_OBJECT_STORE_DIR", "var/objects")),
             profile=_profile(policy),
+            reparse=reparse,
         )
-        summary = runner.run(mode="backfill", scope={"from": start, "to": end, "window_days": window_days})
+        scope = {"from": start, "to": end, "window_days": window_days}
+        previous = _resumable_cursor(client, source["id"], connector_cls.version, scope)
+        if previous:
+            print(f"reanudando desde {previous['position']}", file=sys.stderr)
+        summary = runner.run(mode="backfill", scope=scope, previous_cursor=previous)
     print(json.dumps({k: str(v) if k == "run_id" else v for k, v in summary.__dict__.items()}, ensure_ascii=False, indent=1))
+
+
+NORMALIZE_STEPS = ("catalog", "projects", "votes", "attendance", "agenda")
+
+
+def normalize(code: str) -> None:
+    if code != "SRC-01":
+        sys.exit("solo SRC-01 tiene normalizador por ahora")
+    client = account_client("ingest")
+    for step in NORMALIZE_STEPS:
+        print(json.dumps(client.call("normalize_senado_od", {"p_step": step}), ensure_ascii=False))
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -109,11 +139,16 @@ def main(argv: list[str] | None = None) -> None:
     i.add_argument("--from", dest="start", required=True)
     i.add_argument("--to", dest="end", required=True)
     i.add_argument("--window-days", type=int, default=7)
+    i.add_argument("--reparse", action="store_true", help="reinterpreta capturas sin cambios (nuevo parser)")
+    n = sub.add_parser("normalize", help="convierte observaciones publicadas en entidades (idempotente)")
+    n.add_argument("source")
     args = parser.parse_args(argv)
     if args.command == "verify-account":
         verify_account(args.who, args.code)
+    elif args.command == "normalize":
+        normalize(args.source)
     else:
-        ingest(args.source, args.start, args.end, args.window_days)
+        ingest(args.source, args.start, args.end, args.window_days, args.reparse)
 
 
 if __name__ == "__main__":

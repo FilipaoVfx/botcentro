@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Callable, Mapping
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from botcentro.connectors.base import (
@@ -38,6 +38,8 @@ from botcentro.domain.dates import BOGOTA, DateParseError, PartialDate, parse_sp
 from botcentro.domain.names import display_name, normalize_name
 from botcentro.domain.project_ids import format_ref, parse_project_citations
 from botcentro.domain.votes import AttendanceStatus, VoteMapping, VoteValue, normalize_attendance
+from botcentro.domain.hashing import sha256_hex
+from botcentro.errors import FetchError
 from botcentro.http.fetcher import Fetched, NotModified, SafeFetcher
 
 API = "https://app.senado.gov.co/backend/api/public/v1"
@@ -46,6 +48,7 @@ CATALOGS = ("senators", "commissions")
 DATED = ("events", "votes", "assistances")
 JSON_ONLY = frozenset({"application/json"})
 REF = "senado-od"
+EMPTY_RANGE_RE = re.compile(r"No existen .* en el rango de fechas", re.IGNORECASE)
 
 # Campos esperados por conjunto: su ausencia es un cambio de esquema (cuarentena + caso).
 EXPECTED: Mapping[str, frozenset[str]] = {
@@ -68,7 +71,7 @@ def _day(value: str) -> PartialDate:
 class SenadoOpenDataConnector:
     adapter = "senado_open_data"
     version = "0.1.0"
-    parser_version = "senado-od-parser-1"
+    parser_version = "senado-od-parser-2"
 
     def __init__(self, fetcher: SafeFetcher, *, today: Callable[[], date] | None = None) -> None:
         self._fetcher = fetcher
@@ -114,7 +117,15 @@ class SenadoOpenDataConnector:
     # -- §7.1 fetch ----------------------------------------------------------------------------
     def fetch(self, item: DiscoveredItem, *, etag: str | None = None,
               last_modified: str | None = None) -> Fetched | NotModified:
-        return self._fetcher.fetch(item.url, etag=etag, last_modified=last_modified, accept_mimes=item.accept_mimes)
+        try:
+            return self._fetcher.fetch(item.url, etag=etag, last_modified=last_modified, accept_mimes=item.accept_mimes)
+        except FetchError as exc:
+            # La API responde 400 {"error": "No existen … en el rango de fechas …"} a un rango sin
+            # datos: es un vacío válido. Se conserva la respuesta real como captura (evidencia).
+            if exc.status == 400 and exc.body and EMPTY_RANGE_RE.search(exc.body.decode("utf-8", "replace")):
+                return Fetched(item.url, item.url, 400, exc.body, sha256_hex(exc.body), "application/json",
+                               "application/json", None, None, datetime.now(timezone.utc))
+            raise
 
     # -- §7.1 parse ----------------------------------------------------------------------------
     def parse(self, item: DiscoveredItem, snapshot: Fetched) -> ParseResult:
@@ -122,6 +133,8 @@ class SenadoOpenDataConnector:
             rows = json.loads(snapshot.content.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             return ParseResult(issues=[Issue("INVALID_JSON", str(exc), IssueSeverity.SCHEMA_CHANGE)])
+        if not rows or (isinstance(rows, dict) and EMPTY_RANGE_RE.search(str(rows.get("error", "")))):
+            return ParseResult(empty_source=True)
         if not isinstance(rows, list):
             return ParseResult(issues=[Issue("NOT_A_LIST", "se esperaba una lista de registros", IssueSeverity.SCHEMA_CHANGE)])
 
@@ -199,12 +212,23 @@ class SenadoOpenDataConnector:
             quarantine_reason=None if normalized in (VoteValue.YES, VoteValue.NO)
             else f"etiqueta de voto no validada: {row['vote']!r}",
         )
-        return [voting, vote]
+        return [voting, vote, self._seen(row["senator_id"], row["senator_name"], day, pointer)]
+
+    def _seen(self, senator_id: Any, raw_name: Any, day: PartialDate, pointer: str) -> NormalizedCandidate:
+        """Nombre del senador tal como aparece en votos/asistencias: identifica a senadores
+        históricos que ya no están en el catálogo actual."""
+        name = display_name(str(raw_name))
+        return NormalizedCandidate(
+            subject_type="person", subject_ref=f"{REF}:senator:{senator_id}", predicate="senator_seen",
+            value={"name": name, "normalized_name": normalize_name(name)}, value_raw=str(raw_name),
+            record_pointer=pointer,
+        )
 
     def _parse_assistances(self, row: Mapping[str, Any], pointer: str) -> list[NormalizedCandidate]:
         day = _day(str(row["plenary_created_at"]))
         status = normalize_attendance(str(row["attended"]), ATTENDANCE)
-        return [NormalizedCandidate(
+        seen = self._seen(row["senator_id"], row["senator"], day, pointer)
+        return [seen, NormalizedCandidate(
             subject_type="attendance", subject_ref=f"{REF}:attendance:{row['plenary_id']}:{row['senator_id']}",
             predicate="attendance",
             value={"plenary_ref": f"{REF}:plenary:{row['plenary_id']}", "person_ref": f"{REF}:senator:{row['senator_id']}",
