@@ -18,6 +18,9 @@ from typing import Any
 from botcentro.domain.dates import BOGOTA, DateRange, format_local_date, parse_spanish_date, resolve_relative_period
 from botcentro.query.engine import AnswerEngine, fmt_date
 from botcentro.telegram.render import Section, bold, escape, link, render_sections
+import re
+from html import unescape as html_unescape
+
 from botcentro.telegram_ui.contracts import (Button, Frame, Intent, PageInfo, ResultSet, SessionContext, UiAction,
                                              ViewModel)
 
@@ -29,18 +32,21 @@ IMPLEMENTED = frozenset({
     Intent.QUESTION, Intent.PROJECTS_LIST, Intent.PROJECTS_SEARCH, Intent.PROJECTS_FILTERS, Intent.FILTER_SET,
     Intent.SEARCH_PROMPT, Intent.PAGE, Intent.PROJECT_OPEN, Intent.PROJECT_PARTICIPANTS, Intent.ORDINAL,
     Intent.VOTINGS, Intent.DOCUMENTS, Intent.DAY_OVERVIEW, Intent.PROJECT_TIMELINE, Intent.DISCUSSIONS,
+    Intent.VOTING_OPEN, Intent.VOTINGS_PERSON, Intent.VOTE_PERSON_PROMPT, Intent.EVIDENCE,
 })
+_NO_EVIDENCE_VIEWS = {"home", "help", "sources", "evidence", "cancel", "filters", "search_prompt", "unavailable",
+                      "clarify", "expired"}
 _ENGINE_FALLBACK = frozenset({Intent.PROJECTS_SEARCH})
 _PENDING_LABELS = {
     Intent.DAY_OVERVIEW: "la portada del día", Intent.DISCUSSIONS: "los debates legislativos",
-    Intent.VOTINGS: "el explorador general de votaciones", Intent.DOCUMENTS: "el explorador general de documentos",
+    Intent.DOCUMENTS: "el explorador general de documentos",
     Intent.COMPARE: "la comparación de versiones", Intent.EVIDENCE: "las fuentes de cada respuesta",
 }
 _PENDING_HINT = {
     Intent.DAY_OVERVIEW: "Mientras tanto puedes pedir «agenda de esta semana».",
-    Intent.VOTINGS: "Abre un proyecto y toca «Votaciones», o pregunta «¿cómo ha votado [nombre]?».",
     Intent.DOCUMENTS: "Abre un proyecto y toca «Documentos».",
 }
+_LINK_RE = re.compile(r'<a href="([^"]+)">([^<]+)</a>')
 RECENT_DAYS = 30
 PERIODS = {"30": ("30 días", 30), "90": ("90 días", 90), "365": ("1 año", 365), "all": ("Todo", None)}
 CORPORATIONS = {"all": "Ambas", "senado": "Senado", "camara": "Cámara"}
@@ -82,18 +88,37 @@ class UiApplication:
                              rows=[[HOME_BUTTON, HELP_BUTTON]])
         return self._render(action, ctx, result_set, push=True)
 
+    def _track_evidence(self, view: ViewModel, ctx: SessionContext) -> ViewModel:
+        """Fuentes de esta respuesta: enlaces citados en la vista más las fuentes declaradas (CU-11)."""
+        if view.view_type in _NO_EVIDENCE_VIEWS:
+            return view
+        seen = {e.get("url") for e in view.evidence}
+        for url, label in _LINK_RE.findall("\n".join(view.blocks)):
+            url = html_unescape(url)
+            if url not in seen:
+                seen.add(url)
+                view.evidence.append({"label": html_unescape(label), "url": url})
+        if view.evidence:
+            ctx.last_evidence = view.evidence[:15]
+            ctx.last_evidence_title = view.title
+            if not any(b.intent is Intent.EVIDENCE for row in view.rows for b in row):
+                view.rows.insert(max(len(view.rows) - 1, 0), [Button(label="🔗 Fuentes", intent=Intent.EVIDENCE)])
+        return view
+
     def _render(self, action: UiAction, ctx: SessionContext, result_set: ResultSet | None, *, push: bool) -> ViewModel:
         intent = action.intent
         params = dict(action.parameters)
         # Captura de búsqueda: tras «🔎 Buscar», un texto breve sin números es el término buscado;
         # cualquier intención explícita distinta la suspende (§19.3).
-        if ctx.pending_clarification and ctx.pending_clarification.get("expect") in ("search", "discussion"):
+        if ctx.pending_clarification and ctx.pending_clarification.get("expect") in ("search", "discussion",
+                                                                                     "vote_person"):
             expect = ctx.pending_clarification["expect"]
             ctx.pending_clarification = None
             text = params.get("text", "")
             if intent is Intent.QUESTION and text and len(text.split()) <= 6 and not any(c.isdigit() for c in text):
-                intent, params = ((Intent.PROJECTS_SEARCH, {"query": text, "text": text}) if expect == "search"
-                                  else (Intent.DISCUSSIONS, {"query": text, "text": text}))
+                intent, params = {"search": (Intent.PROJECTS_SEARCH, {"query": text, "text": text}),
+                                  "discussion": (Intent.DISCUSSIONS, {"query": text, "text": text}),
+                                  "vote_person": (Intent.VOTINGS_PERSON, {"name": text})}[expect]
         if not self.is_available(intent) and intent in _ENGINE_FALLBACK and params.get("text"):
             intent, params = Intent.QUESTION, {"text": params["text"]}
         if not self.is_available(intent):
@@ -130,13 +155,32 @@ class UiApplication:
                 "<code>PL 178/2025 Senado</code>."], rows=[[Button(label="✖️ Cancelar", intent=Intent.CANCEL)]])
             push = False
         elif intent is Intent.PAGE:
-            view = self._list_page(result_set, int(params.get("page", 1)), ctx)
+            page = int(params.get("page", 1))
+            view = (self._votings_page(result_set, page, ctx) if result_set is not None and result_set.kind == "votings"
+                    else self._list_page(result_set, page, ctx))
             push = False
         elif intent is Intent.ORDINAL:
             return self._ordinal(int(params.get("position", 0)), ctx, result_set)
         elif intent is Intent.PROJECT_OPEN:
             view = self._project_card(str(params["project_id"]), ctx)
-        elif intent in (Intent.PROJECT_PARTICIPANTS, Intent.VOTINGS, Intent.DOCUMENTS):
+        elif intent is Intent.VOTINGS:
+            # Texto «votaciones» con una ficha abierta usa ese proyecto (y lo muestra en el título);
+            # /votaciones y el botón del inicio abren el explorador general (§5.1).
+            project_id = params.get("project_id") or (ctx.active_project_id if action.entry_point == "text" else None)
+            view = self._votings_list(params, ctx, project_id=project_id)
+        elif intent is Intent.VOTINGS_PERSON:
+            view = self._votings_person(params, ctx)
+        elif intent is Intent.VOTE_PERSON_PROMPT:
+            ctx.pending_clarification = {"expect": "vote_person"}
+            view = ViewModel(view_type="search_prompt", title="Persona", blocks=[
+                f"{bold('👤 Votos de una persona')}\nEscribe su nombre, por ejemplo <code>Paloma Valencia</code>."],
+                rows=[[Button(label="✖️ Cancelar", intent=Intent.CANCEL)]])
+            push = False
+        elif intent is Intent.VOTING_OPEN:
+            view = self._voting_detail(str(params["voting_id"]), ctx)
+        elif intent is Intent.EVIDENCE:
+            return self._evidence(ctx)
+        elif intent in (Intent.PROJECT_PARTICIPANTS, Intent.DOCUMENTS):
             project_id = params.get("project_id") or (ctx.active_project_id if params.get("contextual")
                                                       or action.entry_point == "text" else None)
             if not project_id:
@@ -146,26 +190,32 @@ class UiApplication:
                         "📚 Proyectos."], rows=[[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST), HOME_BUTTON]])
                 return self._not_yet(intent)
             params["project_id"] = project_id
-            view = {Intent.PROJECT_PARTICIPANTS: self._participants, Intent.VOTINGS: self._votings,
+            view = {Intent.PROJECT_PARTICIPANTS: self._participants,
                     Intent.DOCUMENTS: self._documents}[intent](str(project_id), ctx)
         else:  # pregunta libre: el motor sin IA resuelve proyecto, persona, agenda o búsqueda
             answer = self.engine.answer(params.get("text", ""))
             rows: list[list[Button]] = []
             if len(answer.project_ids) == 1:
                 ctx.active_project_id = answer.project_ids[0]
-                rows.append(self._project_actions(answer.project_ids[0]))
+                actions = self._project_actions(answer.project_ids[0])
+                rows += [actions[:2], actions[2:]]
+            if answer.person_ids:
+                ctx.active_person_ids = answer.person_ids
+                rows.append([Button(label="🗳 Todas sus votaciones", intent=Intent.VOTINGS_PERSON,
+                                    params={"person_ids": answer.person_ids[:6]})])
             view = self._from_answer("answer", "Respuesta", answer, ctx, rows + [[HOME_BUTTON, HELP_BUTTON]])
             view.active_project_id = ctx.active_project_id if answer.project_ids else None
         if push:
             ctx.push(Frame(intent=intent, params=params, title=view.title))
-        return view
+        return self._track_evidence(view, ctx)
 
     # -- inicio y ayudas -----------------------------------------------------------------------
 
     def _home(self, ctx: SessionContext) -> ViewModel:
         rows = [[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST),
                  Button(label="🏛 Senado hoy", intent=Intent.DAY_OVERVIEW, params={"corporation": "senado"})],
-                [Button(label="🗓 Agenda", intent=Intent.AGENDA), Button(label="💬 Debates", intent=Intent.DISCUSSIONS)],
+                [Button(label="🗳 Votaciones", intent=Intent.VOTINGS), Button(label="🗓 Agenda", intent=Intent.AGENDA)],
+                [Button(label="💬 Debates", intent=Intent.DISCUSSIONS)],
                 [Button(label="🔗 Fuentes", intent=Intent.SOURCES), HELP_BUTTON]]
         return ViewModel(view_type="home", title="🏛 Tu explorador legislativo", blocks=render_sections([Section(
             "🏛 Tu explorador legislativo", [
@@ -325,6 +375,9 @@ class UiApplication:
             return ViewModel(view_type="clarify", title="Posición fuera de la página", status="partial", blocks=[
                 f"La página {ctx.result_page} muestra {len(items)} proyectos; elige un número entre 1 y {len(items)}."],
                 rows=[[BACK_BUTTON, HOME_BUTTON]])
+        if rs.kind == "votings":
+            return self._render(UiAction(intent=Intent.VOTING_OPEN, entry_point="text",
+                                         parameters={"voting_id": items[position - 1][0]}), ctx, rs, push=True)
         return self._render(UiAction(intent=Intent.PROJECT_OPEN, entry_point="text",
                                      parameters={"project_id": items[position - 1][0]}), ctx, rs, push=True)
 
@@ -375,22 +428,6 @@ class UiApplication:
         lines.append("<i>Ponentes: aún no disponibles (cobertura limitada; están en las ponencias de las gacetas).</i>")
         return ViewModel(view_type="participants", title=f"Autores · {label}", active_project_id=project_id,
                          status="ready" if authors else "empty", blocks=["\n".join(lines)], rows=self._sub_rows(project_id))
-
-    def _votings(self, project_id: str, ctx: SessionContext) -> ViewModel:
-        card, sections = self.engine.project_card(project_id)
-        ctx.active_project_id = project_id
-        label = self._project_label(card)
-        votes = [s for s in sections if s.title == "Votaciones"]
-        blocks = [bold(f"🗳 Votaciones · {label}")]
-        if votes:
-            blocks += render_sections(votes)
-            status = "ready"
-        else:
-            blocks.append("No hay votaciones nominales registradas para este proyecto. El Senado publica votos "
-                          "nominales de plenaria desde 2022; las votaciones de la Cámara aún no están en nuestras fuentes.")
-            status = "empty"
-        return ViewModel(view_type="votings", title=f"Votaciones · {label}", status=status, active_project_id=project_id,
-                         blocks=["\n".join(blocks)], rows=self._sub_rows(project_id))
 
     def _documents(self, project_id: str, ctx: SessionContext) -> ViewModel:
         card = self.rpc.call("bot_project_card", {"p_project_id": project_id}) or {}
@@ -583,3 +620,171 @@ class UiApplication:
             status = "partial"
         return ViewModel(view_type="discussions", title="Debates legislativos", status=status,
                          blocks=["\n".join(lines)], rows=[[HOME_BUTTON, HELP_BUTTON]])
+
+    # -- votaciones y evidencia (I4) ----------------------------------------------------------------
+
+    def _votings_list(self, params: dict[str, Any], ctx: SessionContext, *, project_id: str | None) -> ViewModel:
+        filters: dict[str, Any] = {}
+        heading = "🗳 Votaciones"
+        if project_id:
+            card = self.rpc.call("bot_project_card", {"p_project_id": project_id}) or {}
+            ctx.active_project_id = str(project_id)
+            filters["project_id"] = str(project_id)
+            heading = f"🗳 Votaciones · {self._project_label(card)}"
+        else:
+            if not params.get("period"):  # abrir Votaciones empieza sin filtro de persona
+                ctx.applied_filters.pop("vote_person_ids", None)
+                ctx.applied_filters.pop("vote_person_name", None)
+            period = str(params.get("period") or ("30" if not params.get("keep") else
+                                                  ctx.applied_filters.get("vote_period", "30")))
+            ctx.applied_filters["vote_period"] = period
+            days = PERIODS.get(period, PERIODS["30"])[1]
+            if days:
+                filters["since"] = (self.today() - timedelta(days=days)).isoformat()
+            if ctx.applied_filters.get("vote_person_ids"):
+                filters["person_ids"] = ctx.applied_filters["vote_person_ids"]
+                heading = f"🗳 Votaciones de {ctx.applied_filters.get('vote_person_name', 'la persona')}"
+        return self._votings_result(filters, heading, ctx, project_id=project_id)
+
+    def _votings_person(self, params: dict[str, Any], ctx: SessionContext) -> ViewModel:
+        if params.get("person_ids"):
+            ids = [str(i) for i in params["person_ids"]]
+            card = self.rpc.call("bot_person_card", {"p_person_ids": ids}) or {}
+            name = card.get("name") or "la persona"
+        else:
+            from botcentro.domain.names import normalize_name
+            tokens = [t for t in normalize_name(str(params.get("name", ""))).split() if len(t) >= 3][:5]
+            groups = self.rpc.call("bot_person_search", {"p_tokens": tokens, "p_limit": 5}) if tokens else []
+            if not groups:
+                return ViewModel(view_type="clarify", title="Persona no encontrada", status="empty", blocks=[
+                    f"No encontré a «{escape(str(params.get('name', '')))}» entre los congresistas con datos."],
+                    rows=[[Button(label="👤 Otra persona", intent=Intent.VOTE_PERSON_PROMPT), HOME_BUTTON]])
+            best = [g for g in groups if g["hits"] == groups[0]["hits"]]
+            words = [set(normalize_name(g["name"]).split()) for g in best]
+            if len(best) > 1 and not all(w <= max(words, key=len) for w in words):
+                return ViewModel(view_type="clarify", title="¿A quién te refieres?", status="partial",
+                                 blocks=["¿A quién te refieres?"],
+                                 rows=[[Button(label=_clip(g["name"], 28), intent=Intent.VOTINGS_PERSON,
+                                               params={"person_ids": g["person_ids"][:6]})] for g in best[:5]])
+            ids = [str(pid) for g in best for pid in g["person_ids"]][:6]
+            name = max(best, key=lambda g: len(g["name"]))["name"]
+        ctx.applied_filters["vote_person_ids"] = ids
+        ctx.applied_filters["vote_person_name"] = name
+        ctx.applied_filters["vote_period"] = "all"
+        return self._votings_result({"person_ids": ids}, f"🗳 Votaciones de {name}", ctx, project_id=None)
+
+    def _votings_result(self, filters: dict[str, Any], heading: str, ctx: SessionContext, *,
+                        project_id: str | None) -> ViewModel:
+        data = self.rpc.call("bot_votings_page", {"p_filters": filters, "p_limit": 200}) or {}
+        items = data.get("items") or []
+        vote_label = {"yes": "Votó Sí", "no": "Votó No"}
+        rs = ResultSet(kind="votings", query={"filters": filters, "project_id": project_id}, title=heading,
+                       item_ids=[str(i["voting_id"]) for i in items],
+                       labels=[f"{fmt_date(i['date'])} · {', '.join(i.get('projects') or []) or _clip(i.get('subject'), 60)}"
+                               for i in items],
+                       details=[" · ".join(x for x in (f"Sí {i['yes']} · No {i['no']}",
+                                                       vote_label.get(i.get("person_vote") or "")) if x)
+                                for i in items])
+        ctx.result_set_id = rs.result_set_id
+        view = self._votings_page(rs, 1, ctx, total=int(data.get("total") or 0))
+        view.new_result_set = rs
+        return view
+
+    def _votings_page(self, rs: ResultSet | None, page: int, ctx: SessionContext, *, total: int | None = None) -> ViewModel:
+        if rs is None:
+            return self._list_page(None, page, ctx)
+        page = max(1, min(page, rs.pages()))
+        ctx.result_page = page
+        filters = rs.query.get("filters", {})
+        project_id = rs.query.get("project_id")
+        lines = [bold(rs.title), "<i>Votos nominales de plenaria del Senado desde 2022. Totales calculados a partir "
+                                 "del registro nominal; la fuente no publica un resultado oficial agregado.</i>"]
+        if not project_id and not filters.get("person_ids"):
+            period = ctx.applied_filters.get("vote_period", "30")
+            lines.append(f"<i>Periodo: {PERIODS.get(period, PERIODS['30'])[0]}</i>")
+        lines.append("")
+        items = rs.page_items(page)
+        rows: list[list[Button]] = []
+        if not items:
+            lines.append("No hay votaciones nominales registradas con esos filtros. Las votaciones de la Cámara aún "
+                         "no están en nuestras fuentes.")
+        start = (page - 1) * rs.page_size
+        for offset, (item_id, label) in enumerate(items):
+            n = offset + 1
+            detail = rs.details[start + offset] if start + offset < len(rs.details) else ""
+            lines += [f"{n}. {escape(label)}", f"   <i>{escape(detail)}</i>"]
+            short = label.split(" · ", 1)[-1]  # la fecha ya está en el texto
+            rows.append([Button(label=f"{n} · {_clip(short, 24)}", intent=Intent.VOTING_OPEN,
+                                params={"voting_id": item_id})])
+        if items:
+            total_known = total if total is not None else len(rs.item_ids)
+            lines += ["", f"Página {page} de {rs.pages()} · {total_known} votaciones"]
+        nav = []
+        if page > 1:
+            nav.append(Button(label="⬅️ Anterior", intent=Intent.PAGE,
+                              params={"result_set_id": rs.result_set_id, "page": page - 1}))
+        if page < rs.pages():
+            nav.append(Button(label="Siguiente ➡️", intent=Intent.PAGE,
+                              params={"result_set_id": rs.result_set_id, "page": page + 1}))
+        if nav:
+            rows.append(nav)
+        if project_id:
+            rows.append([Button(label="📌 Ficha", intent=Intent.PROJECT_OPEN, params={"project_id": project_id}),
+                         HOME_BUTTON])
+        else:
+            rows.append([Button(label=("✓ " if ctx.applied_filters.get("vote_period", "30") == k else "") + v[0],
+                                intent=Intent.VOTINGS, params={"period": k}) for k, v in PERIODS.items()][:4])
+            person_row = [Button(label="👤 Persona", intent=Intent.VOTE_PERSON_PROMPT)]
+            if filters.get("person_ids"):
+                person_row.append(Button(label="✖️ Quitar persona", intent=Intent.VOTINGS))
+            rows.append(person_row + [HOME_BUTTON])
+        return ViewModel(view_type="votings", title=rs.title, status="ready" if items else "empty",
+                         blocks=["\n".join(lines)], rows=rows,
+                         page=PageInfo(result_set_id=rs.result_set_id, item_ids=[i for i, _ in items], page=page,
+                                       has_next=page < rs.pages(), has_previous=page > 1, total=total))
+
+    def _voting_detail(self, voting_id: str, ctx: SessionContext) -> ViewModel:
+        d = self.rpc.call("bot_voting_detail", {"p_voting_id": voting_id}) or {}
+        if not d:
+            return ViewModel(view_type="unavailable", title="Votación no disponible", status="unavailable",
+                             blocks=["Esa votación ya no está disponible en las fuentes cargadas."], rows=[[HOME_BUTTON]])
+        session = d.get("session") or {}
+        organ = {"plenaria": "Plenaria", "comision": f"Comisión {session.get('commission') or ''}".strip()}.get(
+            session.get("type") or "", "Sesión")
+        corp = {"senado": "del Senado", "camara": "de la Cámara"}.get(session.get("corporation") or "", "")
+        projects = d.get("projects") or []
+        subject = ", ".join(p["label"] for p in projects) or d.get("subject") or "Asunto sin identificar"
+        lines = [bold(f"🗳 {subject}"), f"{organ} {corp} · {fmt_date(d.get('date'))}".strip()]
+        if d.get("subject") and projects:
+            lines.append(f"<i>Asunto según la fuente: {escape(_clip(d['subject'], 200))}</i>")
+        lines += ["", f"Resultado calculado del registro nominal: {bold(f'Sí {d["yes"]} · No {d["no"]}')} "
+                      f"({d['yes'] + d['no']} votos registrados)",
+                  "Registro nominal: disponible. La fuente solo publica «Sí» y «No»; un senador sin fila no es "
+                  "ausencia ni abstención, es falta de dato."]
+        if d.get("no_voters"):
+            names = d["no_voters"]
+            lines.append(f"Votaron No ({len(names)}): " + escape(", ".join(names[:30])) + (" …" if len(names) > 30 else ""))
+        evidence = []
+        if (d.get("source_url") or "").startswith("https://"):
+            lines += ["", f"Fuente: {link('Senado · datos abiertos', d['source_url'])} · capturado el "
+                          f"{fmt_date(d.get('fetched_at'))}"]
+            evidence.append({"label": f"Senado · datos abiertos (votos {fmt_date(d.get('date'))})",
+                             "url": d["source_url"]})
+        rows = [[Button(label="📌 Ficha", intent=Intent.PROJECT_OPEN, params={"project_id": p["project_id"]})
+                 for p in projects[:2]], [Button(label="⬅️ Votaciones", intent=Intent.BACK), HOME_BUTTON]]
+        rows = [r for r in rows if r]
+        return ViewModel(view_type="voting", title=subject, blocks=["\n".join(lines)], rows=rows, evidence=evidence)
+
+    def _evidence(self, ctx: SessionContext) -> ViewModel:
+        if not ctx.last_evidence:
+            view = self._from_answer("sources", "Fuentes disponibles", self.engine.answer("/fuentes"), ctx,
+                                     [[HOME_BUTTON]])
+            view.blocks.insert(0, "<i>No hay una respuesta reciente con fuentes; estas son las fuentes disponibles.</i>")
+            return view
+        lines = [bold("🔗 Fuentes de esta respuesta"), f"<i>{escape(ctx.last_evidence_title)}</i>", ""]
+        for e in ctx.last_evidence:
+            url = e.get("url") or ""
+            lines.append("• " + (link(e["label"], url) if url.startswith("https://") else escape(e["label"])))
+        lines += ["", "<i>Son las fuentes usadas en la última respuesta. «/fuentes» muestra el catálogo completo.</i>"]
+        return ViewModel(view_type="evidence", title="Fuentes de esta respuesta", blocks=["\n".join(lines)],
+                         rows=[[BACK_BUTTON, Button(label="📚 Catálogo", intent=Intent.SOURCES), HOME_BUTTON]])

@@ -19,7 +19,8 @@ from botcentro.telegram_ui.contracts import Intent, UiAction
 _ALIASES: dict[str, Intent] = {
     "inicio": Intent.HOME, "menu": Intent.HOME, "/start": Intent.HOME, "/inicio": Intent.HOME,
     "/menu": Intent.HOME, "ayuda": Intent.HELP, "/help": Intent.HELP, "/ayuda": Intent.HELP,
-    "fuentes": Intent.SOURCES, "/fuentes": Intent.SOURCES, "de donde sale eso": Intent.EVIDENCE,
+    "fuentes": Intent.EVIDENCE, "/fuentes": Intent.SOURCES, "de donde sale eso": Intent.EVIDENCE,
+    "fuentes de esta respuesta": Intent.EVIDENCE, "de donde sale": Intent.EVIDENCE,
     "volver": Intent.BACK, "atras": Intent.BACK, "/volver": Intent.BACK,
     "cancelar": Intent.CANCEL, "/cancel": Intent.CANCEL, "/cancelar": Intent.CANCEL,
     "actualizar": Intent.REFRESH,

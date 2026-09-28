@@ -34,6 +34,8 @@ class Intent(StrEnum):
     DISCUSSIONS = "discussions.open"
     VOTINGS = "votings.list"
     VOTINGS_PERSON = "votings.person"
+    VOTING_OPEN = "voting.open"
+    VOTE_PERSON_PROMPT = "votings.person_prompt"
     DOCUMENTS = "documents.list"
     COMPARE = "versions.compare"
     EVIDENCE = "evidence.show"
@@ -114,6 +116,7 @@ class ViewModel(_Model):
     data_as_of: datetime | None = None
     context_label: str | None = None
     new_result_set: ResultSet | None = None  # lista a guardar en Redis (no se muestra)
+    evidence: list[dict[str, str]] = Field(default_factory=list)  # fuentes usadas en esta vista
 
 
 class Frame(_Model):
@@ -137,6 +140,8 @@ class SessionContext(_Model):
     result_page: int = 1
     navigation_stack: list[Frame] = Field(default_factory=list)
     pending_clarification: dict[str, Any] | None = None
+    last_evidence: list[dict[str, str]] = Field(default_factory=list)
+    last_evidence_title: str = ""
     captured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     expires_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(hours=24))
 

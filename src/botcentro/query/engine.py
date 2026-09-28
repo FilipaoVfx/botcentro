@@ -51,6 +51,7 @@ class Answer:
     sections: list[Section]
     warnings: list[str] = field(default_factory=list)
     project_ids: list[str] = field(default_factory=list)  # proyectos identificados sin ambigüedad
+    person_ids: list[str] = field(default_factory=list)   # persona identificada (puede agrupar fuentes)
 
 
 def fmt_date(value: str | date | None) -> str:
@@ -328,8 +329,10 @@ class AnswerEngine:
                 Section(None, ["Escribe el nombre completo."]),
             ])
         card = self.rpc.call("bot_person_card", {"p_person_ids": best["person_ids"]})
-        return self._render_person(plan, card, merged=len(best["person_ids"]) > 1,
-                                   votes_first=bool(re.search(r"\bvot", fold(text))))
+        answer = self._render_person(plan, card, merged=len(best["person_ids"]) > 1,
+                                     votes_first=bool(re.search(r"\bvot", fold(text))))
+        answer.person_ids = [str(p) for p in best["person_ids"]]
+        return answer
 
     def _render_person(self, plan: QueryPlan, card: dict[str, Any], *, merged: bool, votes_first: bool = False) -> Answer:
         head = [bold(card["name"])]

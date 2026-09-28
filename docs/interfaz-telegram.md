@@ -34,7 +34,7 @@ Módulos en `src/botcentro/telegram_ui/`:
 | I1 — Contratos, contexto y callbacks | ✅ Esta entrega |
 | I2 — Proyectos (explorador, filtros, ficha, contexto) | ✅ |
 | I3 — Portada del día, agenda, cronología y debates | ✅ |
-| I4 — Votaciones, documentos y fuentes por respuesta | Pendiente |
+| I4 — Votaciones, documentos y fuentes por respuesta | ✅ |
 | I5 — Robustez, observabilidad y corpus de 240 entradas | Pendiente |
 
 ## Requisitos cubiertos en I1
@@ -87,3 +87,17 @@ La cobertura de datos por caso de uso está en la sección «Brecha de datos» d
 Pendientes de I3:
 - **«Cámara hoy»:** solo trae radicaciones, porque no hay fuente de agenda ni de votos de la Cámara (SRC-07).
 - **Días de la semana:** «el martes» se resuelve a la próxima ocurrencia y se muestra la fecha explícita. No se ofrecen opciones para elegir.
+
+## Requisitos cubiertos en I4
+
+| Requisito | Evidencia |
+|---|---|
+| UI-F19 Votaciones | Explorador general por periodo o persona, y por proyecto desde su ficha. El detalle muestra el acto, el órgano y la fecha. Los totales se **calculan del registro nominal** y se rotulan así, porque la fuente no publica un resultado oficial. Una persona sin fila en el acto es «falta de dato» (UI-T28). Pruebas en `test_bot_votings.py` |
+| UI-F22 Evidencias | «🔗 Fuentes» muestra las **fuentes de esta respuesta**: los enlaces citados más la captura de origen con su fecha. Sin respuesta previa muestra el **catálogo**. `test_sources_of_this_answer_differ_from_catalog` |
+| UI-F09 Ordinales en votaciones | `test_ordinal_on_votings_list_opens_that_act` |
+| UI-F20 Documentos (por proyecto) | Gacetas enlazadas al proyecto, con tipo de pieza y páginas (I2) |
+
+Pendientes de I4:
+- **Explorador general de documentos:** todavía no existe; por ahora los documentos se ven solo por proyecto.
+- **Votaciones de la Cámara:** sin fuente (SRC-07).
+- **Distinguir abstención, impedimento y ausencia:** la fuente del Senado no publica esas categorías.
