@@ -66,10 +66,9 @@ Desde el 20-jul-2022 hay **8.741 gacetas**, medidas con búsqueda binaria en el 
 2. **Calidad del OCR:** es utilizable pero ruidoso en algunas páginas. La búsqueda por significado devuelve pasajes pertinentes, y lo más útil es filtrar por `project_ids`, que es el caso del bot al preguntar por un proyecto.
 3. **Segmentos «otro» y «portada» (13 %):** vienen de gacetas sin encabezados reconocibles. Son candidatos a no indexarse o a mejorar los patrones.
 
-### Carga en curso (DEC-14)
+### Carga en curso (DEC-15)
 
-- **Alcance:** 6.679 gacetas desde el 1-sep-2023, medido en el listado. Hay 6.022 desde el 1-ene-2024.
-- **Exclusiones:** no se indexan los segmentos `portada` ni `otro` (13 % en el piloto).
-- **Estimación:** ~915 mil chunks, ~2,1 GB en Qdrant v2 y ~3 días de proceso.
-- **Operación:** `botcentro load-gacetas --since 2023-09-01` es reanudable, reintenta las fallidas y se detiene sola en los topes.
-
+- **Destino:** Qdrant autoalojado en el servidor del bot.
+- **Alcance:** 8.741 gacetas desde el 20-jul-2022, con todos los segmentos.
+- **Estimación:** ~1,4 M chunks, ~3,2 GB y ~4 días de proceso.
+- **Operación:** `botcentro load-gacetas --since 2022-07-20 --skip-kinds ""` es reanudable y reintenta las fallidas. El manifiesto está en `var/gacetas-manifest-local.jsonl`.

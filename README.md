@@ -90,6 +90,22 @@ Restricciones de InsForge:
 - Sin cambios de configuración de sesión: `set_config` y `SET LOCAL` se rechazan.
 - Las migraciones aplicadas son historia: no se editan.
 
+## Índice vectorial (Qdrant autoalojado)
+
+Los vectores de documentos (fichas de Cámara y gacetas) viven en Qdrant, dentro del servidor del bot (DEC-15). InsForge conserva los documentos, los chunks citables y los enlaces a proyectos.
+
+```bash
+ops/qdrant.sh up          # contenedor en 127.0.0.1:6333 con API key (.env), datos en /var/lib/botcentro/qdrant
+ops/qdrant.sh status
+ops/qdrant.sh snapshot    # copiar el snapshot fuera del servidor: es la única copia de respaldo
+.venv/bin/python -m botcentro.cli sync-qdrant        # republica los chunks registrados en InsForge
+.venv/bin/python -m botcentro.cli load-gacetas --since 2022-07-20 --skip-kinds ""   # reanudable
+```
+
+Si se pierde el volumen, el índice se reconstruye:
+- las fichas, con `sync-qdrant`;
+- las gacetas, volviendo a ejecutar `load-gacetas` con un manifiesto vacío. Tarda ~4 días, porque los PDF no se guardan (DEC-11).
+
 ## Puesta en marcha (pendiente de aprobación)
 
 1. **Catálogo inicial:** `npx -y @insforge/cli db query "$(grep -v '^--' seeds/catalogo_inicial.sql)"`.

@@ -170,16 +170,22 @@ def sync_qdrant(batch: int) -> None:
     print(json.dumps({**totals, "points_in_collection": store.count()}), flush=True)
 
 
-def migrate_qdrant(skip_kinds: str) -> None:
-    from botcentro.vectors.qdrant import LEGACY_COLLECTION, QdrantStore
+def migrate_qdrant(skip_kinds: str, source: str) -> None:
+    """Copia puntos a la colección activa: desde la colección anterior (`legacy`) o desde Qdrant
+    Cloud (`cloud`, DEC-15: el índice pasa a Qdrant autoalojado en el servidor del bot)."""
+    from botcentro.vectors.qdrant import COLLECTION, LEGACY_COLLECTION, QdrantStore
     from botcentro.vectors.sync import migrate_collection
 
     target = qdrant_store()
-    source = QdrantStore(_required("BOTCENTRO_QDRANT_URL"), _required("BOTCENTRO_QDRANT_API_KEY"),
-                         collection=LEGACY_COLLECTION)
-    totals = migrate_collection(source, target, skip_segment_kinds=[k for k in skip_kinds.split(",") if k],
+    if source == "cloud":
+        origin = QdrantStore(_required("BOTCENTRO_QDRANT_CLOUD_URL"), _required("BOTCENTRO_QDRANT_CLOUD_API_KEY"),
+                             collection=COLLECTION)
+    else:
+        origin = QdrantStore(_required("BOTCENTRO_QDRANT_URL"), _required("BOTCENTRO_QDRANT_API_KEY"),
+                             collection=LEGACY_COLLECTION)
+    totals = migrate_collection(origin, target, skip_segment_kinds=[k for k in skip_kinds.split(",") if k],
                                 progress=lambda t: print(json.dumps(t), flush=True))
-    print(json.dumps({**totals, "target_points": target.count(), "source_points": source.count()}), flush=True)
+    print(json.dumps({**totals, "target_points": target.count(), "source_points": origin.count()}), flush=True)
 
 
 def load_gacetas(since: str, skip_kinds: str, out: str, max_points: int, max_stored_mb: int) -> None:
@@ -253,7 +259,8 @@ def main(argv: list[str] | None = None) -> None:
     f = sub.add_parser("index-fichas", help="documenta e indexa (e5-small) las fichas de proyecto de SRC-06")
     f.add_argument("--batch", type=int, default=100)
     m = sub.add_parser("migrate-qdrant", help="copia la colección anterior a la v2 (float16, carga mínima)")
-    m.add_argument("--skip-kinds", default="portada,otro")
+    m.add_argument("--skip-kinds", default="")
+    m.add_argument("--source", choices=("legacy", "cloud"), default="cloud")
     lg = sub.add_parser("load-gacetas", help="carga SRC-03 desde una fecha → OCR → Qdrant (reanudable, con topes)")
     lg.add_argument("--since", required=True)
     lg.add_argument("--skip-kinds", default="portada,otro")
@@ -271,7 +278,7 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "normalize":
         normalize(args.source)
     elif args.command == "migrate-qdrant":
-        migrate_qdrant(args.skip_kinds)
+        migrate_qdrant(args.skip_kinds, args.source)
     elif args.command == "load-gacetas":
         load_gacetas(args.since, args.skip_kinds, args.out, args.max_points, args.max_stored_mb)
     elif args.command == "pilot-gacetas":

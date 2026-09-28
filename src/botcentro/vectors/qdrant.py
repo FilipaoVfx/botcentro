@@ -1,12 +1,12 @@
-"""Índice vectorial de documentos en Qdrant Cloud (DEC-12).
+"""Índice vectorial de documentos en Qdrant (DEC-12; autoalojado en el servidor del bot, DEC-15).
 
 La base de InsForge conserva documentos, chunks citables y enlaces a proyectos; Qdrant guarda el
 vector de cada chunk con una carga mínima para filtrar y citar sin volver a la base. El id del
 punto es el id del chunk (uuid5 determinista), así que publicar dos veces es idempotente.
 
-El plan gratuito (1 GB de RAM, 4 GB de disco, 1 M de vectores) obliga a: vectores originales en
-disco en float16, copia cuantizada int8 en RAM, carga útil en disco y mínima. Medido en el piloto:
-~3,9 KB por punto con float32 y carga completa; la colección v2 baja a ~2,8 KB (DEC-14).
+Configuración pensada para poca memoria: vectores originales en disco en float16, copia
+cuantizada int8 en RAM y carga útil en disco y mínima (~2,25 KB de vectores más carga útil por
+punto, DEC-14). El mismo cliente sirve para Qdrant Cloud y para la instancia local.
 """
 
 from __future__ import annotations
