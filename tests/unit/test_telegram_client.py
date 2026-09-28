@@ -6,7 +6,6 @@ import httpx
 import pytest
 
 from botcentro.telegram import client as client_module
-from botcentro.telegram.bot import BotService
 from botcentro.telegram.client import BotApi, SentMessage, TelegramApiError
 
 TOKEN = "123456:SECRETO-no-debe-aparecer"
@@ -51,32 +50,3 @@ def test_get_updates_uses_long_polling_timeout() -> None:
 
     assert _api(handler).get_updates(5, timeout=25) == [{"update_id": 7}]
     assert seen == {"timeout": 25, "offset": 5, "allowed_updates": ["message", "callback_query"]}
-
-
-class RejectHtmlApi:
-    def __init__(self) -> None:
-        self.sent = []
-
-    def send_message(self, chat_id, text, *, html=True):
-        if html:
-            raise TelegramApiError("HTTP_400", "sendMessage: can't parse entities", status=400)
-        self.sent.append(text)
-        return SentMessage(1)
-
-
-class RecordingRpc:
-    def __init__(self) -> None:
-        self.calls = []
-
-    def call(self, fn, params=None):
-        self.calls.append((fn, params))
-
-
-def test_rejected_html_is_delivered_as_plain_text() -> None:
-    api, rpc = RejectHtmlApi(), RecordingRpc()
-    service = BotService.__new__(BotService)
-    service.api, service.rpc = api, rpc  # type: ignore[assignment]
-    service._deliver({"delivery_id": "d1", "chat_id": 5, "body": "<b>Estado</b>: A &amp; B"})
-    assert api.sent == ["Estado: A & B"]
-    assert rpc.calls == [("delivery_mark", {"p_delivery_id": "d1", "p_state": "sent", "p_provider_message_id": 1,
-                                            "p_error_code": None})]

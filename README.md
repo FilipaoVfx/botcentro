@@ -92,6 +92,12 @@ Restricciones de InsForge:
 
 ## Bot de Telegram
 
+Adaptador **aiogram 3** con menús, edición de mensajes y contexto breve en **Redis local** (DEC-18; avance en [`docs/interfaz-telegram.md`](docs/interfaz-telegram.md)).
+
+```bash
+ops/redis.sh up            # 127.0.0.1:6379, contraseña en BOTCENTRO_REDIS_URL (.env), AOF, 256 MB
+```
+
 Respuestas sin IA (DEC-16): plantillas deterministas sobre las lecturas `bot_*` de InsForge y los pasajes de Qdrant, siempre con su fuente.
 
 Qué entiende:

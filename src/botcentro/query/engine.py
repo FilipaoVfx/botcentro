@@ -47,6 +47,7 @@ class Answer:
     support: str  # supported | partially_supported | abstained
     sections: list[Section]
     warnings: list[str] = field(default_factory=list)
+    project_ids: list[str] = field(default_factory=list)  # proyectos identificados sin ambigüedad
 
 
 def fmt_date(value: str | date | None) -> str:
@@ -185,7 +186,8 @@ class AnswerEngine:
                                                "disponible; arriba tienes los pasajes de sus documentos."]))
         if missing:
             sections.append(Section(None, [f"No encontré {escape(', '.join(format_ref(r) for r in missing))}."]))
-        return Answer(plan.intent, "answered", "partially_supported" if missing else "supported", sections, warnings)
+        return Answer(plan.intent, "answered", "partially_supported" if missing else "supported", sections, warnings,
+                      [str(c["project_id"]) for c in unique[:2]])
 
     def _render_card(self, card: dict[str, Any]) -> list[Section]:
         ids = " · ".join(i["label"] for i in card.get("identifiers") or [])

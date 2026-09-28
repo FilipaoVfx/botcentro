@@ -209,35 +209,54 @@ def load_gacetas(since: str, skip_kinds: str, out: str, max_points: int, max_sto
 
 
 def run_bot() -> None:
-    """Bot de Telegram por sondeo largo (DEC-16): recibe, responde sin IA y registra entregas."""
+    """Bot de Telegram (DEC-16, DEC-18): aiogram por sondeo largo, interfaz con menús y contexto en
+    Redis, respuestas sin IA."""
+    import asyncio
     import logging
     import socket
+
+    from redis.asyncio import Redis
 
     from botcentro.config import _key
     from botcentro.embeddings.e5 import E5SmallEmbedder
     from botcentro.query.engine import AnswerEngine
-    from botcentro.telegram.bot import BotService
-    from botcentro.telegram.client import BotApi
     from botcentro.telegram.webhook import TelegramWebhook, WebhookSettings
+    from botcentro.telegram_ui.aiogram_adapter import AiogramTransport, make_bot, run_polling
+    from botcentro.telegram_ui.app import UiApplication
+    from botcentro.telegram_ui.runtime import UiRuntime
+    from botcentro.telegram_ui.state import UiState
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-    # httpx registra cada URL en INFO y las de la Bot API contienen el token: nunca deben llegar al log.
-    for noisy in ("httpx", "httpcore"):
+    # httpx/aiohttp registran URLs y las de la Bot API contienen el token: nunca deben llegar al log.
+    for noisy in ("httpx", "httpcore", "aiohttp.access", "aiogram.event"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
-    api = BotApi(_required("BOTCENTRO_TELEGRAM_BOT_TOKEN"))
-    me = api.get_me()
+    token = _required("BOTCENTRO_TELEGRAM_BOT_TOKEN")
+    bot_id = int(token.split(":", 1)[0])
     pseudonym_key = _key(os.environ, "BOTCENTRO_PSEUDONYM_KEY")
     if pseudonym_key is None:
         sys.exit("falta BOTCENTRO_PSEUDONYM_KEY en .env")
     client = account_client("query")
-    settings = WebhookSettings(api.bot_id, "sondeo-largo", pseudonym_key,
+    settings = WebhookSettings(bot_id, "sondeo-largo", pseudonym_key,
                                int(os.environ.get("BOTCENTRO_TELEGRAM_RATE_LIMIT", "10")))
     embedder = E5SmallEmbedder()
     engine = AnswerEngine(client, qdrant_store(), embedder.embed_query)
-    print(json.dumps({"bot": me.get("username"), "bot_id": api.bot_id}), flush=True)
-    BotService(api, TelegramWebhook(settings, client), client, engine,
-               worker_id=f"bot-{socket.gethostname()}",
-               message_limit=int(os.environ.get("BOTCENTRO_TELEGRAM_MESSAGE_LIMIT", "4096"))).run_forever()
+
+    async def main() -> None:
+        redis = Redis.from_url(_required("BOTCENTRO_REDIS_URL"))
+        bot = make_bot(token)
+        runtime = UiRuntime(transport=AiogramTransport(bot), state=UiState(redis, bot_id=bot_id),
+                            app=UiApplication(engine), intake=TelegramWebhook(settings, client), rpc=client,
+                            bot_id=bot_id, pseudonym_key=pseudonym_key, worker_id=f"bot-{socket.gethostname()}",
+                            message_limit=int(os.environ.get("BOTCENTRO_TELEGRAM_MESSAGE_LIMIT", "4096")))
+        me = await bot.get_me()
+        print(json.dumps({"bot": me.username, "bot_id": bot_id, "adapter": "aiogram"}), flush=True)
+        try:
+            await run_polling(bot, runtime)
+        finally:
+            await bot.session.close()
+            await redis.aclose()
+
+    asyncio.run(main())
 
 
 def pilot_gacetas(limit: int, out: str) -> None:

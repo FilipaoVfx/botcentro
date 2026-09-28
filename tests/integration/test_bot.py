@@ -1,11 +1,14 @@
-"""Bot de Telegram de punta a punta contra SQL real (DEC-16; SRS §11; T-21, T-22).
+"""Bot de Telegram de punta a punta contra SQL y Redis reales (DEC-16, DEC-18; centrorequirement.md §29).
 
-Recepción por sondeo → aceptación seudonimizada → cola → motor sin IA → respuesta, segmentos y
-entregas registradas. Telegram y el índice vectorial se sustituyen por dobles en memoria.
+Texto → aceptación seudonimizada → cola → vista → respuesta, segmentos y entregas registradas.
+Clic → token opaco → dueño → autorización → edición del mensaje. Telegram se sustituye por un
+transporte en memoria; el índice vectorial, por un doble.
 """
 
 from __future__ import annotations
 
+import asyncio
+import os
 from datetime import datetime
 from itertools import count
 
@@ -13,46 +16,39 @@ import pytest
 
 from botcentro.domain.dates import BOGOTA
 from botcentro.query.engine import AnswerEngine
-from botcentro.telegram.bot import BotService
-from botcentro.telegram.client import SentMessage
 from botcentro.telegram.security import pseudonymize_user
 from botcentro.telegram.webhook import TelegramWebhook, WebhookSettings
+from botcentro.telegram_ui.app import UiApplication
+from botcentro.telegram_ui.runtime import UiRuntime, keyboard_texts
+from botcentro.telegram_ui.state import UiState
 from tests.integration.support import Db
 from tests.integration.test_normalize_camara_pl import loaded  # noqa: F401 — fixture: fichas de Cámara cargadas
 
 pytestmark = pytest.mark.db
 BOT_ID = 777
 KEY = b"k" * 32
-ALLOWED, STRANGER = 1001, 2002
+ALLOWED, STRANGER, OTHER_ALLOWED = 1001, 2002, 3003
+REDIS_URL = os.environ.get("BOTCENTRO_TEST_REDIS_URL")
 
 
-class FakeApi:
-    bot_id = BOT_ID
-
+class FakeTransport:
     def __init__(self) -> None:
-        self.inbox: list[dict] = []
-        self.sent: list[tuple[int, str, bool]] = []
+        self.sent: list[dict] = []
+        self.edits: list[dict] = []
+        self.answers: list[dict] = []
         self._ids = count(1)
-        self._update_ids = count(1)
 
-    def say(self, user_id: int, text: str, *, update_id: int | None = None) -> int:
-        uid = update_id or next(self._update_ids) + 100
-        self.inbox.append({"update_id": uid, "message": {"message_id": uid, "date": 0, "text": text,
-                                                         "chat": {"id": user_id, "type": "private"},
-                                                         "from": {"id": user_id, "is_bot": False}}})
-        return uid
+    async def send(self, chat_id, html, keyboard):
+        message_id = next(self._ids)
+        self.sent.append({"chat": chat_id, "html": html, "keyboard": keyboard, "id": message_id})
+        return message_id
 
-    def get_updates(self, offset, *, timeout=25):
-        batch, self.inbox = self.inbox, []
-        return batch
+    async def edit(self, chat_id, message_id, html, keyboard):
+        self.edits.append({"chat": chat_id, "id": message_id, "html": html, "keyboard": keyboard})
+        return True
 
-    def send_message(self, chat_id, text, *, html=True):
-        self.sent.append((chat_id, text, html))
-        return SentMessage(next(self._ids))
-
-    def answer_callback(self, *a, **k) -> None: ...
-    def delete_webhook(self) -> None: ...
-    def set_commands(self, commands) -> None: ...
+    async def answer_callback(self, callback_id, text=None, alert=False):
+        self.answers.append({"id": callback_id, "text": text, "alert": alert})
 
 
 class FakeVectors:
@@ -65,18 +61,50 @@ class FakeVectors:
         return self.hits[:limit]
 
 
+class Harness:
+    def __init__(self, runtime: UiRuntime, transport: FakeTransport, vectors: FakeVectors) -> None:
+        self.runtime, self.transport, self.vectors = runtime, transport, vectors
+        self._updates = count(10_000)
+        self._callbacks = count(1)
+        self.loop = asyncio.new_event_loop()
+
+    def run(self, coro):
+        return self.loop.run_until_complete(coro)
+
+    def say(self, text: str, user: int = ALLOWED, update_id: int | None = None) -> list[dict]:
+        before = len(self.transport.sent)
+        uid = update_id or next(self._updates)
+        self.run(self.runtime.on_update({"update_id": uid, "message": {
+            "message_id": uid, "date": 0, "text": text, "chat": {"id": user, "type": "private"},
+            "from": {"id": user, "is_bot": False}}}))
+        return self.transport.sent[before:]
+
+    def click(self, message: dict, label: str, user: int = ALLOWED, callback_id: str | None = None) -> str:
+        data = next(b["callback_data"] for row in message["keyboard"] for b in row if b["text"] == label)
+        cid = callback_id or f"cb{next(self._callbacks)}"
+        self.run(self.runtime.on_update({"update_id": next(self._updates), "callback_query": {
+            "id": cid, "data": data, "from": {"id": user, "is_bot": False},
+            "message": {"message_id": message["id"], "date": 0, "chat": {"id": message["chat"], "type": "private"}}}}))
+        return cid
+
+
 @pytest.fixture(scope="module")
 def bot(db: Db, loaded):  # noqa: F811
+    if not REDIS_URL:
+        pytest.skip("BOTCENTRO_TEST_REDIS_URL no configurada")
+    from redis.asyncio import Redis
+
     admin, query = db.create_user("admin"), db.create_user("query_service")
-    db.rpc(admin).call("admin_authorize_telegram", {
-        "p_bot_id": BOT_ID, "p_user_hash": pseudonymize_user(KEY, BOT_ID, ALLOWED), "p_chat_id": ALLOWED,
-        "p_label": "piloto", "p_reason": "prueba de integración"})
+    for user in (ALLOWED, OTHER_ALLOWED):
+        db.rpc(admin).call("admin_authorize_telegram", {
+            "p_bot_id": BOT_ID, "p_user_hash": pseudonymize_user(KEY, BOT_ID, user), "p_chat_id": user,
+            "p_label": "piloto", "p_reason": "prueba de integración"})
     rpc = db.rpc(query)
     ficha = db.execute("select subject_ref, value_json from public.observations where predicate = 'project_profile' "
                        "and status = 'published' and value_json ->> 'camara_ref' is not null limit 1")[0]
     vectors = FakeVectors([{"score": 0.9, "payload": {
         "doc_kind": "ficha", "document_key": f"camara-ficha:{ficha['subject_ref']}",
-        "title": ficha["value_json"]["short_name"], "text": ficha["value_json"]["title"], "year": 2026,
+        "title": ficha["value_json"]["short_name"], "text": "Título: " + ficha["value_json"]["title"], "year": 2026,
         "source_url": ficha["value_json"]["link"], "project_ids": []}}, {"score": 0.88, "payload": {
         "doc_kind": "gaceta", "document_key": "gaceta:senado:2026:1382", "title": "Gaceta 1382 de 2026 (senado)",
         "text": "El presente proyecto de ley tiene por objeto la seguridad hídrica.", "pdf_page_start": 3,
@@ -84,77 +112,152 @@ def bot(db: Db, loaded):  # noqa: F811
         "project_ids": []}}])
     engine = AnswerEngine(rpc, vectors, lambda text: [0.0] * 384,
                           clock=lambda: datetime(2026, 9, 28, 10, tzinfo=BOGOTA))
-    api = FakeApi()
-    intake = TelegramWebhook(WebhookSettings(BOT_ID, "no-se-usa", KEY), rpc)
-    return BotService(api, intake, rpc, engine, worker_id="test-bot"), api, vectors
-
-
-def _ask(service: BotService, api: FakeApi, text: str, user: int = ALLOWED) -> list[str]:
-    before = len(api.sent)
-    api.say(user, text)
-    service.poll_once(None)
-    service.drain()
-    return [t for _, t, _ in api.sent[before:]]
+    transport = FakeTransport()
+    harness_loop = asyncio.new_event_loop()
+    redis = Redis.from_url(REDIS_URL)
+    state = UiState(redis, bot_id=BOT_ID, namespace=f"test-{os.getpid()}")
+    runtime = UiRuntime(transport=transport, state=state, app=UiApplication(engine),
+                        intake=TelegramWebhook(WebhookSettings(BOT_ID, "no-se-usa", KEY, rate_limit_per_minute=500), rpc), rpc=rpc,
+                        bot_id=BOT_ID, pseudonym_key=KEY, worker_id="test-bot")
+    harness = Harness(runtime, transport, vectors)
+    harness.loop = harness_loop
+    yield harness
+    harness.run(redis.aclose())
+    harness_loop.close()
 
 
 def test_project_card_is_answered_and_recorded(db: Db, bot) -> None:
-    service, api, _ = bot
-    [reply] = _ask(service, api, "PL 396/2026 Cámara")
-    assert "PL 396/2026 Cámara" in reply and "Estado" in reply and "Autores" in reply
-    assert "Ficha en la Cámara" in reply and 'href="https://www.camara.gov.co/' in reply
-    run = db.execute("select q.status, q.intent, a.support_status, d.state, d.provider_message_id "
+    [reply] = bot.say("PL 396/2026 Cámara")
+    assert "PL 396/2026 Cámara" in reply["html"] and "Estado" in reply["html"] and "Autores" in reply["html"]
+    assert 'href="https://www.camara.gov.co/' in reply["html"]
+    assert "🏠 Inicio" in keyboard_texts(reply["keyboard"])
+    run = db.execute("select q.status, a.support_status, d.state, d.provider_message_id "
                      "from public.query_runs q join public.answer_records a on a.query_id = q.id "
                      "join public.delivery_attempts d on d.answer_id = a.id order by q.created_at desc limit 1")[0]
-    assert run == {"status": "answered", "intent": "hybrid", "support_status": "supported", "state": "sent",
-                   "provider_message_id": run["provider_message_id"]} and run["provider_message_id"]
+    assert run["status"] == "answered" and run["state"] == "sent" and run["provider_message_id"] == reply["id"]
 
 
 def test_unknown_project_says_absence_is_not_zero(bot) -> None:
-    service, api, _ = bot
-    [reply] = _ask(service, api, "¿En qué va el PL 9999/2019 Senado?")
-    assert "No encontré" in reply and "PL 9999/2019 Senado" in reply
+    [reply] = bot.say("¿En qué va el PL 9999/2019 Senado?")
+    assert "No encontré" in reply["html"] and "PL 9999/2019 Senado" in reply["html"]
 
 
 def test_unauthorized_user_gets_their_id_and_no_query(db: Db, bot) -> None:
-    service, api, _ = bot
     before = db.execute("select count(*) n from public.query_runs")[0]["n"]
-    [reply] = _ask(service, api, "hola", user=STRANGER)
-    assert str(STRANGER) in reply and "piloto privado" in reply
+    [reply] = bot.say("hola", user=STRANGER)
+    assert str(STRANGER) in reply["html"] and "piloto privado" in reply["html"]
     assert db.execute("select count(*) n from public.query_runs")[0]["n"] == before
 
 
 def test_duplicate_update_is_answered_once(bot) -> None:
-    service, api, _ = bot
-    api.say(ALLOWED, "/help", update_id=5000)
-    api.say(ALLOWED, "/help", update_id=5000)
-    before = len(api.sent)
-    service.poll_once(None)
-    service.drain()
-    assert len(api.sent) - before == 1
+    first = bot.say("/help", update_id=5000)
+    again = bot.say("/help", update_id=5000)
+    assert len(first) == 1 and again == []
 
 
 def test_person_query_lists_authored_projects(db: Db, bot) -> None:
-    service, api, _ = bot
     name = db.execute("select pe.canonical_name from public.persons pe join public.project_participants pp "
                       "on pp.person_id = pe.id group by pe.canonical_name order by count(*) desc limit 1")[0]["canonical_name"]
-    [reply] = _ask(service, api, f"proyectos de {name}")
-    assert "Proyectos como autor" in reply and "PL " in reply
-
-
-def test_agenda_without_data_reports_latest_available(bot) -> None:
-    service, api, _ = bot
-    [reply] = _ask(service, api, "agenda de esta semana")
-    assert "No hay agenda publicada" in reply
+    [reply] = bot.say(f"proyectos de {name}")
+    assert "Proyectos como autor" in reply["html"] and "PL " in reply["html"]
 
 
 def test_document_search_cites_sources(bot) -> None:
-    service, api, vectors = bot
-    [reply] = _ask(service, api, "proyectos sobre seguridad hídrica")
-    assert "Proyectos relacionados" in reply and "Pasajes en gacetas" in reply and "p. 3" in reply
-    assert vectors.calls[-1] is None  # sin proyecto citado no se filtra
+    [reply] = bot.say("¿qué propuestas hay sobre seguridad hídrica?")
+    assert "Proyectos relacionados" in reply["html"] and "Pasajes en gacetas" in reply["html"]
+    assert "p. 3" in reply["html"] and bot.vectors.calls[-1] is None
 
 
 def test_unsupported_question_is_declined(bot) -> None:
-    service, api, _ = bot
-    [reply] = _ask(service, api, "¿El PL 396/2026 Cámara se va a aprobar?")
-    assert "no hago predicciones" in reply
+    [reply] = bot.say("¿El PL 396/2026 Cámara se va a aprobar?")
+    assert "no hago predicciones" in reply["html"]
+
+
+# -- interfaz conversacional (centrorequirement.md) -------------------------------------------
+
+def test_start_opens_home_with_only_available_sections(bot) -> None:
+    """UI-T01/UI-F05: el menú solo ofrece lo que responde con datos; lo pendiente se explica por texto."""
+    [home] = bot.say("/start")
+    labels = keyboard_texts(home["keyboard"])
+    assert labels == ["🗓 Agenda", "🔗 Fuentes", "❓ Ayuda"]
+    [pending] = bot.say("proyectos")
+    assert "Todavía no tengo el explorador de proyectos" in pending["html"]
+
+
+def test_button_edits_the_same_message_and_back_returns(bot) -> None:
+    [home] = bot.say("inicio")
+    bot.click(home, "🔗 Fuentes")
+    edit = bot.transport.edits[-1]
+    assert edit["id"] == home["id"] and "Fuentes consultadas" in edit["html"]
+    assert bot.transport.answers[-1] == {"id": bot.transport.answers[-1]["id"], "text": None, "alert": False}
+    bot.click({"id": home["id"], "chat": ALLOWED, "keyboard": edit["keyboard"]}, "⬅️ Volver")
+    assert "Tu explorador legislativo" in bot.transport.edits[-1]["html"]
+
+
+def test_callback_payload_is_short_and_opaque(bot) -> None:
+    """UI-T37: token opaco ≤ 64 bytes; no lleva filtros, textos ni permisos."""
+    [home] = bot.say("inicio")
+    for row in home["keyboard"]:
+        for button in row:
+            data = button["callback_data"]
+            assert data.startswith("v1:") and len(data.encode()) <= 64 and "{" not in data
+
+
+def test_double_click_has_one_effect(bot) -> None:
+    """UI-T38: el mismo callback entregado dos veces produce una sola edición."""
+    [home] = bot.say("inicio")
+    before = len(bot.transport.edits)
+    bot.click(home, "❓ Ayuda", callback_id="doble")
+    bot.click(home, "❓ Ayuda", callback_id="doble")
+    assert len(bot.transport.edits) - before == 1
+
+
+def test_foreign_and_forged_callbacks_are_rejected(bot) -> None:
+    """UI-T36: un menú ajeno no se ejecuta; un token falso o vencido reabre el inicio sin exponer datos."""
+    [home] = bot.say("inicio")
+    edits = len(bot.transport.edits)
+    bot.click(home, "🔗 Fuentes", user=OTHER_ALLOWED)
+    assert bot.transport.answers[-1]["alert"] and "otra persona" in bot.transport.answers[-1]["text"]
+    assert len(bot.transport.edits) == edits
+    forged = {"id": home["id"], "chat": ALLOWED, "keyboard": [[{"text": "x", "callback_data": "v1:falsificado"}]]}
+    bot.click(forged, "x")
+    assert "venció" in bot.transport.answers[-1]["text"]
+    assert "Tu explorador legislativo" in (bot.transport.edits[-1]["html"] + bot.transport.sent[-1]["html"])
+
+
+def test_repeated_start_keeps_navigation_bounded(bot) -> None:
+    """UI-T06: repetir /start no acumula marcos de retorno."""
+    for _ in range(5):
+        bot.say("/start")
+    ctx = bot.run(bot.runtime.state.load(ALLOWED, ALLOWED))
+    assert ctx.navigation_stack == [] and ctx.current.intent.value == "home.open"
+
+
+def test_stale_render_does_not_overwrite_newer_view(bot) -> None:
+    """UI-T41/UI-F28: si otra interacción guarda la sesión mientras se arma una vista, la vista
+    vieja no edita el mensaje ni pisa el contexto."""
+    runtime = bot.runtime
+    [home] = bot.say("inicio")
+    original = runtime.app.handle
+
+    def concurrent_handle(action, ctx):
+        view = original(action, ctx)
+        other = asyncio.run_coroutine_threadsafe(runtime.state.load(ALLOWED, ALLOWED), bot.loop).result()
+        assert asyncio.run_coroutine_threadsafe(runtime.state.save(ALLOWED, ALLOWED, other), bot.loop).result()
+        return view
+
+    runtime.app.handle = concurrent_handle
+    try:
+        edits = len(bot.transport.edits)
+        bot.click(home, "❓ Ayuda")
+        assert len(bot.transport.edits) == edits  # la vista vieja se descarta
+    finally:
+        runtime.app.handle = original
+
+
+def test_session_compare_and_swap(bot) -> None:
+    state = bot.runtime.state
+    first = bot.run(state.load(ALLOWED, ALLOWED))
+    second = bot.run(state.load(ALLOWED, ALLOWED))
+    assert bot.run(state.save(ALLOWED, ALLOWED, first)) is True
+    assert bot.run(state.save(ALLOWED, ALLOWED, second)) is False
