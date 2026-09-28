@@ -19,7 +19,7 @@ from botcentro.embeddings.e5 import DIMENSIONS, INDEX_NAMESPACE
 from botcentro.errors import BotcentroError
 
 COLLECTION = f"botcentro-docs-{INDEX_NAMESPACE}"
-_KEYWORD_FIELDS = ("document_key", "document_type", "source_code", "project_ids", "doc_kind")
+_KEYWORD_FIELDS = ("document_key", "document_type", "source_code", "project_ids", "doc_kind", "segment_kind")
 _INTEGER_FIELDS = ("year",)
 
 
@@ -48,23 +48,25 @@ class QdrantStore:
         return response.json().get("result")
 
     def ensure_collection(self) -> bool:
-        """Crea la colección y sus índices de carga útil si no existen. Devuelve True si la creó."""
+        """Crea la colección si no existe y asegura sus índices de carga útil (idempotente).
+        Devuelve True si la creó."""
         existing = self._request("GET", "/collections")
-        if any(c["name"] == self.collection for c in existing["collections"]):
-            return False
-        self._request("PUT", f"/collections/{self.collection}", {
-            "vectors": {"size": DIMENSIONS, "distance": "Cosine", "on_disk": True},
-            "quantization_config": {"scalar": {"type": "int8", "quantile": 0.99, "always_ram": True}},
-            "on_disk_payload": True,
-            "hnsw_config": {"m": 16, "ef_construct": 100},
-        })
-        for field in _KEYWORD_FIELDS:
+        created = not any(c["name"] == self.collection for c in existing["collections"])
+        if created:
+            self._request("PUT", f"/collections/{self.collection}", {
+                "vectors": {"size": DIMENSIONS, "distance": "Cosine", "on_disk": True},
+                "quantization_config": {"scalar": {"type": "int8", "quantile": 0.99, "always_ram": True}},
+                "on_disk_payload": True,
+                "hnsw_config": {"m": 16, "ef_construct": 100},
+            })
+        schema = self.info().get("payload_schema", {}) if not created else {}
+        for field in (f for f in _KEYWORD_FIELDS if f not in schema):
             self._request("PUT", f"/collections/{self.collection}/index?wait=true",
                           {"field_name": field, "field_schema": "keyword"})
-        for field in _INTEGER_FIELDS:
+        for field in (f for f in _INTEGER_FIELDS if f not in schema):
             self._request("PUT", f"/collections/{self.collection}/index?wait=true",
                           {"field_name": field, "field_schema": "integer"})
-        return True
+        return created
 
     def upsert(self, points: Sequence[Mapping[str, Any]]) -> int:
         """Publica puntos {id, vector, payload}; espera confirmación para no perder lotes."""

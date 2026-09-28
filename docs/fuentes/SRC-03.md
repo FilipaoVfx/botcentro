@@ -34,12 +34,34 @@ Ficha de descubrimiento (H0), verificada en vivo el 2026-09-28.
 - referencias encontradas y enlazadas;
 - chunks.
 
-Primeras 3 gacetas (smoke test, 2026-09-28):
+### Resultados (2026-09-28)
 
-| Gaceta | Páginas | OCR | Ilegibles | Segmentos | Referencias enlazadas | Chunks | Segundos |
-|---|---|---|---|---|---|---|---|
-| Senado 1382 | 8 | 5 | 0 | 7 | 1 de 2 | 55 | 28 |
-| Senado 1381 | 14 | 1 | 0 | 10 | 1 de 7 | 99 | 21 |
-| Senado 1380 | 80 | 16 | 3 | 2 | 1 de 1 | 287 | 78 |
+**Muestra:** las 200 gacetas más recientes, publicadas del 1 al 24 de septiembre de 2026 (98 de Senado y 99 de Cámara).
+- **Procesadas:** 197.
+- **Fallidas:** 3. Dos PDF superan 120 MB y en uno la fuente no entregó el PDF.
 
-Las referencias sin enlazar son, sobre todo, números de Senado de proyectos que todavía no están en la base. SRC-02 está bloqueada, y SRC-01 solo incluye proyectos votados en plenaria. El informe final cuantificará esta brecha.
+| Métrica | Valor |
+|---|---|
+| Descarga | 1.634 MB (mediana 2,4 MB por gaceta; máximo 85 MB). No se guardó ningún PDF |
+| Páginas | 6.144: 4.902 con texto nativo (80 %), 1.020 con OCR (17 %) y 222 ilegibles (3,6 %, no indexadas) |
+| Tiempo | 2,2 h en total, 1,3 s por página y mediana de 23 s por gaceta. Lo más lento son los embeddings (1,2 h) y luego el texto y OCR (0,8 h) |
+| Chunks en Qdrant | 31.260, el 56 % enlazado a un proyecto |
+| Tipos de chunk | texto radicado 50 %, ponencia 24 %, otro 11 %, texto aprobado 8 %, acta 3,5 % y portada 2 % |
+| Referencias en encabezados | 485, de las cuales 324 se enlazaron (67 %). Hay 197 proyectos distintos enlazados y 182 de las 197 gacetas tocan al menos uno |
+| Referencias no enlazadas | 121 distintas, **todas con número de Senado** de 2025–2026: proyectos que aún no están en la base, porque SRC-02 está bloqueada y SRC-01 solo tiene proyectos votados |
+
+### Proyección para la carga desde 2022
+
+Desde el 20-jul-2022 hay **8.741 gacetas**, medidas con búsqueda binaria en el listado; desde 2018 hay 14.956. La proyección aplica los promedios del piloto y tiene un sesgo posible, porque la muestra es de septiembre (periodo de sesiones):
+
+| | Proyección 2022+ |
+|---|---|
+| Chunks | ~1,39 M: **supera el límite de 1 M de vectores de Qdrant free** |
+| Proceso | ~99 h (~4 días continuos en 2 CPU) |
+| Transferencia | ~72 GB (no se almacenan) |
+
+### Hallazgos
+
+1. **El enlace falla por cobertura, no por el parser:** todas las referencias sin enlazar son números de Senado. Los segmentos `texto_radicado` de Senado traen número y título, así que pueden crear la identidad Senado de esos proyectos y cerrar en parte el hueco de SRC-02.
+2. **Calidad del OCR:** es utilizable pero ruidoso en algunas páginas. La búsqueda por significado devuelve pasajes pertinentes, y lo más útil es filtrar por `project_ids`, que es el caso del bot al preguntar por un proyecto.
+3. **Segmentos «otro» y «portada» (13 %):** vienen de gacetas sin encabezados reconocibles. Son candidatos a no indexarse o a mejorar los patrones.
