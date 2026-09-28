@@ -166,6 +166,10 @@ class SafeFetcher:
     def close(self) -> None:
         self._client.close()
 
+    def clear_cookies(self) -> None:
+        """Descarta la sesión HTTP (cookies) antes de un flujo que debe empezar limpio."""
+        self._client.cookies.clear()
+
     def __enter__(self) -> SafeFetcher:
         return self
 

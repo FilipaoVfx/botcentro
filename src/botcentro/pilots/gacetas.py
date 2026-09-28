@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import time
 import uuid
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -56,13 +55,12 @@ def _project_of(ref: ProjectRef, index: dict[tuple[str, str, str, int], str]) ->
     return None
 
 
-def recent(listing: GacetaListing, limit: int, pause: float) -> Iterator[GacetaRef]:
-    first = 0
-    while first < min(limit, listing.total):
-        for ref in listing.page(first, 50)[: limit - first]:
-            yield ref
-        first += 50
+def recent(listing: GacetaListing, limit: int, pause: float) -> list[GacetaRef]:
+    refs: list[GacetaRef] = []
+    while len(refs) < min(limit, listing.total):
+        refs.extend(listing.page(len(refs), 50)[: limit - len(refs)])
         time.sleep(pause)
+    return refs
 
 
 def process(ref: GacetaRef, *, fetcher: SafeFetcher, embedder: E5SmallEmbedder, store: QdrantStore,
@@ -118,15 +116,22 @@ def process(ref: GacetaRef, *, fetcher: SafeFetcher, embedder: E5SmallEmbedder, 
 
 def run_pilot(*, limit: int, out: Path, fetcher: SafeFetcher, client: InsForgeClient, store: QdrantStore,
               embedder: E5SmallEmbedder, budget: BudgetGuard, pause: float = 3.0) -> dict[str, int]:
-    done = set()
+    done: set[str] = set()
+    retry: set[str] = set()  # las fallidas se reintentan; el informe usa la última línea de cada gaceta
     if out.exists():
-        done = {json.loads(line)["document_key"] for line in out.read_text().splitlines() if line.strip()}
+        for line in filter(str.strip, out.read_text().splitlines()):
+            record = json.loads(line)
+            done.add(record["document_key"])
+            if "error" in record:
+                retry.add(record["document_key"])
+            else:
+                retry.discard(record["document_key"])
     identifiers = load_identifiers(client)
     listing = GacetaListing(fetcher)
     totals = {"processed": 0, "skipped": 0, "failed": 0}
     with out.open("a") as sink:
         for ref in recent(listing, limit, pause):
-            if ref.document_key in done:
+            if ref.document_key in done and ref.document_key not in retry:
                 totals["skipped"] += 1
                 continue
             try:

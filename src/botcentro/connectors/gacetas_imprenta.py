@@ -68,7 +68,8 @@ def parse_rows(markup: str) -> list[GacetaRef]:
 
 
 class GacetaListing:
-    """Recorre el listado (más reciente primero) conservando la sesión JSF."""
+    """Recorre el listado (más reciente primero) conservando la sesión JSF. La sesión caduca en
+    ~30 min: léase el listado completo antes de descargar."""
 
     def __init__(self, fetcher: SafeFetcher) -> None:
         self.fetcher = fetcher
@@ -98,6 +99,9 @@ class GacetaListing:
 
 
 def download(fetcher: SafeFetcher, ref: GacetaRef) -> Fetched:
+    """Cada descarga abre su propia sesión JSF: en una sesión reutilizada la fuente decodifica mal
+    `ent=C%E1mara` y devuelve HTML en lugar del PDF (medido en el piloto)."""
+    fetcher.clear_cookies()
     page = _html(fetcher.fetch(ref.permalink))
     form, state = _FORM_RE.search(page), _STATE_RE.search(page)
     if not (form and form["form"] == "dldFile" and state):
