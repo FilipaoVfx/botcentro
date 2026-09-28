@@ -6,7 +6,7 @@ Entregable de PRD §6.1 y SRS §20. Ninguna fuente pasa de `candidate` sin compl
 
 | ID | Fuente | Autoridad | Fase | Estado | Responsable |
 |---|---|---|---|---|---|
-| SRC-01 | Senado — Datos Públicos | primaria | MVP | candidata · descubierta ([ficha](SRC-01.md)); perfil propuesto, pendiente de aprobación | por asignar |
+| SRC-01 | Senado — Datos Públicos | primaria | MVP | **activa** · perfil v1 aprobado ([ficha](SRC-01.md)); conector `senado_open_data` 0.1.0 | juanku2003@gmail.com |
 | SRC-02 | Senado — Sección de Leyes | primaria | MVP | candidata · bloqueada por anti-bots, requiere autorización ([ficha](SRC-02.md)) | por asignar |
 | SRC-03 | Gacetas enlazadas | primaria | MVP | candidata | por asignar |
 | SRC-04 | Senado — Órdenes del día | primaria | MVP | candidata | por asignar |
