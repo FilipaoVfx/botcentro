@@ -168,3 +168,18 @@ def test_parse_retry_after() -> None:
     assert parse_retry_after("30", now) == 30
     assert parse_retry_after("Sat, 26 Sep 2026 12:01:00 GMT", now) == 60
     assert parse_retry_after("mañana", now) is None
+
+
+def test_post_form_and_redirect_switches_to_get() -> None:
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append((request.method, request.url.path, request.content))
+        if request.url.path == "/ajax":
+            return httpx.Response(303, headers={"location": "/result"})
+        return httpx.Response(200, content=b'{"ok": true}')
+
+    result = _fetcher(handler).fetch("https://leyes.senado.gov.co/ajax", method="POST", data={"action": "x"})
+    assert result.sniffed_mime == "application/json"
+    assert seen[0][0] == "POST" and b"action=x" in seen[0][2]
+    assert seen[1][:2] == ("GET", "/result")

@@ -14,10 +14,12 @@ import json
 import os
 import sys
 from pathlib import Path
+from collections.abc import Sequence
 from typing import Any
 
 import httpx
 
+from botcentro.connectors.camara_proyectos import CamaraProyectosConnector
 from botcentro.connectors.senado_open_data import SenadoOpenDataConnector
 from botcentro.http.fetcher import SafeFetcher
 from botcentro.ingest.runner import IngestionRunner
@@ -28,7 +30,7 @@ from botcentro.sources.policy import Permission, UsageProfile
 from botcentro.storage.objects import LocalObjectStore
 
 ACCOUNTS = {"ingest": "BOTCENTRO_INGEST", "query": "BOTCENTRO_QUERY"}
-CONNECTORS = {"senado_open_data": SenadoOpenDataConnector}
+CONNECTORS = {"senado_open_data": SenadoOpenDataConnector, "camara_proyectos": CamaraProyectosConnector}
 
 
 def load_env(path: str = ".env") -> None:
@@ -122,20 +124,46 @@ NORMALIZE_STEPS = ("catalog", "projects", "sessions", "votings", "vote_observati
 BATCHED_STEPS = {"vote_observations", "current_votes", "attendance"}
 
 
-def normalize(code: str, batch: int = 20000) -> None:
-    if code != "SRC-01":
-        sys.exit("solo SRC-01 tiene normalizador por ahora")
-    client = account_client("ingest")
-    for step in NORMALIZE_STEPS:
+CAMARA_STEPS = ("projects", "status", "authors")
+
+
+def _run_steps(client: InsForgeClient, fn: str, steps: Sequence[str], batched: set[str], batch: int) -> None:
+    for step in steps:
         total: dict[str, int] = {}
         while True:
-            result = client.call("normalize_senado_od", {"p_step": step, "p_limit": batch})
+            result = client.call(fn, {"p_step": step, "p_limit": batch})
             counts = {k: v for k, v in result.items() if k != "step"}
             for k, v in counts.items():
                 total[k] = total.get(k, 0) + v
-            if step not in BATCHED_STEPS or not any(counts.values()):
+            if step not in batched or not any(counts.values()):
                 break
         print(json.dumps({"step": step, **total}, ensure_ascii=False), flush=True)
+
+
+def normalize(code: str) -> None:
+    client = account_client("ingest")
+    if code == "SRC-01":
+        _run_steps(client, "normalize_senado_od", NORMALIZE_STEPS, BATCHED_STEPS, 20000)
+    elif code == "SRC-06":
+        _run_steps(client, "normalize_camara_pl", CAMARA_STEPS, set(CAMARA_STEPS), 100)
+    else:
+        sys.exit(f"{code} no tiene normalizador")
+
+
+def index_fichas(batch: int) -> None:
+    from botcentro.costs.budget import BudgetGuard
+    from botcentro.documents.fichas import FichaIndexer
+    from botcentro.embeddings.e5 import E5SmallEmbedder
+
+    client = account_client("ingest")
+    indexer = FichaIndexer(client, E5SmallEmbedder(), BudgetGuard(client), batch=batch)
+    totals: dict[str, int] = {}
+    while (counts := indexer.run_batch()) is not None:
+        for k, v in counts.items():
+            totals[k] = totals.get(k, 0) + v
+        print(json.dumps(totals, ensure_ascii=False), flush=True)
+        if not counts["created"] and not counts["revised"]:
+            break  # solo quedan fichas sin texto: no se reintentan en bucle
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -153,11 +181,15 @@ def main(argv: list[str] | None = None) -> None:
     i.add_argument("--reparse", action="store_true", help="reinterpreta capturas sin cambios (nuevo parser)")
     n = sub.add_parser("normalize", help="convierte observaciones publicadas en entidades (idempotente)")
     n.add_argument("source")
+    f = sub.add_parser("index-fichas", help="documenta e indexa (e5-small) las fichas de proyecto de SRC-06")
+    f.add_argument("--batch", type=int, default=100)
     args = parser.parse_args(argv)
     if args.command == "verify-account":
         verify_account(args.who, args.code)
     elif args.command == "normalize":
         normalize(args.source)
+    elif args.command == "index-fichas":
+        index_fichas(args.batch)
     else:
         ingest(args.source, args.start, args.end, args.window_days, args.reparse)
 

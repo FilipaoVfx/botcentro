@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -179,9 +179,14 @@ class SafeFetcher:
         etag: str | None = None,
         last_modified: str | None = None,
         accept_mimes: frozenset[str] | None = None,
+        method: str = "GET",
+        data: Mapping[str, str] | None = None,
     ) -> Fetched | NotModified:
+        """GET (por defecto) o POST de formulario. Tras 301/302/303 un POST continúa como GET."""
+        if method not in ("GET", "POST"):
+            raise ValueError("solo se admiten GET y POST")
         try:
-            return self._fetch(url, etag, last_modified, accept_mimes)
+            return self._fetch(url, etag, last_modified, accept_mimes, method, data)
         except UrlRejected as exc:
             raise FetchError(exc.code, str(exc), kind=FailureKind.POLICY) from exc
         except httpx.TimeoutException as exc:
@@ -190,7 +195,8 @@ class SafeFetcher:
             raise FetchError("NETWORK_ERROR", f"error de red: {exc}", kind=FailureKind.TRANSIENT) from exc
 
     def _fetch(
-        self, url: str, etag: str | None, last_modified: str | None, accept_mimes: frozenset[str] | None
+        self, url: str, etag: str | None, last_modified: str | None, accept_mimes: frozenset[str] | None,
+        method: str = "GET", data: Mapping[str, str] | None = None,
     ) -> Fetched | NotModified:
         self._guard.check_url(url)
         headers: dict[str, str] = {}
@@ -201,7 +207,8 @@ class SafeFetcher:
 
         current = url
         for _ in range(self._limits.max_redirects + 1):
-            with self._client.stream("GET", current, headers=headers) as response:
+            with self._client.stream(method, current, headers=headers,
+                                     data=dict(data) if method == "POST" and data else None) as response:
                 # httpx considera redirección cualquier 3xx (incluido 304): se usa la lista explícita.
                 if response.status_code in _REDIRECT_STATUSES:
                     location = response.headers.get("location")
@@ -209,6 +216,8 @@ class SafeFetcher:
                         raise FetchError("REDIRECT_WITHOUT_LOCATION", "redirección sin destino", kind=FailureKind.INVALID_CONTENT)
                     current = urljoin(current, location)
                     self._guard.check_url(current)
+                    if response.status_code in (301, 302, 303):
+                        method, data = "GET", None
                     continue
                 return self._read(url, current, response, accept_mimes)
         raise FetchError("TOO_MANY_REDIRECTS", f"más de {self._limits.max_redirects} redirecciones", kind=FailureKind.POLICY)

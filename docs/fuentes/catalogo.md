@@ -11,7 +11,7 @@ Entregable de PRD §6.1 y SRS §20. Ninguna fuente pasa de `candidate` sin compl
 | SRC-03 | Gacetas enlazadas | primaria | MVP | candidata | por asignar |
 | SRC-04 | Senado — Órdenes del día | primaria | MVP | candidata | por asignar |
 | SRC-05 | Senado — Actas y Relatoría | primaria | MVP | candidata | por asignar |
-| SRC-06 | Cámara — Buscador Legislativo | primaria | MVP | candidata | por asignar |
+| SRC-06 | Cámara — Proyectos de Ley | primaria | MVP | **activa** · licencia abierta publicada ([ficha](SRC-06.md)); conector `camara_proyectos` 0.1.0 | juanku2003@gmail.com |
 | SRC-07 | Cámara — Actas y votaciones | primaria | MVP | candidata | por asignar |
 | SRC-08 | Congreso Visible | secundaria | MVP condicional | candidata | por asignar |
 | SRC-09…14 | Normativa, video, noticias y comunidades | varias | Fases 2–3 | candidatas | por asignar |
