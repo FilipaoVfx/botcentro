@@ -32,6 +32,7 @@ class LiveStats:
         self.redis_url = redis_url
         self.metrics_prefix = metrics_prefix
         self._redis = None
+        self._manifest_cache: tuple[float, dict[str, Any]] | None = None
 
     @classmethod
     def from_env(cls) -> LiveStats:
@@ -118,6 +119,60 @@ class LiveStats:
         return {**stage, "total": views, "pending": None, "running": None, "failed": rejected,
                 "unit": f"vistas hoy · {counts.get('ui.context_conflict', 0)} conflictos de contexto"
                         + (f" · {latency}" if latency else "")}
+
+    def _manifest_summary(self) -> dict[str, Any] | None:
+        """Agregados del manifiesto de gacetas (última línea por gaceta), en caché por fecha de cambio."""
+        if not self.gacetas_status:
+            return None
+        manifest = Path(str(self.gacetas_status).replace(".status.json", ".jsonl"))
+        try:
+            mtime = manifest.stat().st_mtime
+        except OSError:
+            return None
+        if self._manifest_cache and self._manifest_cache[0] == mtime:
+            return self._manifest_cache[1]
+        last: dict[str, dict[str, Any]] = {}
+        for line in manifest.read_text().splitlines():
+            if line.strip():
+                record = json.loads(line)
+                last[record["document_key"]] = record
+        ok = [r for r in last.values() if "error" not in r]
+        order = list(last.values())[-10:][::-1]
+        summary = {
+            "processed": len(ok), "failed": len(last) - len(ok),
+            "pages": sum(r.get("pages", 0) for r in ok), "pages_ocr": sum(r.get("ocr_pages", 0) for r in ok),
+            "pages_unreadable": sum(r.get("unreadable_pages", 0) for r in ok),
+            "chunks": sum(r.get("chunks", 0) for r in ok),
+            "projects_linked": len({p for r in ok for p in r.get("projects", [])}),
+            "recent": [{"document_key": r["document_key"], "url": r.get("url"), "pages": r.get("pages"),
+                        "ocr_pages": r.get("ocr_pages"), "unreadable_pages": r.get("unreadable_pages"),
+                        "chunks": r.get("chunks"), "projects": len(r.get("projects", [])),
+                        "segment_kinds": r.get("segment_kinds", []), "error": r.get("error"),
+                        "seconds": r.get("seconds_total")} for r in order],
+        }
+        self._manifest_cache = (mtime, summary)
+        return summary
+
+    def documents_extra(self) -> dict[str, Any]:
+        index: dict[str, Any] = {"available": False}
+        if self.qdrant_url:
+            try:
+                with httpx.Client(base_url=self.qdrant_url, headers={"api-key": self.qdrant_key or ""}, timeout=3) as c:
+                    index = {"available": True, "total": self._qdrant_count(c, None),
+                             "fichas": self._qdrant_count(c, "ficha"), "gacetas": self._qdrant_count(c, "gaceta")}
+            except Exception as exc:  # noqa: BLE001
+                log.warning("Qdrant no disponible para el panel: %s", type(exc).__name__)
+        status = self._read_status() or {}
+        gacetas = self._manifest_summary() or {}
+        return {"vector_index": index, "gacetas": {**gacetas, "listed": status.get("listed"), "state": status.get("state"),
+                                                   "since": status.get("since"), "updated_at": status.get("updated_at")}}
+
+    def enrich_view(self, view: str, data: dict[str, Any]) -> dict[str, Any]:
+        if view == "overview":
+            return self.enrich(data)
+        if view == "documents" and data.get("access"):
+            return {**data, **self.documents_extra()}
+        return data
 
     def enrich(self, overview: dict[str, Any]) -> dict[str, Any]:
         if not overview.get("access") or "stages" not in overview:

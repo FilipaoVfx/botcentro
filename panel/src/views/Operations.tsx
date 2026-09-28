@@ -209,6 +209,14 @@ interface DocumentsData {
     extraction: { status: string; quality: string | null; page_count: number | null; pages_ocr: number | null; extractor_version: string } | null;
     chunks: number;
   }>;
+  vector_index?: { available: boolean; total?: number; fichas?: number; gacetas?: number };
+  gacetas?: {
+    processed?: number; failed?: number; pages?: number; pages_ocr?: number; pages_unreadable?: number;
+    chunks?: number; projects_linked?: number; listed?: number | null; state?: string | null; since?: string | null;
+    updated_at?: string | null;
+    recent?: Array<{ document_key: string; url?: string | null; pages?: number; ocr_pages?: number;
+      unreadable_pages?: number; chunks?: number; projects?: number; error?: string | null; seconds?: number }>;
+  };
 }
 
 const DOC_TOTALS: Array<[string, string]> = [
@@ -219,9 +227,22 @@ const DOC_TOTALS: Array<[string, string]> = [
   ["pages", "Páginas"],
   ["pages_ocr", "Páginas OCR"],
   ["chunks", "Chunks"],
-  ["embeddings_pending", "Embeddings pendientes"],
-  ["embeddings_indexed", "Embeddings indexados"],
 ];
+
+const GACETA_TOTALS: Array<[string, string]> = [
+  ["processed", "Procesadas"],
+  ["failed", "Fallidas"],
+  ["pages", "Páginas"],
+  ["pages_ocr", "Páginas OCR"],
+  ["pages_unreadable", "Ilegibles"],
+  ["chunks", "Chunks"],
+  ["projects_linked", "Proyectos enlazados"],
+];
+
+function gacetaName(key: string): string {
+  const [, corp, year, num] = key.split(":");
+  return `Gaceta ${num} de ${year} · ${corp === "camara" ? "Cámara" : "Senado"}`;
+}
 
 export function Documents({ now }: { now: number }) {
   const view = useView<Maybe<DocumentsData>>("/v1/admin/ops/documents?limit=100");
@@ -229,13 +250,58 @@ export function Documents({ now }: { now: number }) {
     <>
       <PageHead
         title="Documentos e índice"
-        intro="Linaje por revisión: archivo, extracción, chunks e índice. La metadata no implica permiso para redistribuir el original."
+        intro="Índice vectorial (Qdrant), carga de gacetas y documentos registrados en InsForge. Los vectores viven en Qdrant (DEC-12, DEC-15); los PDF de gacetas no se guardan (DEC-11)."
         asOf={view.data?.as_of}
         now={now}
       />
       <Guard view={view}>
         {(data) => (
           <>
+            <section className="section" aria-labelledby="index-title">
+              <h2 id="index-title">Índice vectorial · Qdrant</h2>
+              {data.vector_index?.available ? (
+                <div className="counters">
+                  <div className="counter"><span className="counter__label">Vectores</span><FlapCount value={data.vector_index.total} digits={6} size="lg" /></div>
+                  <div className="counter"><span className="counter__label">De fichas</span><FlapCount value={data.vector_index.fichas} digits={6} size="lg" /></div>
+                  <div className="counter"><span className="counter__label">De gacetas</span><FlapCount value={data.vector_index.gacetas} digits={6} size="lg" /></div>
+                </div>
+              ) : (
+                <StateBlock tone="empty" title="Qdrant no disponible">No se pudo medir el índice ahora; esto no significa que esté vacío.</StateBlock>
+              )}
+            </section>
+            <section className="section" aria-labelledby="gacetas-title">
+              <h2 id="gacetas-title">
+                Gacetas · Imprenta Nacional
+                {data.gacetas?.listed ? <span className="row-sub"> {data.gacetas.processed ?? 0} de {data.gacetas.listed} desde {data.gacetas.since} · {data.gacetas.state === "running" ? "carga en curso" : data.gacetas.state ?? ""}</span> : null}
+              </h2>
+              <div className="counters">
+                {GACETA_TOTALS.map(([key, label]) => (
+                  <div className="counter" key={key}>
+                    <span className="counter__label">{label}</span>
+                    <FlapCount value={(data.gacetas as Record<string, number> | undefined)?.[key]} digits={6} size="lg" />
+                  </div>
+                ))}
+              </div>
+              {data.gacetas?.recent?.length ? (
+                <div className="board-wrap">
+                  <table className="board">
+                    <thead><tr><th>Últimas procesadas</th><th className="num">Páginas / OCR / ilegibles</th><th className="num">Chunks</th><th className="num">Proyectos</th><th className="num">Segundos</th></tr></thead>
+                    <tbody>
+                      {data.gacetas.recent.map((g) => (
+                        <tr key={g.document_key}>
+                          <td>{g.url ? <a href={g.url} target="_blank" rel="noreferrer">{gacetaName(g.document_key)}</a> : gacetaName(g.document_key)}{g.error ? <span className="row-sub sev--warning">{g.error}</span> : null}</td>
+                          <td className="num">{g.error ? "—" : `${g.pages ?? "—"} / ${g.ocr_pages ?? "—"} / ${g.unreadable_pages ?? "—"}`}</td>
+                          <td className="num">{g.chunks ?? "—"}</td>
+                          <td className="num">{g.projects ?? "—"}</td>
+                          <td className="num">{g.seconds ? Math.round(g.seconds) : "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+            </section>
+            <section className="section"><h2>Documentos registrados en InsForge (fichas de la Cámara)</h2></section>
             <div className="counters">
               {DOC_TOTALS.map(([key, label]) => (
                 <div className="counter" key={key}>

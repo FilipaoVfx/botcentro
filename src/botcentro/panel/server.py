@@ -73,7 +73,7 @@ def _from_env() -> FastAPI:
     secure = os.environ.get("BOTCENTRO_PANEL_INSECURE_COOKIE") != "1"
     from botcentro.panel.live_stats import LiveStats
 
-    return create_panel_app(SessionStore(InsForgeAuth(base)), secure_cookie=secure, enrich=LiveStats.from_env().enrich)
+    return create_panel_app(SessionStore(InsForgeAuth(base)), secure_cookie=secure, enrich=LiveStats.from_env().enrich_view)
 
 
 app = _from_env() if os.environ.get("BOTCENTRO_INSFORGE_URL") else None

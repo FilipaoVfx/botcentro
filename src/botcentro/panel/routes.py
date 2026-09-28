@@ -155,7 +155,7 @@ def build_router(store: SessionStore, *, secure_cookie: bool = True, enrich=None
                 try:
                     data = await run_in_threadpool(store.rpc, session, "ops_overview", {})
                     if enrich is not None:
-                        data = await run_in_threadpool(enrich, data)
+                        data = await run_in_threadpool(enrich, "overview", data)
                 except SessionExpired:
                     yield "event: session_expired\ndata: {}\n\n"
                     return
@@ -196,8 +196,8 @@ def build_router(store: SessionStore, *, secure_cookie: bool = True, enrich=None
                     return _error("INVALID_FILTER", "Estado no reconocido.", 422, request)
                 params["p_state"] = value
         data = await run_in_threadpool(store.rpc, session, fn, params)
-        if view == "overview" and enrich is not None:
-            data = await run_in_threadpool(enrich, data)
+        if enrich is not None:
+            data = await run_in_threadpool(enrich, view, data)
         return JSONResponse({**data, "request_id": request.state.request_id})
 
     return router
