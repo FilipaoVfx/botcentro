@@ -15,7 +15,7 @@ from collections.abc import Callable
 from datetime import date, datetime, timedelta
 from typing import Any
 
-from botcentro.domain.dates import BOGOTA
+from botcentro.domain.dates import BOGOTA, DateRange, format_local_date, parse_spanish_date, resolve_relative_period
 from botcentro.query.engine import AnswerEngine, fmt_date
 from botcentro.telegram.render import Section, bold, escape, link, render_sections
 from botcentro.telegram_ui.contracts import (Button, Frame, Intent, PageInfo, ResultSet, SessionContext, UiAction,
@@ -28,7 +28,7 @@ IMPLEMENTED = frozenset({
     Intent.HOME, Intent.HELP, Intent.SOURCES, Intent.AGENDA, Intent.BACK, Intent.CANCEL, Intent.REFRESH,
     Intent.QUESTION, Intent.PROJECTS_LIST, Intent.PROJECTS_SEARCH, Intent.PROJECTS_FILTERS, Intent.FILTER_SET,
     Intent.SEARCH_PROMPT, Intent.PAGE, Intent.PROJECT_OPEN, Intent.PROJECT_PARTICIPANTS, Intent.ORDINAL,
-    Intent.VOTINGS, Intent.DOCUMENTS,
+    Intent.VOTINGS, Intent.DOCUMENTS, Intent.DAY_OVERVIEW, Intent.PROJECT_TIMELINE, Intent.DISCUSSIONS,
 })
 _ENGINE_FALLBACK = frozenset({Intent.PROJECTS_SEARCH})
 _PENDING_LABELS = {
@@ -87,11 +87,13 @@ class UiApplication:
         params = dict(action.parameters)
         # Captura de búsqueda: tras «🔎 Buscar», un texto breve sin números es el término buscado;
         # cualquier intención explícita distinta la suspende (§19.3).
-        if ctx.pending_clarification and ctx.pending_clarification.get("expect") == "search":
+        if ctx.pending_clarification and ctx.pending_clarification.get("expect") in ("search", "discussion"):
+            expect = ctx.pending_clarification["expect"]
             ctx.pending_clarification = None
             text = params.get("text", "")
             if intent is Intent.QUESTION and text and len(text.split()) <= 6 and not any(c.isdigit() for c in text):
-                intent, params = Intent.PROJECTS_SEARCH, {"query": text, "text": text}
+                intent, params = ((Intent.PROJECTS_SEARCH, {"query": text, "text": text}) if expect == "search"
+                                  else (Intent.DISCUSSIONS, {"query": text, "text": text}))
         if not self.is_available(intent) and intent in _ENGINE_FALLBACK and params.get("text"):
             intent, params = Intent.QUESTION, {"text": params["text"]}
         if not self.is_available(intent):
@@ -107,8 +109,13 @@ class UiApplication:
             view = self._from_answer("sources", "Fuentes disponibles", self.engine.answer("/fuentes"), ctx,
                                      [[HOME_BUTTON]])
         elif intent is Intent.AGENDA:
-            text = params.get("text") or "agenda de esta semana"
-            view = self._from_answer("agenda", "Agenda", self.engine.answer(text), ctx, [[HOME_BUTTON]])
+            view = self._agenda(params)
+        elif intent is Intent.DAY_OVERVIEW:
+            view = self._day(params)
+        elif intent is Intent.PROJECT_TIMELINE:
+            view = self._timeline(str(params.get("project_id") or ctx.active_project_id or ""), ctx)
+        elif intent is Intent.DISCUSSIONS:
+            view = self._discussions(params, ctx)
         elif intent in (Intent.PROJECTS_LIST, Intent.PROJECTS_SEARCH, Intent.FILTER_SET):
             view = self._project_list(intent, params, ctx)
             if view.view_type == "search_fallback":
@@ -156,7 +163,9 @@ class UiApplication:
     # -- inicio y ayudas -----------------------------------------------------------------------
 
     def _home(self, ctx: SessionContext) -> ViewModel:
-        rows = [[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST), Button(label="🗓 Agenda", intent=Intent.AGENDA)],
+        rows = [[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST),
+                 Button(label="🏛 Senado hoy", intent=Intent.DAY_OVERVIEW, params={"corporation": "senado"})],
+                [Button(label="🗓 Agenda", intent=Intent.AGENDA), Button(label="💬 Debates", intent=Intent.DISCUSSIONS)],
                 [Button(label="🔗 Fuentes", intent=Intent.SOURCES), HELP_BUTTON]]
         return ViewModel(view_type="home", title="🏛 Tu explorador legislativo", blocks=render_sections([Section(
             "🏛 Tu explorador legislativo", [
@@ -322,7 +331,8 @@ class UiApplication:
     # -- proyecto abierto ------------------------------------------------------------------------
 
     def _project_actions(self, project_id: str) -> list[Button]:
-        return [Button(label="👥 Autores", intent=Intent.PROJECT_PARTICIPANTS, params={"project_id": project_id}),
+        return [Button(label="🗓 Trámite", intent=Intent.PROJECT_TIMELINE, params={"project_id": project_id}),
+                Button(label="👥 Autores", intent=Intent.PROJECT_PARTICIPANTS, params={"project_id": project_id}),
                 Button(label="🗳 Votaciones", intent=Intent.VOTINGS, params={"project_id": project_id}),
                 Button(label="📄 Documentos", intent=Intent.DOCUMENTS, params={"project_id": project_id})]
 
@@ -335,7 +345,8 @@ class UiApplication:
             return ViewModel(view_type="unavailable", title="Proyecto no disponible", status="unavailable",
                              blocks=["Ese proyecto ya no está disponible en las fuentes cargadas."], rows=[[HOME_BUTTON]])
         ctx.active_project_id = project_id
-        rows = [self._project_actions(project_id)]
+        actions = self._project_actions(project_id)
+        rows = [actions[:2], actions[2:]]
         rows.append(([Button(label="⬅️ Resultados", intent=Intent.PAGE,
                              params={"result_set_id": ctx.result_set_id, "page": ctx.result_page})]
                      if ctx.result_set_id else []) + [HOME_BUTTON])
@@ -403,3 +414,172 @@ class UiApplication:
             lines.append("Aún no hay gacetas indexadas con este proyecto; la carga de gacetas desde 2022 está en curso.")
         return ViewModel(view_type="documents", title=f"Documentos · {label}", active_project_id=project_id,
                          status="ready" if docs else "partial", blocks=["\n".join(lines)], rows=self._sub_rows(project_id))
+
+    # -- jornada, agenda, cronología y debates (I3) ------------------------------------------------
+
+    def _resolve_day(self, params: dict[str, Any]) -> tuple[date, str]:
+        """(fecha, modo). Una fecha explícita se conserva; una relativa se reinterpreta al actualizar."""
+        if params.get("date"):
+            return date.fromisoformat(str(params["date"])), "explicit"
+        expression = str(params.get("expression") or "hoy")
+        now = datetime.combine(self.today(), datetime.min.time(), BOGOTA)
+        if (period := resolve_relative_period(expression, now)) is not None:
+            return period.start, "relative"
+        parsed = parse_spanish_date(expression)
+        return (parsed.value or self.today()), "explicit"
+
+    def _day(self, params: dict[str, Any]) -> ViewModel:
+        corp = "camara" if params.get("corporation") == "camara" else "senado"
+        corp_name = {"senado": "Senado", "camara": "Cámara"}[corp]
+        day, mode = self._resolve_day(params)
+        data = self.rpc.call("bot_day_overview", {"p_corporation": corp, "p_date": day.isoformat()}) or {}
+        future = day > self.today()
+        lines = [bold(f"🏛 {corp_name} · {format_local_date(day)}")]
+        if mode == "relative" and params.get("expression", "hoy") in ("hoy", "ayer", "manana"):
+            lines.append(f"<i>«{escape(str(params.get('expression', 'hoy')))}» en hora de Colombia.</i>")
+        # 1. Confirmado ese día
+        lines += ["", bold("Confirmado")]
+        if future:
+            lines.append("No hay hechos para fechas futuras; abajo está lo programado.")
+        else:
+            facts = []
+            grouped: dict[tuple[str, str], int] = {}
+            for v in data.get("votings") or []:
+                subject = ", ".join(v.get("projects") or []) or _clip(v.get("subject"), 90)
+                key = (subject, f"Sí {v['yes']} · No {v['no']}")
+                grouped[key] = grouped.get(key, 0) + 1
+            for (subject, tally), n in grouped.items():
+                times = f" ({n} votaciones)" if n > 1 else ""
+                facts.append(f"• Votación en plenaria: {escape(subject)} — {tally}{times}")
+            for f in data.get("filings") or []:
+                facts.append(f"• Radicado: {escape(f.get('label') or '')} — {escape(_clip(f.get('title'), 70))}")
+            lines += facts or [f"No encontré registros para esta fecha en las fuentes cubiertas."]
+            if corp == "camara" and not data.get("votings_covered"):
+                lines.append("<i>Las votaciones de la Cámara aún no están en nuestras fuentes.</i>")
+        # 2. Programado para ese día
+        lines += ["", bold("Programado")]
+        if not data.get("agenda_covered"):
+            lines.append(f"La agenda de la {corp_name if corp == 'camara' else corp_name} no está en nuestras fuentes; "
+                         "no significa que no haya sesiones.")
+        elif data.get("agenda"):
+            lines += [f"• {escape(_clip(a.get('title'), 150))}" for a in data["agenda"][:10]]
+            lines.append("<i>Publicar la agenda no confirma que la sesión se celebre.</i>")
+        else:
+            lines.append(f"Sin agenda publicada para esta fecha (la más reciente es del "
+                         f"{fmt_date(data.get('latest_agenda'))}).")
+        # 3. Publicado ese día
+        docs = self.engine.gacetas_published(corp, day)
+        lines += ["", bold("Publicado")]
+        if docs:
+            for d in docs[:8]:
+                title = d.get("title") or "Gaceta"
+                lines.append("• " + (link(title, d["url"]) if (d.get("url") or "").startswith("https://") else escape(title)))
+        else:
+            lines.append("Sin gacetas indexadas con esta fecha (la carga desde 2022 está en curso).")
+        coverage = (f"votaciones nominales de plenaria desde 2022 (última: {fmt_date(data.get('latest_voting'))}) y agenda"
+                    if corp == "senado" else "radicaciones de la ficha de la Cámara; sin votaciones ni agenda")
+        lines += ["", f"<i>Cobertura {corp_name}: {coverage}; gacetas de la Imprenta desde 2022 (carga en curso).</i>"]
+        other = "camara" if corp == "senado" else "senado"
+        rows = [[Button(label="⬅️ Día anterior", intent=Intent.DAY_OVERVIEW,
+                        params={"corporation": corp, "date": (day - timedelta(days=1)).isoformat()}),
+                 Button(label="Día siguiente ➡️", intent=Intent.DAY_OVERVIEW,
+                        params={"corporation": corp, "date": (day + timedelta(days=1)).isoformat()})],
+                [Button(label=f"🏛 {'Cámara' if other == 'camara' else 'Senado'}", intent=Intent.DAY_OVERVIEW,
+                        params={"corporation": other, "date": day.isoformat()}),
+                 Button(label="🗓 Agenda", intent=Intent.AGENDA,
+                        params={"from": day.isoformat(), "to": (day + timedelta(days=6)).isoformat()})],
+                [Button(label="🔄 Actualizar", intent=Intent.REFRESH), HOME_BUTTON]]
+        empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs)
+        return ViewModel(view_type="day", title=f"{corp_name} · {day.isoformat()}", status="empty" if empty else "ready",
+                         blocks=["\n".join(lines)], rows=rows)
+
+    def _agenda(self, params: dict[str, Any]) -> ViewModel:
+        if params.get("from"):
+            start, end = date.fromisoformat(str(params["from"])), date.fromisoformat(str(params["to"]))
+        else:
+            now = datetime.combine(self.today(), datetime.min.time(), BOGOTA)
+            expression = str(params.get("expression") or "esta semana")
+            period = resolve_relative_period(expression, now)
+            if period is None:
+                parsed = parse_spanish_date(expression)
+                period = DateRange(parsed.value, parsed.value) if parsed.value else None
+            start, end = (period.start, period.end) if period else (self.today(), self.today() + timedelta(days=6))
+        data = self.rpc.call("bot_agenda", {"p_from": start.isoformat(), "p_to": end.isoformat(), "p_limit": 25}) or {}
+        label = fmt_date(start) if start == end else f"{fmt_date(start)} – {fmt_date(end)}"
+        lines = [bold(f"🗓 Agenda · {label}"), "<i>Fuente: Senado · datos abiertos. La agenda de la Cámara no está "
+                                               "en nuestras fuentes.</i>", ""]
+        items = data.get("items") or []
+        if items:
+            for item in items:
+                lines.append(f"• {fmt_date(item['date'])} · hora no publicada — {escape(_clip(item.get('title'), 150))}")
+            if (data.get("total") or 0) > len(items):
+                lines.append(f"… y {data['total'] - len(items)} más.")
+            lines.append("<i>Publicar la agenda no confirma que la sesión se celebre.</i>")
+        else:
+            lines.append(f"No encontré agenda publicada para {escape(label)} en las fuentes cubiertas. "
+                         f"La más reciente es del {fmt_date(data.get('latest_date'))}.")
+        span = (end - start).days + 1
+        rows = [[Button(label="⬅️ Anterior", intent=Intent.AGENDA,
+                        params={"from": (start - timedelta(days=span)).isoformat(),
+                                "to": (start - timedelta(days=1)).isoformat()}),
+                 Button(label="Siguiente ➡️", intent=Intent.AGENDA,
+                        params={"from": (end + timedelta(days=1)).isoformat(),
+                                "to": (end + timedelta(days=span)).isoformat()})],
+                [Button(label="🏛 Senado hoy", intent=Intent.DAY_OVERVIEW, params={"corporation": "senado"}), HOME_BUTTON]]
+        return ViewModel(view_type="agenda", title=f"Agenda · {label}", status="ready" if items else "empty",
+                         blocks=["\n".join(lines)], rows=rows)
+
+    def _timeline(self, project_id: str, ctx: SessionContext) -> ViewModel:
+        if not project_id:
+            return ViewModel(view_type="clarify", title="¿De qué proyecto?", status="partial",
+                             blocks=["¿De qué proyecto? Escribe su número o ábrelo desde 📚 Proyectos."],
+                             rows=[[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST), HOME_BUTTON]])
+        card = self.rpc.call("bot_project_card", {"p_project_id": project_id}) or {}
+        data = self.rpc.call("bot_project_timeline", {"p_project_id": project_id}) or {}
+        ctx.active_project_id = project_id
+        label = self._project_label(card)
+        events = list(data.get("events") or [])
+        kinds = {"texto_radicado": "texto radicado", "ponencia": "ponencia", "texto_aprobado": "texto aprobado",
+                 "acta": "acta", "concepto": "concepto", "objeciones": "objeciones", "informe": "informe"}
+        for d in self.engine.project_documents(project_id, limit=20):
+            if d.get("date"):
+                what = ", ".join(sorted(kinds[k] for k in d["kinds"] if k in kinds)) or "mención"
+                events.append({"date": d["date"], "kind": "publicacion", "detail": f"Publicado en {d['title']}: {what}",
+                               "source": "SRC-03", "url": d.get("url")})
+        events.sort(key=lambda e: str(e["date"]), reverse=True)
+        corp = {"senado": "Senado", "camara": "Cámara"}
+        lines = [bold(f"🗓 Trámite · {label}"), "<i>Hechos fechados en las fuentes, del más reciente al más antiguo. "
+                                              "Los del mismo día no tienen orden horario.</i>", ""]
+        for e in events[:25]:
+            where = f" · {corp[e['corporation']]}" if e.get("corporation") in corp else ""
+            detail = escape(e["detail"])
+            if e.get("url", "").startswith("https://") if e.get("url") else False:
+                detail = link(e["detail"], e["url"])
+            lines.append(f"• {fmt_date(e['date'])}{where} — {detail} <i>({e['source']})</i>")
+        if not events:
+            lines.append("No tengo hechos fechados para este proyecto en las fuentes cargadas.")
+        if status := data.get("status"):
+            lines += ["", f"Estado reportado: {bold(status['raw'])} — la fuente no fecha el estado; "
+                          f"comprobado el {fmt_date(status.get('observed_at'))} ({status['source']})."]
+        return ViewModel(view_type="timeline", title=f"Trámite · {label}", active_project_id=project_id,
+                         status="ready" if events else "empty", blocks=["\n".join(lines)],
+                         rows=self._sub_rows(project_id))
+
+    def _discussions(self, params: dict[str, Any], ctx: SessionContext) -> ViewModel:
+        query = params.get("query")
+        lines = [bold("🏛 Debates legislativos")]
+        if query:
+            passages = self.engine.search_actas(str(query))
+            lines.append(f"<i>Búsqueda en actas publicadas en gacetas: «{escape(str(query))}»</i>")
+            lines += passages or ["No encontré actas sobre eso en las gacetas indexadas."]
+            lines.append("<i>Las actas pueden ser parciales; un pasaje no es la transcripción completa de la sesión.</i>")
+            status = "ready" if passages else "empty"
+        else:
+            ctx.pending_clarification = {"expect": "discussion"}
+            lines += ["Cobertura limitada: aún no tengo actas ni intervenciones estructuradas por sesión. Puedo "
+                      "buscar en las actas publicadas en las Gacetas del Congreso.",
+                      "Escribe el tema, por ejemplo <code>debates de salud</code>.",
+                      "<i>La conversación pública (prensa y redes) todavía no está habilitada.</i>"]
+            status = "partial"
+        return ViewModel(view_type="discussions", title="Debates legislativos", status=status,
+                         blocks=["\n".join(lines)], rows=[[HOME_BUTTON, HELP_BUTTON]])

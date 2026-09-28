@@ -26,7 +26,7 @@ _ALIASES: dict[str, Intent] = {
     "proyectos": Intent.PROJECTS_LIST, "/proyectos": Intent.PROJECTS_LIST,
     "senadohoy": Intent.DAY_OVERVIEW, "senado hoy": Intent.DAY_OVERVIEW, "/senadohoy": Intent.DAY_OVERVIEW,
     "camarahoy": Intent.DAY_OVERVIEW, "camara hoy": Intent.DAY_OVERVIEW, "/camarahoy": Intent.DAY_OVERVIEW,
-    "discusiones": Intent.DISCUSSIONS, "/discusiones": Intent.DISCUSSIONS, "debates": Intent.DISCUSSIONS,
+    "/agenda": Intent.AGENDA, "discusiones": Intent.DISCUSSIONS, "/discusiones": Intent.DISCUSSIONS, "debates": Intent.DISCUSSIONS,
     "votaciones": Intent.VOTINGS, "/votaciones": Intent.VOTINGS,
     "documentos": Intent.DOCUMENTS, "autores": Intent.PROJECT_PARTICIPANTS,
 }
@@ -44,7 +44,23 @@ _ORDINAL_RE = re.compile(r"^(?:abre |abrir |ver |el |la |ese |esa )*(?:el |la )?
                          "|".join(_ORDINALS) + r")$")
 _OPEN_N_RE = re.compile(r"^(?:abre|abrir|ver|opcion|numero) (?:el |la |la opcion )?(?P<n>[1-8])$")
 _SEARCH_RE = re.compile(r"^(?:proyectos?|buscar|busca) (?:de |sobre |del |de la )?(?P<q>.{2,60})$")
-_DAY_RE = re.compile(r"^(?P<corp>senado|camara)(?: hoy| ayer| manana)?$")
+_DAY_RE = re.compile(r"^(?P<corp>senado|camara)(?: (?:el |del |de )?(?P<when>.+))?$")
+_AGENDA_RE = re.compile(r"^agenda(?: (?:de |del |para |el )?(?P<when>.+))?$")
+_DISCUSSION_SEARCH_RE = re.compile(r"^(?:discusiones|debates) (?:de |sobre |del )?(?P<q>.{3,60})$")
+
+
+def _is_date_expression(text: str) -> bool:
+    """Fecha explícita o expresión relativa reconocible («hoy», «ayer», «el martes», «esta semana»)."""
+    from datetime import datetime
+
+    from botcentro.domain.dates import BOGOTA, parse_spanish_date, resolve_relative_period
+
+    if resolve_relative_period(text, datetime.now(BOGOTA)) is not None:
+        return True
+    try:
+        return parse_spanish_date(text).value is not None
+    except Exception:  # noqa: BLE001 — cualquier texto no fechable
+        return False
 
 
 def _corporation(folded: str) -> str | None:
@@ -63,10 +79,14 @@ def parse_text(text: str) -> UiAction:
             params = {"corporation": _corporation(command) or "senado"}
         return UiAction(intent=intent, entry_point="command" if command.startswith("/") else "text",
                         parameters=params, parameter_origins={k: "explicit" for k in params})
-    if m := _DAY_RE.match(folded):
+    if (m := _DAY_RE.match(folded)) and _is_date_expression(m["when"] or "hoy"):
         return UiAction(intent=Intent.DAY_OVERVIEW, entry_point="text",
-                        parameters={"corporation": m["corp"], "when": folded.split(" ", 1)[1] if " " in folded else "hoy"},
-                        parameter_origins={"corporation": "explicit"})
+                        parameters={"corporation": m["corp"], "expression": m["when"] or "hoy"},
+                        parameter_origins={"corporation": "explicit", "expression": "explicit" if m["when"] else "default"})
+    if (m := _AGENDA_RE.match(folded)) and _is_date_expression(m["when"] or "esta semana"):
+        return UiAction(intent=Intent.AGENDA, entry_point="text", parameters={"expression": m["when"] or "esta semana"})
+    if m := _DISCUSSION_SEARCH_RE.match(folded):
+        return UiAction(intent=Intent.DISCUSSIONS, entry_point="text", parameters={"query": m["q"], "text": raw})
     for pattern, intent in _CONTEXTUAL:
         if pattern.match(folded):
             return UiAction(intent=intent, entry_point="text", parameters={"contextual": True})

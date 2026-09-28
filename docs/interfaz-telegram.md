@@ -33,7 +33,7 @@ Módulos en `src/botcentro/telegram_ui/`:
 | I0 — Inventario | ✅ Revisión de `centrorequirement.md` y DEC-18 |
 | I1 — Contratos, contexto y callbacks | ✅ Esta entrega |
 | I2 — Proyectos (explorador, filtros, ficha, contexto) | ✅ |
-| I3 — Portada del día, agenda y cronología | Pendiente |
+| I3 — Portada del día, agenda, cronología y debates | ✅ |
 | I4 — Votaciones, documentos y fuentes por respuesta | Pendiente |
 | I5 — Robustez, observabilidad y corpus de 240 entradas | Pendiente |
 
@@ -72,3 +72,18 @@ La cobertura de datos por caso de uso está en la sección «Brecha de datos» d
 
 - **Latencia de la lista:** ~2 s con datos reales, en el límite de UI-O05. Hay que materializar la actividad por proyecto.
 - **Filtros sin tema ni estado:** falta un catálogo temático; el estado solo existe para la Cámara.
+
+## Requisitos cubiertos en I3
+
+| Requisito | Evidencia |
+|---|---|
+| UI-F13 Cronología | `bot_project_timeline` suma radicaciones, votaciones y agenda, más las gacetas publicadas desde Qdrant. Los hechos del mismo día no tienen orden horario, y el estado sin fecha va aparte. `test_timeline_lists_dated_facts…` |
+| UI-F14 Jornada | `bot_day_overview` separa lo **Confirmado**, lo **Programado** y lo **Publicado**. `test_day_overview_separates…` |
+| UI-F15 Fechas | Relativas en hora de Colombia y reinterpretadas al «Actualizar»; los botones de día llevan fecha explícita; las fechas futuras no tienen hechos. `test_day_navigation…` |
+| UI-F16 Agenda (limitado) | Navegación por semanas. «Hora no publicada» cuando la fuente no la trae. Sin estados de aplazamiento: la fuente no los publica |
+| UI-F17 Debates (P0 limitado) | Explica que la cobertura es limitada y busca solo en actas de gacetas, advirtiendo que un acta puede ser parcial. `test_debates_have_limited_coverage…` |
+| UI-F18 / UI-T25 | La conversación pública se declara no habilitada |
+
+Pendientes de I3:
+- **«Cámara hoy»:** solo trae radicaciones, porque no hay fuente de agenda ni de votos de la Cámara (SRC-07).
+- **Días de la semana:** «el martes» se resuelve a la próxima ocurrencia y se muestra la fecha explícita. No se ofrecen opciones para elegir.

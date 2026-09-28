@@ -21,7 +21,7 @@ from botcentro.errors import BotcentroError
 
 COLLECTION = f"botcentro-docs-{INDEX_NAMESPACE}-v2"
 LEGACY_COLLECTION = f"botcentro-docs-{INDEX_NAMESPACE}"
-_KEYWORD_FIELDS = ("document_key", "document_type", "source_code", "project_ids", "doc_kind", "segment_kind")
+_KEYWORD_FIELDS = ("document_key", "document_type", "source_code", "project_ids", "doc_kind", "segment_kind", "published_on")
 _INTEGER_FIELDS = ("year",)
 
 

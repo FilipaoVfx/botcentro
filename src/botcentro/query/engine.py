@@ -269,6 +269,36 @@ class AnswerEngine:
         ordered = sorted(docs.values(), key=lambda d: d["date"] or "", reverse=True)
         return ordered[:limit]
 
+    def gacetas_published(self, corporation: str, day: date, *, limit: int = 15) -> list[dict[str, Any]]:
+        """Gacetas de una corporación publicadas en una fecha (según el listado de la Imprenta)."""
+        if self.vectors is None:
+            return []
+        points, _ = self.vectors.scroll(limit=1000, with_vector=False, flt={"must": [
+            {"key": "doc_kind", "match": {"value": "gaceta"}},
+            {"key": "published_on", "match": {"value": day.isoformat()}}]},
+            with_payload=["document_key", "title", "source_url", "segment_kind"])
+        docs: dict[str, dict[str, Any]] = {}
+        for point in points:
+            p = point["payload"]
+            if not str(p.get("document_key", "")).startswith(f"gaceta:{corporation}:"):
+                continue
+            doc = docs.setdefault(p["document_key"], {"title": p.get("title"), "url": p.get("source_url"), "kinds": set()})
+            doc["kinds"].add(p.get("segment_kind") or "otro")
+        return sorted(docs.values(), key=lambda d: d["title"] or "")[:limit]
+
+    def search_actas(self, text: str, *, limit: int = 4) -> list[str]:
+        """Pasajes de actas publicadas en gacetas (debates con cobertura limitada, DEC-18)."""
+        if self.vectors is None or self.embed_query is None:
+            return []
+        hits = self.vectors.search(self.embed_query(text), limit=limit, flt={"must": [
+            {"key": "doc_kind", "match": {"value": "gaceta"}}, {"key": "segment_kind", "match": {"value": "acta"}}]})
+        lines = []
+        for hit in hits:
+            p = hit["payload"]
+            where = f"{p.get('title')}, p. {p.get('pdf_page_start')}"
+            lines.append(f"• «{escape(_clip(p.get('text'), 260))}»\n  — {_safe_link(where, p.get('source_url'))}")
+        return lines
+
     # -- congresistas --------------------------------------------------------------------------
 
     def _person(self, plan: QueryPlan, text: str) -> Answer | None:

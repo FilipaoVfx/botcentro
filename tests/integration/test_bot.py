@@ -182,9 +182,9 @@ def test_start_opens_home_with_only_available_sections(bot) -> None:
     """UI-T01/UI-F05: el menú solo ofrece lo que responde con datos; lo pendiente se explica por texto."""
     [home] = bot.say("/start")
     labels = keyboard_texts(home["keyboard"])
-    assert labels == ["📚 Proyectos", "🗓 Agenda", "🔗 Fuentes", "❓ Ayuda"]
-    [pending] = bot.say("senadohoy")
-    assert "Todavía no tengo la portada del día" in pending["html"]
+    assert labels == ["📚 Proyectos", "🏛 Senado hoy", "🗓 Agenda", "💬 Debates", "🔗 Fuentes", "❓ Ayuda"]
+    [pending] = bot.say("/votaciones")
+    assert "Todavía no tengo el explorador general de votaciones" in pending["html"]
 
 
 def test_button_edits_the_same_message_and_back_returns(bot) -> None:
@@ -347,3 +347,48 @@ def test_project_documents_and_votings_views(bot) -> None:
     bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": docs["keyboard"]}, "📌 Ficha")
     bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": _last_view(bot)["keyboard"]}, "🗳 Votaciones")
     assert "🗳 Votaciones" in _last_view(bot)["html"]
+
+
+# -- I3: jornada, agenda, cronología y debates (CU-04/05/06/07) ----------------------------------
+
+def test_day_overview_separates_confirmed_scheduled_and_published(bot) -> None:
+    """UI-T19: hechos, programación y publicaciones en secciones distintas; cobertura explícita."""
+    [day] = bot.say("cámara el 23 de septiembre de 2026")
+    html = day["html"]
+    assert "Cámara · miércoles 23 de septiembre de 2026" in html
+    assert html.index("Confirmado") < html.index("Programado") < html.index("Publicado")
+    assert "Radicado: PL 396/2026 Cámara" in html
+    assert "La agenda de la Cámara no está en nuestras fuentes; no significa que no haya sesiones" in html
+
+
+def test_day_navigation_uses_explicit_dates_and_future_has_no_facts(bot) -> None:
+    """UI-T20/UI-F15: los botones llevan fecha explícita; una fecha futura no tiene hechos."""
+    [day] = bot.say("senado el 27 de septiembre de 2026")
+    bot.click(day, "Día siguiente ➡️")
+    assert "domingo 27" not in bot.transport.edits[-1]["html"] and "lunes 28 de septiembre" in bot.transport.edits[-1]["html"]
+    [future] = bot.say("senado el 30 de octubre de 2026")
+    assert "No hay hechos para fechas futuras" in future["html"]
+
+
+def test_timeline_lists_dated_facts_without_inventing_order(bot) -> None:
+    """UI-F13/UI-T18."""
+    [card] = bot.say("PL 396/2026 Cámara")
+    bot.click(card, "🗓 Trámite")
+    timeline = bot.transport.edits[-1]["html"]
+    assert "🗓 Trámite" in timeline and "Radicado en la Cámara" in timeline
+    assert "no tienen orden horario" in timeline
+
+
+def test_agenda_has_week_navigation_and_explains_absence(bot) -> None:
+    [agenda] = bot.say("agenda")
+    assert "No encontré agenda publicada" in agenda["html"] and "hora" not in agenda["html"].split("\n")[0]
+    assert {"⬅️ Anterior", "Siguiente ➡️"} <= set(keyboard_texts(agenda["keyboard"]))
+
+
+def test_debates_have_limited_coverage_and_search_only_actas(bot) -> None:
+    """UI-T23/T24/T25: sin actas estructuradas se explica el límite; la búsqueda filtra actas."""
+    [intro] = bot.say("debates")
+    assert "Cobertura limitada" in intro["html"] and "conversación pública" in intro["html"]
+    [found] = bot.say("salud")  # respuesta a la captura abierta por «Debates»
+    assert "Búsqueda en actas" in found["html"] and "no es la transcripción completa" in found["html"]
+    assert {"key": "segment_kind", "match": {"value": "acta"}} in bot.vectors.calls[-1]["must"]
