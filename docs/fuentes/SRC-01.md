@@ -49,3 +49,25 @@ Están en `tests/fixtures/senado_open_data/` (senadores sin datos de contacto; v
 ## Cobertura propuesta (DEC-02)
 
 Cuatrienio 2026–2030, desde el 2026-07-20, por ventanas mensuales. Después, los antecedentes de expedientes activos.
+
+## Carga histórica (2026-09-28)
+
+Rango 2017-01-01 → 2026-09-28 en ventanas de 14 días. Ejecución `succeeded`: 240 páginas, 718 capturas nuevas, 0 fallos y 0 observaciones en cuarentena.
+
+| Entidad normalizada | Cantidad |
+|---|---|
+| Observaciones con evidencia | 215.928 |
+| Votos nominales (= voto vigente, 0 conflictos) | 145.696 |
+| Asistencias | 60.840 |
+| Votaciones (actos) | 1.913 |
+| Sesiones plenarias | 582 |
+| Asuntos de agenda | 7.038 |
+| Personas (senadores vigentes e históricos) | 320 |
+| Proyectos | 459 (567 identificadores; 101 con numeración Senado–Cámara vinculada) |
+| Partidos · comisiones | 18 · 18 |
+
+Hallazgos de la fuente:
+
+- **Rango vacío:** la API responde HTTP 400 `{"error":"No existen … en el rango de fechas …"}` cuando no hay datos. El conector lo trata como vacío válido y conserva la respuesta como evidencia.
+- **Numeración contradictoria:** la numeración Senado–Cámara no siempre es coherente. Por ejemplo, «345 de 2024 Senado – 056 de 2023 Cámara» frente a «… 056 de 2024 Cámara». El normalizador no fusiona expedientes y abre un caso de identidad.
+- **Asistencias sin fecha:** parte de las asistencias de 2018–2019 no tienen fecha (`plenary_created_at` vacío). Se conservan con precisión «desconocida».

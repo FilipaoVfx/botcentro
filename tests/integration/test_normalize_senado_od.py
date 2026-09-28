@@ -20,7 +20,7 @@ from tests.integration.support import Db
 
 pytestmark = pytest.mark.db
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "senado_open_data"
-STEPS = ["catalog", "projects", "votes", "attendance", "agenda"]
+STEPS = ["catalog", "projects", "sessions", "votings", "vote_observations", "current_votes", "attendance", "agenda"]
 
 
 class FixtureFetcher:
@@ -60,7 +60,11 @@ def loaded(db: Db, tmp_path_factory) -> UUID:
     assert summary.status == "succeeded"
     rpc = db.rpc(ingest)
     for step in STEPS:
-        rpc.call("normalize_senado_od", {"p_step": step})
+        while True:
+            counts = rpc.call("normalize_senado_od", {"p_step": step, "p_limit": 150})
+            if step not in {"vote_observations", "current_votes", "attendance"} or not any(
+                    v for k, v in counts.items() if k != "step"):
+                break
     return ingest
 
 
@@ -108,7 +112,7 @@ def test_attendance_and_agenda(db: Db, loaded) -> None:
 
 def test_normalizer_is_idempotent(db: Db, loaded) -> None:
     rpc = db.rpc(loaded)
-    results = [rpc.call("normalize_senado_od", {"p_step": step}) for step in STEPS]
+    results = [rpc.call("normalize_senado_od", {"p_step": step, "p_limit": 150}) for step in STEPS]
     for result in results:
         assert all(v == 0 for k, v in result.items() if k != "step"), result
 
@@ -117,4 +121,4 @@ def test_only_ingest_service_can_normalize(db: Db, loaded) -> None:
     from botcentro.insforge.client import PermissionDenied
 
     with pytest.raises(PermissionDenied):
-        db.rpc(db.create_user("query_service")).call("normalize_senado_od", {"p_step": "catalog"})
+        db.rpc(db.create_user("query_service")).call("normalize_senado_od", {"p_step": "catalog", "p_limit": 10})

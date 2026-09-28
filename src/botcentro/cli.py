@@ -116,15 +116,26 @@ def ingest(code: str, start: str, end: str, window_days: int, reparse: bool = Fa
     print(json.dumps({k: str(v) if k == "run_id" else v for k, v in summary.__dict__.items()}, ensure_ascii=False, indent=1))
 
 
-NORMALIZE_STEPS = ("catalog", "projects", "votes", "attendance", "agenda")
+# InsForge limita cada RPC a 10 s: los pasos por lotes se repiten hasta que no queda nada pendiente.
+NORMALIZE_STEPS = ("catalog", "projects", "sessions", "votings", "vote_observations", "current_votes",
+                   "attendance", "agenda")
+BATCHED_STEPS = {"vote_observations", "current_votes", "attendance"}
 
 
-def normalize(code: str) -> None:
+def normalize(code: str, batch: int = 20000) -> None:
     if code != "SRC-01":
         sys.exit("solo SRC-01 tiene normalizador por ahora")
     client = account_client("ingest")
     for step in NORMALIZE_STEPS:
-        print(json.dumps(client.call("normalize_senado_od", {"p_step": step}), ensure_ascii=False))
+        total: dict[str, int] = {}
+        while True:
+            result = client.call("normalize_senado_od", {"p_step": step, "p_limit": batch})
+            counts = {k: v for k, v in result.items() if k != "step"}
+            for k, v in counts.items():
+                total[k] = total.get(k, 0) + v
+            if step not in BATCHED_STEPS or not any(counts.values()):
+                break
+        print(json.dumps({"step": step, **total}, ensure_ascii=False), flush=True)
 
 
 def main(argv: list[str] | None = None) -> None:
