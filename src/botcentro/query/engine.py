@@ -128,6 +128,7 @@ class AnswerEngine:
         lines = [f"• {escape(_SOURCE_NAMES.get(code, code))} ({code}): actualizado el {fmt_date(ts)}"
                  for code, ts in sorted(fresh.items())]
         lines.append("• Gacetas del Congreso (SRC-03): carga desde el 20 jul 2022 en curso")
+        lines.append("<i>Senado: votaciones, asistencia y agenda desde el 1 ene 2022. Cámara: fichas desde 2010.</i>")
         return Answer(plan.intent, "answered", "supported", [
             Section("Fuentes consultadas", lines),
             Section(None, ["El Senado solo publica las votaciones de plenaria registradas en su aplicación; "

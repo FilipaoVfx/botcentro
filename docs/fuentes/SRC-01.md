@@ -50,7 +50,11 @@ Están en `tests/fixtures/senado_open_data/` (senadores sin datos de contacto; v
 
 Cuatrienio 2026–2030, desde el 2026-07-20, por ventanas mensuales. Después, los antecedentes de expedientes activos.
 
-## Carga histórica (2026-09-28)
+## Recorte (DEC-17, 2026-09-28)
+
+Para volver al cupo gratuito de InsForge se borró todo lo fechado antes del 2022-01-01. Hoy la base cubre **2022-01-01 → hoy**; lo anterior puede recargarse desde la API.
+
+## Carga histórica (2026-09-28, antes del recorte)
 
 Rango 2017-01-01 → 2026-09-28 en ventanas de 14 días. Ejecución `succeeded`: 240 páginas, 718 capturas nuevas, 0 fallos y 0 observaciones en cuarentena.
 

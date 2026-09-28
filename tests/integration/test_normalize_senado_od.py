@@ -122,3 +122,31 @@ def test_only_ingest_service_can_normalize(db: Db, loaded) -> None:
 
     with pytest.raises(PermissionDenied):
         db.rpc(db.create_user("query_service")).call("normalize_senado_od", {"p_step": "catalog", "p_limit": 10})
+
+
+def test_trim_history_removes_only_dated_data_before_cutoff(db: Db, loaded) -> None:
+    """DEC-17: recorte por fecha. Va al final del módulo porque borra parte de los datos cargados."""
+    import psycopg
+
+    def count(sql: str, *params) -> int:
+        return db.execute(sql, params or None)[0]["n"]
+
+    before = {"late_votings": count("select count(*) n from public.votings where local_date >= '2026-09-15'"),
+              "senators": count("select count(*) n from public.persons"),
+              "catalog": count("select count(*) n from public.observations where effective_date is null")}
+    result = db.execute("select public.maintenance_trim_source_before('SRC-01', date '2026-09-15') r")[0]["r"]
+    assert result["observations"] > 0 and result["votings"] > 0
+    assert count("select count(*) n from public.votings where local_date < '2026-09-15'") == 0
+    assert count("select count(*) n from public.observations where effective_date < '2026-09-15'") == 0
+    assert count("select count(*) n from public.votings where local_date >= '2026-09-15'") == before["late_votings"]
+    assert count("select count(*) n from public.persons") == before["senators"]
+    assert count("select count(*) n from public.observations where effective_date is null") == before["catalog"]
+    assert count("select count(*) n from public.current_votes cv left join public.vote_observations vo "
+                 "on vo.id = cv.selected_observation_id where vo.id is null") == 0
+    assert count("select count(*) n from public.audit_log where action = 'source.trim_history'") == 1
+    # La protección de solo inserción vuelve a quedar activa.
+    with pytest.raises(psycopg.Error):
+        db.execute("delete from public.evidence where id = (select id from public.evidence limit 1)")
+    # Repetirlo no borra nada más.
+    again = db.execute("select public.maintenance_trim_source_before('SRC-01', date '2026-09-15') r")[0]["r"]
+    assert again["observations"] == 0
