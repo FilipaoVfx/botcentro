@@ -102,13 +102,16 @@ class SenadoOpenDataConnector:
 
         window_start = start + window * (page - 1)
         window_end = min(window_start + window - timedelta(days=1), end)
+        # La API exige start_at anterior a hoy (400 «debe ser una fecha anterior a …»): una ventana que
+        # empieza hoy se adelanta un día; el solape se deduplica por clave de observación.
+        request_start = min(window_start, self._today() - timedelta(days=1))
         items = [
             DiscoveredItem(
                 record_type=name,
-                logical_key=f"{name}:{window_start.isoformat()}:{window_end.isoformat()}",
-                url=f"{API}/{name}?format=json&start_at={window_start.isoformat()}&end_at={window_end.isoformat()}",
+                logical_key=f"{name}:{request_start.isoformat()}:{window_end.isoformat()}",
+                url=f"{API}/{name}?format=json&start_at={request_start.isoformat()}&end_at={window_end.isoformat()}",
                 accept_mimes=JSON_ONLY,
-                hints={"from": window_start.isoformat(), "to": window_end.isoformat()},
+                hints={"from": request_start.isoformat(), "to": window_end.isoformat()},
             )
             for name in DATED
         ]

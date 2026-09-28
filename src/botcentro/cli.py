@@ -221,6 +221,9 @@ def run_bot() -> None:
     from botcentro.telegram.webhook import TelegramWebhook, WebhookSettings
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    # httpx registra cada URL en INFO y las de la Bot API contienen el token: nunca deben llegar al log.
+    for noisy in ("httpx", "httpcore"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     api = BotApi(_required("BOTCENTRO_TELEGRAM_BOT_TOKEN"))
     me = api.get_me()
     pseudonym_key = _key(os.environ, "BOTCENTRO_PSEUDONYM_KEY")

@@ -115,6 +115,22 @@ def test_future_dates_are_never_requested() -> None:
     assert last == {"from": "2026-09-22", "to": "2026-09-28"}
 
 
+def test_window_starting_today_is_moved_back_one_day() -> None:
+    """La API exige start_at anterior a hoy: una ventana de solo hoy se pide desde ayer."""
+    connector = SenadoOpenDataConnector(NoFetch(), today=lambda: date(2026, 9, 28))  # type: ignore[arg-type]
+    scope = {"from": "2026-09-14", "to": "2026-09-28", "window_days": 7}
+    cursor = connector.discover(Cursor(connector.version, scope)).next_cursor
+    windows = []
+    while True:
+        page = connector.discover(cursor)
+        windows.append(page.items[0].hints)
+        if not page.has_more:
+            break
+        cursor = page.next_cursor
+    assert windows[-1] == {"from": "2026-09-27", "to": "2026-09-28"}
+    assert all(w["from"] < "2026-09-28" for w in windows)
+
+
 def test_empty_week_is_valid_not_a_schema_change(connector) -> None:
     page = connector.discover(Cursor(connector.version, SCOPE, {"page": 1}))
     result = connector.parse(page.items[0], snapshot(b"[]"))
