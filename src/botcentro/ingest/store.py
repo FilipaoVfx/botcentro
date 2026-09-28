@@ -105,6 +105,36 @@ class IngestStore:
         }))[0]
         return ObservationResult(_uuid(row["observation_id"]), bool(row["created"]), _uuid(row["evidence_id"]))
 
+    def upsert_observations(self, snapshot_id: UUID, candidates: Sequence[NormalizedCandidate], *,
+                            parser_version: str, force_quarantine_reason: str | None = None,
+                            batch_size: int = 500) -> tuple[int, int]:
+        """Registra observaciones por lotes; devuelve (creadas, ya vistas)."""
+        created = seen = 0
+        for start in range(0, len(candidates), batch_size):
+            items = []
+            for candidate in candidates[start:start + batch_size]:
+                reason = force_quarantine_reason or candidate.quarantine_reason
+                items.append({
+                    "subject_type": candidate.subject_type,
+                    "subject_ref": candidate.subject_ref,
+                    "predicate": candidate.predicate,
+                    "value": dict(candidate.value),
+                    "value_raw": candidate.value_raw,
+                    "effective_date": candidate.effective.value.isoformat() if candidate.effective.value else None,
+                    "date_precision": candidate.effective.precision.value,
+                    "effective_at": candidate.effective_at.isoformat() if candidate.effective_at else None,
+                    "published_on": candidate.published_on.value.isoformat() if candidate.published_on.value else None,
+                    "record_pointer": candidate.record_pointer,
+                    "status": "quarantined" if reason else "published",
+                    "status_reason": reason,
+                })
+            row = as_rows(self._rpc.call("ingest_upsert_observations", {
+                "p_snapshot_id": snapshot_id, "p_parser_version": parser_version, "p_items": items,
+            }))[0]
+            created += int(row["created"])
+            seen += int(row["seen"])
+        return created, seen
+
     def commit_cursor(self, run_id: UUID, cursor: Cursor) -> None:
         self._rpc.call("ingest_commit_cursor", {"p_run_id": run_id, "p_cursor": cursor.to_json()})
 

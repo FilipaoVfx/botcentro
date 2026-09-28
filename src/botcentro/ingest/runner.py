@@ -135,17 +135,14 @@ class IngestionRunner:
                 run_id=run_id,
             )
 
-        quarantined = 0
-        for candidate in parsed.candidates:
-            outcome = self.store.upsert_observation(
-                registration.snapshot_id, candidate, parser_version=self.connector.parser_version,
-                force_quarantine_reason=f"cambio de esquema: {schema_problem}" if schema_problem else None,
-            )
-            quarantined += bool(candidate.quarantine_reason or schema_problem)
-            if outcome.created:
-                summary.observations_created += 1
-            else:
-                summary.observations_seen += 1
+        reason = f"cambio de esquema: {schema_problem}" if schema_problem else None
+        created, seen = self.store.upsert_observations(
+            registration.snapshot_id, parsed.candidates, parser_version=self.connector.parser_version,
+            force_quarantine_reason=reason,
+        )
+        summary.observations_created += created
+        summary.observations_seen += seen
+        quarantined = sum(bool(c.quarantine_reason or schema_problem) for c in parsed.candidates)
         # Un registro sin candidatos por cambio de esquema cuenta como un ítem en cuarentena.
         quarantined_items = quarantined if parsed.candidates else int(schema_problem is not None)
         summary.quarantined += quarantined_items
