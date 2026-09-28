@@ -1,0 +1,13 @@
+[Unit]
+Description=botcentro: actualización diaria de fuentes (SRC-01, SRC-06) e índice de fichas
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/botcentro
+ExecStart=/root/botcentro/ops/actualizar.sh
+Environment=PYTHONUNBUFFERED=1
+Environment=BOTCENTRO_MODEL_CACHE=/root/botcentro/var/models
+TimeoutStartSec=3h
+NoNewPrivileges=true

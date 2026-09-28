@@ -1,0 +1,12 @@
+# Instalar: sudo cp ops/botcentro-actualizar.* /etc/systemd/system/ && sudo systemctl daemon-reload &&
+# sudo systemctl enable --now botcentro-actualizar.timer
+[Unit]
+Description=botcentro: actualización diaria a las 05:30 (hora de Bogotá)
+
+[Timer]
+OnCalendar=*-*-* 05:30:00 America/Bogota
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

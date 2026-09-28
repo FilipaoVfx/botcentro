@@ -114,6 +114,20 @@ Es un piloto privado:
 - Un usuario no autorizado recibe su identificador de Telegram.
 - Un administrador lo autoriza con `admin_authorize_telegram`, que guarda un seudónimo HMAC y queda en la auditoría.
 
+## Actualización diaria
+
+`botcentro-actualizar.timer` ejecuta `ops/actualizar.sh` cada día a las 05:30 (hora de Bogotá). Los pasos son:
+1. ingesta de los últimos 14 días de SRC-01 (con solape);
+2. listado completo de SRC-06;
+3. normalización de ambas fuentes;
+4. indexación de las fichas nuevas.
+
+```bash
+sudo cp ops/botcentro-actualizar.* /etc/systemd/system/ && sudo systemctl daemon-reload
+sudo systemctl enable --now botcentro-actualizar.timer
+journalctl -u botcentro-actualizar -f
+```
+
 ## Índice vectorial (Qdrant autoalojado)
 
 Los vectores de documentos (fichas de Cámara y gacetas) viven en Qdrant, dentro del servidor del bot (DEC-15). InsForge conserva los documentos, los chunks citables y los enlaces a proyectos.
