@@ -56,3 +56,30 @@ def as_chunk(row: dict[str, Any]) -> Chunk:
                  pdf_page_start=1, pdf_page_end=1, char_start=0, char_end=len(row["text"]),
                  section_label=row.get("section_label"), heading=row.get("heading"), segment_id=None,
                  quality_status=QualityStatus.ACCEPTED, chunker_version="")
+
+
+_DROPPED_FIELDS = ("chunk_id", "heading", "section_label", "extractor_version")
+
+
+def migrate_collection(source: QdrantStore, target: QdrantStore, *, skip_segment_kinds: Sequence[str] = (),
+                       progress: Callable[[dict[str, int]], None] | None = None) -> dict[str, int]:
+    """Copia puntos entre colecciones (p. ej. a v2 en float16, DEC-14) recortando la carga útil y
+    omitiendo los segmentos de gaceta excluidos. Idempotente: el id del punto se conserva."""
+    skip = frozenset(skip_segment_kinds)
+    totals = {"read": 0, "copied": 0, "skipped": 0}
+    offset: Any = None
+    while True:
+        points, offset = source.scroll(offset=offset, limit=256)
+        batch = []
+        for point in points:
+            payload = {k: v for k, v in point["payload"].items() if k not in _DROPPED_FIELDS}
+            if payload.get("segment_kind") in skip:
+                totals["skipped"] += 1
+                continue
+            batch.append({"id": point["id"], "vector": point["vector"], "payload": payload})
+        totals["read"] += len(points)
+        totals["copied"] += target.upsert(batch)
+        if progress:
+            progress(totals)
+        if offset is None:
+            return totals

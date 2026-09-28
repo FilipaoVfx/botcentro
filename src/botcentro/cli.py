@@ -170,6 +170,38 @@ def sync_qdrant(batch: int) -> None:
     print(json.dumps({**totals, "points_in_collection": store.count()}), flush=True)
 
 
+def migrate_qdrant(skip_kinds: str) -> None:
+    from botcentro.vectors.qdrant import LEGACY_COLLECTION, QdrantStore
+    from botcentro.vectors.sync import migrate_collection
+
+    target = qdrant_store()
+    source = QdrantStore(_required("BOTCENTRO_QDRANT_URL"), _required("BOTCENTRO_QDRANT_API_KEY"),
+                         collection=LEGACY_COLLECTION)
+    totals = migrate_collection(source, target, skip_segment_kinds=[k for k in skip_kinds.split(",") if k],
+                                progress=lambda t: print(json.dumps(t), flush=True))
+    print(json.dumps({**totals, "target_points": target.count(), "source_points": source.count()}), flush=True)
+
+
+def load_gacetas(since: str, skip_kinds: str, out: str, max_points: int, max_stored_mb: int) -> None:
+    from datetime import date
+    from pathlib import Path
+
+    from botcentro.connectors.gacetas_imprenta import DOMAINS
+    from botcentro.costs.budget import BudgetGuard
+    from botcentro.embeddings.e5 import E5SmallEmbedder
+    from botcentro.http.fetcher import FetchLimits
+    from botcentro.pilots.gacetas import run_load
+
+    client = account_client("ingest")
+    fetcher = SafeFetcher(UrlGuard(UrlPolicy.for_domains(DOMAINS)),
+                          limits=FetchLimits(max_bytes=250 * 1024 * 1024, timeout_seconds=300))
+    totals = run_load(out=Path(out), fetcher=fetcher, client=client, store=qdrant_store(), embedder=E5SmallEmbedder(),
+                      budget=BudgetGuard(client), since=date.fromisoformat(since),
+                      skip_kinds=[k for k in skip_kinds.split(",") if k], max_points=max_points,
+                      max_stored_bytes=max_stored_mb * 1024 * 1024)
+    print(json.dumps(totals), flush=True)
+
+
 def pilot_gacetas(limit: int, out: str) -> None:
     from pathlib import Path
 
@@ -220,6 +252,14 @@ def main(argv: list[str] | None = None) -> None:
     n.add_argument("source")
     f = sub.add_parser("index-fichas", help="documenta e indexa (e5-small) las fichas de proyecto de SRC-06")
     f.add_argument("--batch", type=int, default=100)
+    m = sub.add_parser("migrate-qdrant", help="copia la colección anterior a la v2 (float16, carga mínima)")
+    m.add_argument("--skip-kinds", default="portada,otro")
+    lg = sub.add_parser("load-gacetas", help="carga SRC-03 desde una fecha → OCR → Qdrant (reanudable, con topes)")
+    lg.add_argument("--since", required=True)
+    lg.add_argument("--skip-kinds", default="portada,otro")
+    lg.add_argument("--out", default="var/gacetas-manifest.jsonl")
+    lg.add_argument("--max-points", type=int, default=950_000)
+    lg.add_argument("--max-stored-mb", type=int, default=2_900)
     q = sub.add_parser("sync-qdrant", help="publica en Qdrant los chunks registrados (idempotente)")
     q.add_argument("--batch", type=int, default=500)
     g = sub.add_parser("pilot-gacetas", help="piloto SRC-03: gacetas recientes → OCR → Qdrant, con métricas")
@@ -230,6 +270,10 @@ def main(argv: list[str] | None = None) -> None:
         verify_account(args.who, args.code)
     elif args.command == "normalize":
         normalize(args.source)
+    elif args.command == "migrate-qdrant":
+        migrate_qdrant(args.skip_kinds)
+    elif args.command == "load-gacetas":
+        load_gacetas(args.since, args.skip_kinds, args.out, args.max_points, args.max_stored_mb)
     elif args.command == "pilot-gacetas":
         pilot_gacetas(args.limit, args.out)
     elif args.command == "sync-qdrant":

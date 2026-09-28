@@ -39,3 +39,25 @@ def test_segments_only_link_their_own_heading_and_skip_lowercase_index() -> None
     assert segments[0].refs == ()
     assert [r.number for r in segments[1].refs] == ["113"] and [r.number for r in segments[2].refs] == ["245"]
     assert segment_at(segments, len(text) - 10).kind == "texto_aprobado"
+
+
+class FakeListing:
+    total = 120
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def page(self, first, rows):
+        self.calls += 1
+        return [GacetaRef("senado", date(2026, 9, 30) - __import__("datetime").timedelta(days=(first + i) // 5),
+                          str(1000 - first - i)) for i in range(min(rows, self.total - first))]
+
+
+def test_listing_stops_at_since_date_and_limit() -> None:
+    from botcentro.pilots.gacetas import recent
+
+    listing = FakeListing()
+    refs = recent(listing, 1000, 0, since=date(2026, 9, 25))  # type: ignore[arg-type]
+    assert refs and min(r.published_on for r in refs) >= date(2026, 9, 25) and len(refs) == 30
+    assert listing.calls == 1
+    assert len(recent(FakeListing(), 70, 0)) == 70  # type: ignore[arg-type]

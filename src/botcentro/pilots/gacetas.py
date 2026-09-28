@@ -1,9 +1,12 @@
-"""Piloto de gacetas (DEC-11, DEC-12): mide si vale la pena indexar SRC-03.
+"""Carga de gacetas (SRC-03; DEC-11, DEC-12, DEC-13, DEC-14).
 
-Por cada gaceta reciente: descarga el PDF (en memoria, nunca se guarda), extrae texto con OCR
-donde hace falta, segmenta por pieza, enlaza cada segmento solo a los proyectos de su propio
-encabezado, trocea y embebe con e5-small y publica en Qdrant. Escribe una línea JSON de
-métricas por gaceta para el informe del piloto.
+Por cada gaceta: descarga el PDF (en memoria, nunca se guarda), extrae texto con OCR donde hace
+falta, segmenta por pieza, enlaza cada segmento solo a los proyectos de su propio encabezado,
+trocea y embebe con e5-small y publica en Qdrant. Escribe una línea JSON de métricas por gaceta
+(manifiesto): reanudar es volver a ejecutar; las fallidas se reintentan.
+
+Topes del plan gratuito de Qdrant: la carga se detiene sola antes de superar el número de puntos
+o los bytes almacenados configurados.
 """
 
 from __future__ import annotations
@@ -11,6 +14,8 @@ from __future__ import annotations
 import json
 import time
 import uuid
+from collections.abc import Iterable
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -55,17 +60,26 @@ def _project_of(ref: ProjectRef, index: dict[tuple[str, str, str, int], str]) ->
     return None
 
 
-def recent(listing: GacetaListing, limit: int, pause: float) -> list[GacetaRef]:
+def recent(listing: GacetaListing, limit: int, pause: float, since: date | None = None) -> list[GacetaRef]:
+    """Gacetas del listado (más reciente primero) hasta `limit` o hasta la primera anterior a `since`.
+    Se lee todo antes de descargar: la sesión JSF del listado caduca en ~30 min."""
     refs: list[GacetaRef] = []
-    while len(refs) < min(limit, listing.total):
-        refs.extend(listing.page(len(refs), 50)[: limit - len(refs)])
+    position = 0
+    while len(refs) < limit and position < listing.total:
+        page = listing.page(position, 50)
+        position += 50
+        for ref in page:
+            if since and ref.published_on < since:
+                return refs
+            refs.append(ref)
         time.sleep(pause)
-    return refs
+    return refs[:limit]
 
 
 def process(ref: GacetaRef, *, fetcher: SafeFetcher, embedder: E5SmallEmbedder, store: QdrantStore,
-            identifiers: dict[tuple[str, str, str, int], str]) -> dict[str, Any]:
-    m: dict[str, Any] = {"document_key": ref.document_key, "url": ref.permalink}
+            identifiers: dict[tuple[str, str, str, int], str], skip_kinds: Iterable[str] = ()) -> dict[str, Any]:
+    skip = frozenset(skip_kinds)
+    m: dict[str, Any] = {"document_key": ref.document_key, "url": ref.permalink, "extractor": EXTRACTOR_VERSION}
     t0 = time.monotonic()
     fetched = download(fetcher, ref)
     m.update(bytes=fetched.byte_size, pdf_sha256=fetched.content_hash, seconds_download=round(time.monotonic() - t0, 1))
@@ -93,29 +107,28 @@ def process(ref: GacetaRef, *, fetcher: SafeFetcher, embedder: E5SmallEmbedder, 
     chunks = [c for c in chunk_extraction(extraction_id, page_texts, recipe=E5_SMALL_RECIPE,
                                           measure=embedder.passage_measure, max_measure=MAX_INPUT_TOKENS)
               if c.quality_status is QualityStatus.ACCEPTED and c.text.strip()]
-    vectors = {v.chunk_id: v.vector for v in embedder.embed_passages(chunks)} if chunks else {}
+    kept = [(c, segment_at(segments, c.char_start)) for c in chunks]
+    kept = [(c, seg) for c, seg in kept if seg.kind not in skip]
+    vectors = {v.chunk_id: v.vector for v in embedder.embed_passages([c for c, _ in kept])} if kept else {}
     points = []
-    for c in chunks:
-        segment = segment_at(segments, c.char_start)
+    for c, segment in kept:
         payload = chunk_payload({
-            "chunk_id": c.id, "text": c.text, "heading": c.heading, "section_label": c.section_label,
-            "document_key": ref.document_key, "document_type": "gaceta",
+            "text": c.text, "document_key": ref.document_key, "document_type": "gaceta",
             "title": f"Gaceta {ref.number} de {ref.published_on.year} ({ref.corporation})",
             "published_on": ref.published_on.isoformat(), "source_url": ref.permalink, "source_code": "SRC-03",
             "project_ids": sorted({p for r in segment.refs if (p := linked.get(r))}),
         }, doc_kind="gaceta")
         payload.update(segment_kind=segment.kind, pdf_page_start=c.pdf_page_start, pdf_page_end=c.pdf_page_end,
-                       pdf_sha256=m["pdf_sha256"], extractor_version=EXTRACTOR_VERSION)
+                       pdf_sha256=m["pdf_sha256"])
         points.append({"id": str(c.id), "vector": vectors[str(c.id)], "payload": payload})
     store.upsert(points)
-    m.update(chunks=len(points), chunks_linked=sum(bool(p["payload"]["project_ids"]) for p in points),
+    m.update(chunks=len(points), chunks_skipped=len(chunks) - len(points), chunks_linked=sum(bool(p["payload"]["project_ids"]) for p in points),
              text_chars=sum(len(p.text) for p in pages), seconds_embed=round(time.monotonic() - t2, 1),
              seconds_total=round(time.monotonic() - t0, 1))
     return m
 
 
-def run_pilot(*, limit: int, out: Path, fetcher: SafeFetcher, client: InsForgeClient, store: QdrantStore,
-              embedder: E5SmallEmbedder, budget: BudgetGuard, pause: float = 3.0) -> dict[str, int]:
+def _manifest(out: Path) -> tuple[set[str], set[str]]:
     done: set[str] = set()
     retry: set[str] = set()  # las fallidas se reintentan; el informe usa la última línea de cada gaceta
     if out.exists():
@@ -126,24 +139,56 @@ def run_pilot(*, limit: int, out: Path, fetcher: SafeFetcher, client: InsForgeCl
                 retry.add(record["document_key"])
             else:
                 retry.discard(record["document_key"])
+    return done, retry
+
+
+def run_load(*, out: Path, fetcher: SafeFetcher, client: InsForgeClient, store: QdrantStore,
+             embedder: E5SmallEmbedder, budget: BudgetGuard, limit: int = 1_000_000, since: date | None = None,
+             skip_kinds: Iterable[str] = (), max_points: int | None = None, max_stored_bytes: int | None = None,
+             pause: float = 3.0, ledger_every: int = 25) -> dict[str, Any]:
+    """Procesa las gacetas del rango. El consumo (costo 0, local) se registra cada `ledger_every`
+    gacetas para no llenar la base de InsForge con una fila por documento."""
+    done, retry = _manifest(out)
     identifiers = load_identifiers(client)
-    listing = GacetaListing(fetcher)
-    totals = {"processed": 0, "skipped": 0, "failed": 0}
+    refs = recent(GacetaListing(fetcher), limit, pause, since)
+    pending = [r for r in refs if r.document_key not in done or r.document_key in retry]
+    totals: dict[str, Any] = {"listed": len(refs), "pending": len(pending), "processed": 0, "failed": 0}
+    unbilled = 0
+
+    def bill() -> None:
+        nonlocal unbilled
+        if unbilled:
+            with budget.spend("local", "gaceta_ocr_embedding", "0", units=unbilled) as reservation:
+                reservation.settle(0)
+            unbilled = 0
+
     with out.open("a") as sink:
-        for ref in recent(listing, limit, pause):
-            if ref.document_key in done and ref.document_key not in retry:
-                totals["skipped"] += 1
-                continue
+        for i, ref in enumerate(pending):
+            if i % 25 == 0 and (max_points or max_stored_bytes):
+                points, stored = store.count(), store.stored_bytes()
+                if (max_points and points >= max_points) or (max_stored_bytes and stored >= max_stored_bytes):
+                    totals["stopped"] = f"tope alcanzado: {points} puntos, {stored} bytes"
+                    break
             try:
-                with budget.spend("local", "gaceta_ocr_embedding", "0", units=1) as reservation:
-                    metrics = process(ref, fetcher=fetcher, embedder=embedder, store=store, identifiers=identifiers)
-                    reservation.settle(0)
+                metrics = process(ref, fetcher=fetcher, embedder=embedder, store=store, identifiers=identifiers,
+                                  skip_kinds=skip_kinds)
                 totals["processed"] += 1
-            except Exception as exc:  # noqa: BLE001 — el piloto registra el fallo y sigue
-                metrics = {"document_key": ref.document_key, "url": ref.permalink, "error": f"{type(exc).__name__}: {exc}"[:300]}
+                unbilled += 1
+            except Exception as exc:  # noqa: BLE001 — se registra el fallo y se sigue; se reintenta al reanudar
+                metrics = {"document_key": ref.document_key, "url": ref.permalink,
+                           "error": f"{type(exc).__name__}: {exc}"[:300]}
                 totals["failed"] += 1
             sink.write(json.dumps(metrics, ensure_ascii=False) + "\n")
             sink.flush()
             print(json.dumps({**totals, "last": ref.document_key}), flush=True)
+            if unbilled >= ledger_every:
+                bill()
             time.sleep(pause)
+    bill()
     return totals
+
+
+def run_pilot(*, limit: int, out: Path, fetcher: SafeFetcher, client: InsForgeClient, store: QdrantStore,
+              embedder: E5SmallEmbedder, budget: BudgetGuard, pause: float = 3.0) -> dict[str, Any]:
+    return run_load(out=out, fetcher=fetcher, client=client, store=store, embedder=embedder, budget=budget,
+                    limit=limit, pause=pause)

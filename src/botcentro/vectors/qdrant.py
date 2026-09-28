@@ -4,8 +4,9 @@ La base de InsForge conserva documentos, chunks citables y enlaces a proyectos; 
 vector de cada chunk con una carga mínima para filtrar y citar sin volver a la base. El id del
 punto es el id del chunk (uuid5 determinista), así que publicar dos veces es idempotente.
 
-El plan gratuito (1 GB de RAM, 4 GB de disco) obliga a: vectores originales en disco, copia
-cuantizada int8 en RAM y carga útil en disco. Con 384 dimensiones cabe ~1 M de chunks.
+El plan gratuito (1 GB de RAM, 4 GB de disco, 1 M de vectores) obliga a: vectores originales en
+disco en float16, copia cuantizada int8 en RAM, carga útil en disco y mínima. Medido en el piloto:
+~3,9 KB por punto con float32 y carga completa; la colección v2 baja a ~2,8 KB (DEC-14).
 """
 
 from __future__ import annotations
@@ -18,7 +19,8 @@ import httpx
 from botcentro.embeddings.e5 import DIMENSIONS, INDEX_NAMESPACE
 from botcentro.errors import BotcentroError
 
-COLLECTION = f"botcentro-docs-{INDEX_NAMESPACE}"
+COLLECTION = f"botcentro-docs-{INDEX_NAMESPACE}-v2"
+LEGACY_COLLECTION = f"botcentro-docs-{INDEX_NAMESPACE}"
 _KEYWORD_FIELDS = ("document_key", "document_type", "source_code", "project_ids", "doc_kind", "segment_kind")
 _INTEGER_FIELDS = ("year",)
 
@@ -54,7 +56,7 @@ class QdrantStore:
         created = not any(c["name"] == self.collection for c in existing["collections"])
         if created:
             self._request("PUT", f"/collections/{self.collection}", {
-                "vectors": {"size": DIMENSIONS, "distance": "Cosine", "on_disk": True},
+                "vectors": {"size": DIMENSIONS, "distance": "Cosine", "on_disk": True, "datatype": "float16"},
                 "quantization_config": {"scalar": {"type": "int8", "quantile": 0.99, "always_ram": True}},
                 "on_disk_payload": True,
                 "hnsw_config": {"m": 16, "ef_construct": 100},
@@ -68,14 +70,14 @@ class QdrantStore:
                           {"field_name": field, "field_schema": "integer"})
         return created
 
-    def upsert(self, points: Sequence[Mapping[str, Any]]) -> int:
-        """Publica puntos {id, vector, payload}; espera confirmación para no perder lotes."""
-        if not points:
-            return 0
+    def upsert(self, points: Sequence[Mapping[str, Any]], *, batch: int = 256) -> int:
+        """Publica puntos {id, vector, payload} por lotes; espera confirmación para no perder datos."""
         for point in points:
             if len(point["vector"]) != DIMENSIONS:
                 raise QdrantError(f"el vector de {point['id']} no tiene {DIMENSIONS} dimensiones")
-        self._request("PUT", f"/collections/{self.collection}/points?wait=true", {"points": list(points)})
+        for start in range(0, len(points), batch):
+            self._request("PUT", f"/collections/{self.collection}/points?wait=true",
+                          {"points": list(points[start:start + batch])})
         return len(points)
 
     def count(self, flt: Mapping[str, Any] | None = None) -> int:
@@ -95,6 +97,24 @@ class QdrantStore:
     def info(self) -> dict[str, Any]:
         return dict(self._request("GET", f"/collections/{self.collection}"))
 
+    def scroll(self, *, offset: Any = None, limit: int = 256) -> tuple[list[dict[str, Any]], Any]:
+        """Página de puntos con vector y carga útil; devuelve (puntos, siguiente desplazamiento)."""
+        body: dict[str, Any] = {"limit": limit, "with_payload": True, "with_vector": True}
+        if offset is not None:
+            body["offset"] = offset
+        result = self._request("POST", f"/collections/{self.collection}/points/scroll", body)
+        return list(result["points"]), result.get("next_page_offset")
+
+    def stored_bytes(self) -> int:
+        """Bytes de vectores y carga útil de la colección según la telemetría (sin índices)."""
+        telemetry = self._request("GET", "/telemetry?details_level=3")
+        for collection in telemetry.get("collections", {}).get("collections", []):
+            if isinstance(collection, dict) and collection.get("id") == self.collection:
+                return sum((shard.get("local") or {}).get("vectors_size_bytes", 0)
+                           + (shard.get("local") or {}).get("payloads_size_bytes", 0)
+                           for shard in collection.get("shards", []))
+        return 0
+
 
 def parse_vector(literal: str) -> list[float]:
     """Vector en texto de pgvector ('[0.1,0.2,...]') → lista de floats."""
@@ -102,12 +122,10 @@ def parse_vector(literal: str) -> list[float]:
 
 
 def chunk_payload(row: Mapping[str, Any], *, doc_kind: str) -> dict[str, Any]:
+    """Carga útil mínima: el id del punto ya es el del chunk y el encabezado solo sirve al embeber."""
     published = row.get("published_on")
     return {
-        "chunk_id": str(row["chunk_id"]),
         "text": row["text"],
-        "heading": row.get("heading"),
-        "section_label": row.get("section_label"),
         "document_key": row["document_key"],
         "document_type": row.get("document_type"),
         "doc_kind": doc_kind,
