@@ -122,6 +122,9 @@ Panel web de solo lectura (hito P-H2 de [`prd-panel-web.md`](prd-panel-web.md) y
 - **Lectura:** todas las lecturas usan el JWT del operador (RPC `ops_*` SECURITY INVOKER), así que RLS decide qué ve. Una sección sin permiso muestra «sin acceso», no ceros.
 - **Estados honestos:** se distingue «sin datos», «no instrumentado» (workers, intentos, alertas, incidentes, logs), «vencido» y «desconectado».
 - **Actualización:** resumen en vivo por SSE, con respaldo de consulta periódica. «Congelar tablero» detiene solo la animación.
+  - Si en 10 s no llega ningún evento, el panel cierra el canal y pasa a «Consulta periódica» (cada 15 s).
+  - Es lo que ocurre detrás del túnel temporal de Cloudflare (`trycloudflare.com`), que retiene la respuesta SSE completa. Está medido: eventos enviados cada 2 s llegan todos juntos al cerrarse el canal.
+  - Para «En vivo» real hace falta un túnel con nombre o acceso directo.
 - **Acciones:** se muestran deshabilitadas con su motivo hasta el hito P-H3.
 
 ```bash
