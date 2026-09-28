@@ -1,9 +1,9 @@
 """Fichas de proyecto de SRC-06 como documentos de texto indexados (SRS §8, SRS-F14; PRD-05).
 
 Cada ficha publicada del listado de la Cámara (título, objeto, observaciones, tipo, comisiones,
-legislatura, autores) se convierte en un documento `otro` con una sola página, sus chunks con la
-receta de e5-small y sus embeddings. El registro es atómico por lote en la base
-(`ingest_register_text_documents`); aquí solo se arma el texto, se segmenta y se embebe.
+legislatura, autores) se convierte en un documento `otro` con una sola página y sus chunks con la
+receta de e5-small. El registro es atómico por lote en la base (`ingest_register_text_documents`);
+los vectores se publican después en Qdrant (DEC-12) con el id del chunk, de forma idempotente.
 """
 
 from __future__ import annotations
@@ -18,8 +18,9 @@ from botcentro.documents.chunking import Chunk, PageText, chunk_extraction
 from botcentro.domain.hashing import sha256_hex
 from botcentro.embeddings.e5 import (DIMENSIONS, E5_SMALL_RECIPE, INDEX_NAMESPACE, MAX_INPUT_TOKENS, MODEL_ID,
                                      MODEL_VERSION, PassageVector)
-from botcentro.embeddings.indexer import TruncatedPassage, vector_literal
-from botcentro.insforge.client import RpcClient
+from botcentro.embeddings.indexer import TruncatedPassage
+from botcentro.insforge.client import RpcClient, as_rows
+from botcentro.vectors.qdrant import QdrantStore, chunk_payload
 
 EXTRACTOR_VERSION = "ficha-text-v1"
 EXTRACTION_NAMESPACE = uuid.UUID("0c3f6a1e-2b7d-4f55-9a61-5e0d2c7b8a94")
@@ -95,10 +96,12 @@ def build_item(row: Mapping[str, Any], embedder: Embedder) -> tuple[dict[str, An
 
 
 class FichaIndexer:
-    def __init__(self, rpc: RpcClient, embedder: Embedder, budget: BudgetGuard, *, batch: int = 100) -> None:
+    def __init__(self, rpc: RpcClient, embedder: Embedder, budget: BudgetGuard, vectors: QdrantStore, *,
+                 batch: int = 100) -> None:
         self.rpc = rpc
         self.embedder = embedder
         self.budget = budget
+        self.vectors = vectors
         self.batch = batch
 
     def run_batch(self) -> dict[str, int] | None:
@@ -112,10 +115,21 @@ class FichaIndexer:
             vectors = {v.chunk_id: v for v in self.embedder.embed_passages(chunks)} if chunks else {}
             if any(v.truncated for v in vectors.values()):
                 raise TruncatedPassage("hay pasajes de ficha que exceden el límite del modelo")
-            for item, _ in built:
-                for c in item["chunks"]:
-                    c["embedding"] = vector_literal(vectors[c["id"]].vector)
             result = self.rpc.call("ingest_register_text_documents", {"p_items": [i for i, _ in built]})
             reservation.settle(0)
-        counts = result[0] if isinstance(result, list) else result
+        counts = dict(as_rows(result)[0])
+        ids = list(vectors)
+        projects = {str(r["chunk_id"]): r["project_ids"] or []
+                    for r in as_rows(self.rpc.call("ingest_chunk_projects", {"p_chunk_ids": ids}))} if ids else {}
+        points = []
+        for item, _ in built:
+            for c in item["chunks"]:
+                points.append({"id": c["id"], "vector": vectors[c["id"]].vector, "payload": chunk_payload({
+                    "chunk_id": c["id"], "text": c["text"], "heading": c["heading"],
+                    "section_label": c["section_label"], "document_key": item["document_key"],
+                    "document_type": item["document_type"], "title": item["title"],
+                    "published_on": item["published_on"], "source_url": item["source_url"], "source_code": "SRC-06",
+                    "project_ids": projects.get(c["id"], []),
+                }, doc_kind="ficha")})
+        counts["vectors"] = self.vectors.upsert(points)
         return {**counts, "without_text": len(rows) - len(built)}

@@ -8,7 +8,7 @@ Entregable de PRD §6.1 y SRS §20. Ninguna fuente pasa de `candidate` sin compl
 |---|---|---|---|---|---|
 | SRC-01 | Senado — Datos Públicos | primaria | MVP | **activa** · perfil v1 aprobado ([ficha](SRC-01.md)); conector `senado_open_data` 0.1.0 | juanku2003@gmail.com |
 | SRC-02 | Senado — Sección de Leyes | primaria | MVP | candidata · bloqueada por anti-bots, requiere autorización ([ficha](SRC-02.md)) | por asignar |
-| SRC-03 | Gacetas enlazadas | primaria | MVP | candidata | por asignar |
+| SRC-03 | Gacetas del Congreso (Imprenta Nacional) | primaria | MVP | candidata · piloto de 200 gacetas en curso ([ficha](SRC-03.md)); conector `gacetas_imprenta` | juanku2003@gmail.com |
 | SRC-04 | Senado — Órdenes del día | primaria | MVP | candidata | por asignar |
 | SRC-05 | Senado — Actas y Relatoría | primaria | MVP | candidata | por asignar |
 | SRC-06 | Cámara — Proyectos de Ley | primaria | MVP | **activa** · licencia abierta publicada ([ficha](SRC-06.md)); conector `camara_proyectos` 0.1.0 | juanku2003@gmail.com |

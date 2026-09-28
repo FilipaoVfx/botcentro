@@ -14,6 +14,7 @@ dependencies = [
     "httpcore>=1.0",
     "pydantic>=2.7",
     "openpyxl>=3.1",
+    "pypdf>=5.0",
 ]
 
 [project.optional-dependencies]

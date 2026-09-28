@@ -119,6 +119,16 @@ class FakeEmbedder:
         return [PassageVector(str(c.id), vec, 10, False) for c in chunks]
 
 
+class FakeStore:
+    def __init__(self) -> None:
+        self.points: dict[str, dict] = {}
+
+    def upsert(self, points) -> int:
+        for p in points:
+            self.points[p["id"]] = p
+        return len(points)
+
+
 def test_fichas_become_indexed_documents_linked_to_projects(db: Db, loaded) -> None:
     from botcentro.costs.budget import BudgetGuard
     from botcentro.documents.fichas import FichaIndexer
@@ -126,14 +136,18 @@ def test_fichas_become_indexed_documents_linked_to_projects(db: Db, loaded) -> N
     db.execute("insert into public.budgets (name, provider, period, limit_amount) values ('local-e5', 'local', "
                "'daily', 0) on conflict do nothing")
     rpc = db.rpc(loaded)
-    indexer = FichaIndexer(rpc, FakeEmbedder(), BudgetGuard(rpc), batch=20)
-    totals = {"created": 0, "chunks": 0, "embeddings": 0}
+    store = FakeStore()
+    indexer = FichaIndexer(rpc, FakeEmbedder(), BudgetGuard(rpc), store, batch=20)  # type: ignore[arg-type]
+    totals = {"created": 0, "chunks": 0, "vectors": 0}
     while (counts := indexer.run_batch()) is not None:
         for k in totals:
             totals[k] += counts[k]
     published = db.execute("select count(distinct subject_ref) n from public.observations "
                            "where predicate = 'project_profile' and status = 'published'")[0]["n"]
-    assert totals["created"] == published and totals["chunks"] == totals["embeddings"] >= published
+    assert totals["created"] == published and totals["chunks"] == totals["vectors"] >= published
+    assert db.execute("select count(*) n from public.chunk_embeddings")[0]["n"] == 0  # DEC-12: vectores en Qdrant
+    payload = next(iter(store.points.values()))["payload"]
+    assert payload["doc_kind"] == "ficha" and payload["project_ids"] and payload["source_code"] == "SRC-06"
     linked = db.execute("""select count(distinct c.id) n from public.chunks c
                            join public.chunk_project_links l on l.chunk_id = c.id""")[0]["n"]
     assert linked == totals["chunks"]
@@ -141,3 +155,10 @@ def test_fichas_become_indexed_documents_linked_to_projects(db: Db, loaded) -> N
     assert sample.startswith("Proyecto:") and "Objeto:" in sample
     # Idempotente: nada pendiente y un reenvío del mismo contenido se omite.
     assert indexer.run_batch() is None
+    # La sincronización recorre todo lo registrado y vuelve a embeber lo que no tiene vector.
+    from botcentro.vectors.sync import as_chunk, sync_chunks
+    again = FakeStore()
+    embedder = FakeEmbedder()
+    result = sync_chunks(rpc, again, batch=7,  # type: ignore[arg-type]
+                         embed_missing=lambda rows: embedder.embed_passages([as_chunk(r) for r in rows]))
+    assert result["published"] == totals["chunks"] and set(again.points) == set(store.points)

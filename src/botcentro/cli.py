@@ -150,13 +150,50 @@ def normalize(code: str) -> None:
         sys.exit(f"{code} no tiene normalizador")
 
 
+def qdrant_store():
+    from botcentro.vectors.qdrant import QdrantStore
+
+    store = QdrantStore(_required("BOTCENTRO_QDRANT_URL"), _required("BOTCENTRO_QDRANT_API_KEY"))
+    store.ensure_collection()
+    return store
+
+
+def sync_qdrant(batch: int) -> None:
+    from botcentro.embeddings.e5 import E5SmallEmbedder
+    from botcentro.vectors.sync import as_chunk, sync_chunks
+
+    embedder = E5SmallEmbedder()
+    store = qdrant_store()
+    totals = sync_chunks(account_client("ingest"), store, batch=batch,
+                         embed_missing=lambda rows: embedder.embed_passages([as_chunk(r) for r in rows]),
+                         progress=lambda t: print(json.dumps(t), flush=True))
+    print(json.dumps({**totals, "points_in_collection": store.count()}), flush=True)
+
+
+def pilot_gacetas(limit: int, out: str) -> None:
+    from pathlib import Path
+
+    from botcentro.connectors.gacetas_imprenta import DOMAINS
+    from botcentro.costs.budget import BudgetGuard
+    from botcentro.embeddings.e5 import E5SmallEmbedder
+    from botcentro.http.fetcher import FetchLimits
+    from botcentro.pilots.gacetas import run_pilot
+
+    client = account_client("ingest")
+    fetcher = SafeFetcher(UrlGuard(UrlPolicy.for_domains(DOMAINS)),
+                          limits=FetchLimits(max_bytes=120 * 1024 * 1024, timeout_seconds=180))
+    totals = run_pilot(limit=limit, out=Path(out), fetcher=fetcher, client=client, store=qdrant_store(),
+                       embedder=E5SmallEmbedder(), budget=BudgetGuard(client))
+    print(json.dumps(totals), flush=True)
+
+
 def index_fichas(batch: int) -> None:
     from botcentro.costs.budget import BudgetGuard
     from botcentro.documents.fichas import FichaIndexer
     from botcentro.embeddings.e5 import E5SmallEmbedder
 
     client = account_client("ingest")
-    indexer = FichaIndexer(client, E5SmallEmbedder(), BudgetGuard(client), batch=batch)
+    indexer = FichaIndexer(client, E5SmallEmbedder(), BudgetGuard(client), qdrant_store(), batch=batch)
     totals: dict[str, int] = {}
     while (counts := indexer.run_batch()) is not None:
         for k, v in counts.items():
@@ -183,11 +220,20 @@ def main(argv: list[str] | None = None) -> None:
     n.add_argument("source")
     f = sub.add_parser("index-fichas", help="documenta e indexa (e5-small) las fichas de proyecto de SRC-06")
     f.add_argument("--batch", type=int, default=100)
+    q = sub.add_parser("sync-qdrant", help="publica en Qdrant los chunks registrados (idempotente)")
+    q.add_argument("--batch", type=int, default=500)
+    g = sub.add_parser("pilot-gacetas", help="piloto SRC-03: gacetas recientes → OCR → Qdrant, con métricas")
+    g.add_argument("--limit", type=int, default=200)
+    g.add_argument("--out", default="var/pilot-gacetas.jsonl")
     args = parser.parse_args(argv)
     if args.command == "verify-account":
         verify_account(args.who, args.code)
     elif args.command == "normalize":
         normalize(args.source)
+    elif args.command == "pilot-gacetas":
+        pilot_gacetas(args.limit, args.out)
+    elif args.command == "sync-qdrant":
+        sync_qdrant(args.batch)
     elif args.command == "index-fichas":
         index_fichas(args.batch)
     else:
