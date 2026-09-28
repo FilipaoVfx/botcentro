@@ -83,7 +83,7 @@ def _error(code: str, message: str, status: int, request: Request) -> JSONRespon
                          "retryable": False, "details": {}}, status_code=status)
 
 
-def build_router(store: SessionStore, *, secure_cookie: bool = True) -> APIRouter:
+def build_router(store: SessionStore, *, secure_cookie: bool = True, enrich=None) -> APIRouter:  # noqa: ANN001
     router = APIRouter(prefix="/v1/admin")
     code_limiter = RateLimiter(limit=5, window=600)
 
@@ -154,6 +154,8 @@ def build_router(store: SessionStore, *, secure_cookie: bool = True) -> APIRoute
             while not await request.is_disconnected():
                 try:
                     data = await run_in_threadpool(store.rpc, session, "ops_overview", {})
+                    if enrich is not None:
+                        data = await run_in_threadpool(enrich, data)
                 except SessionExpired:
                     yield "event: session_expired\ndata: {}\n\n"
                     return
@@ -194,6 +196,8 @@ def build_router(store: SessionStore, *, secure_cookie: bool = True) -> APIRoute
                     return _error("INVALID_FILTER", "Estado no reconocido.", 422, request)
                 params["p_state"] = value
         data = await run_in_threadpool(store.rpc, session, fn, params)
+        if view == "overview" and enrich is not None:
+            data = await run_in_threadpool(enrich, data)
         return JSONResponse({**data, "request_id": request.state.request_id})
 
     return router

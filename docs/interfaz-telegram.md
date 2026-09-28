@@ -35,7 +35,7 @@ Módulos en `src/botcentro/telegram_ui/`:
 | I2 — Proyectos (explorador, filtros, ficha, contexto) | ✅ |
 | I3 — Portada del día, agenda, cronología y debates | ✅ |
 | I4 — Votaciones, documentos y fuentes por respuesta | ✅ |
-| I5 — Robustez, observabilidad y corpus de 240 entradas | Pendiente |
+| I5 — Robustez, observabilidad y corpus de 240 entradas | ✅ (salvo prueba con usuarios) |
 
 ## Requisitos cubiertos en I1
 
@@ -101,3 +101,19 @@ Pendientes de I4:
 - **Explorador general de documentos:** todavía no existe; por ahora los documentos se ven solo por proyecto.
 - **Votaciones de la Cámara:** sin fuente (SRC-07).
 - **Distinguir abstención, impedimento y ausencia:** la fuente del Senado no publica esas categorías.
+
+## Requisitos cubiertos en I5
+
+| Requisito | Evidencia |
+|---|---|
+| UX-O03 Continuidad (corpus) | `tests/corpus/ui_corpus.jsonl` tiene 240 entradas: 60 de comandos, 60 de filtros, 60 de seguimiento y 60 adversariales. Resultado: 60/60 en ajuste y **180/180 en evaluación**, y el grupo adversarial exige 100 % (`test_ui_corpus.py`) |
+| UX-O05 Render ≤ 2 s | La lista de proyectos pasó de ~2 s a **0,04–0,09 s** con la vista materializada `project_activity`, que se refresca al normalizar |
+| UI-F25 Contexto persistente breve | `test_context_survives_process_restart` y `test_expired_context_is_not_revived` |
+| UI-F26 Token vencido | `test_expired_button_reopens_home_without_data` |
+| UI-F36 Observabilidad | Eventos `ui.*` como contadores diarios y latencias p95 por tipo de entrada en Redis, sin texto ni identificadores. El panel los muestra en la etapa **Bot** (`test_interaction_metrics_reach_the_panel`) |
+| Panel: índice real | La etapa **Índice** cuenta vectores en Qdrant por tipo; antes contaba `chunk_embeddings` en InsForge, vacía desde DEC-12, y mostraba 0. La etapa nueva **Gacetas** muestra el avance de la carga y detecta cuando se detiene (`test_panel_live_stats.py`) |
+
+## Pendiente fuera de lo automatizable
+
+- **UI-N06:** prueba de usabilidad móvil con 10 participantes y 5 tareas (UX-O01, UX-O02). La recluta y la moderación las hace el equipo.
+- **UI-N02:** carga con dos réplicas. Hoy hay un solo proceso; el diseño (CAS y Redis compartido) ya lo admite.

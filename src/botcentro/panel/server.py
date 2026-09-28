@@ -26,7 +26,8 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' 
        "connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 
 
-def create_panel_app(store: SessionStore, *, dist: Path = DIST, secure_cookie: bool = True) -> FastAPI:
+def create_panel_app(store: SessionStore, *, dist: Path = DIST, secure_cookie: bool = True,
+                     enrich=None) -> FastAPI:  # noqa: ANN001
     app = create_app(rpc=None, telegram=None)
 
     @app.exception_handler(SessionExpired)
@@ -45,7 +46,7 @@ def create_panel_app(store: SessionStore, *, dist: Path = DIST, secure_cookie: b
             response.headers.setdefault("Cache-Control", "no-store")
         return response
 
-    app.include_router(build_router(store, secure_cookie=secure_cookie))
+    app.include_router(build_router(store, secure_cookie=secure_cookie, enrich=enrich))
 
     if (dist / "assets").is_dir():
         app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
@@ -70,7 +71,9 @@ def _from_env() -> FastAPI:
     if not base:
         raise RuntimeError("falta BOTCENTRO_INSFORGE_URL")
     secure = os.environ.get("BOTCENTRO_PANEL_INSECURE_COOKIE") != "1"
-    return create_panel_app(SessionStore(InsForgeAuth(base)), secure_cookie=secure)
+    from botcentro.panel.live_stats import LiveStats
+
+    return create_panel_app(SessionStore(InsForgeAuth(base)), secure_cookie=secure, enrich=LiveStats.from_env().enrich)
 
 
 app = _from_env() if os.environ.get("BOTCENTRO_INSFORGE_URL") else None

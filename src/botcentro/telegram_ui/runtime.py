@@ -27,6 +27,7 @@ from botcentro.telegram.webhook import TelegramWebhook, TgUpdate
 from botcentro.telegram_ui.app import HOME_BUTTON, UiApplication
 from botcentro.telegram_ui.contracts import Button, CallbackRecord, SessionContext, UiAction, ViewModel
 from botcentro.telegram_ui.intents import parse_text
+from botcentro.telegram_ui.metrics import UiMetrics, metrics_prefix
 from botcentro.telegram_ui.state import UiState
 
 log = logging.getLogger("botcentro.ui")
@@ -63,12 +64,16 @@ class UiRuntime:
         self.message_limit = message_limit
         self.clock = clock
         self._drain_lock = asyncio.Lock()
+        self.metrics = UiMetrics(state.redis, metrics_prefix(bot_id, state.prefix.split(":")[1]))
 
     def principal(self, chat_id: int, user_id: int) -> Principal:
         return Principal(chat_id, user_id, pseudonymize_user(self.key, self.bot_id, user_id))
 
     def _event(self, name: str, who: Principal, **fields: Any) -> None:
         log.info(json.dumps({"event": name, "user": who.user_hash[:12], **fields}, ensure_ascii=False, default=str))
+        task = asyncio.get_running_loop().create_task(
+            self.metrics.record(name, ms=fields.get("ms"), entry=fields.get("entry")))
+        task.add_done_callback(lambda t: t.exception() and log.warning("métrica no registrada: %s", t.exception()))
 
     # -- texto ---------------------------------------------------------------------------------
 

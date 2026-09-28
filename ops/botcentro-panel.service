@@ -1,0 +1,18 @@
+# Panel de operación (BFF + SPA). Instalar: sudo cp ops/botcentro-panel.service /etc/systemd/system/ &&
+# sudo systemctl daemon-reload && sudo systemctl enable --now botcentro-panel
+[Unit]
+Description=botcentro: panel de operación (127.0.0.1:8710)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/botcentro
+EnvironmentFile=/root/botcentro/.env
+ExecStart=/root/botcentro/.venv/bin/uvicorn botcentro.panel.server:app --host 127.0.0.1 --port 8710 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

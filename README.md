@@ -113,6 +113,7 @@ Rechaza predicciones, asesoría jurídica y recomendaciones de voto.
 # .env: BOTCENTRO_TELEGRAM_BOT_TOKEN (de @BotFather), BOTCENTRO_QUERY_EMAIL/PASSWORD, BOTCENTRO_PSEUDONYM_KEY
 sudo cp ops/botcentro-bot.service /etc/systemd/system/ && sudo systemctl daemon-reload
 sudo systemctl enable --now botcentro-bot      # sondeo largo: no necesita URL pública
+sudo cp ops/botcentro-panel.service /etc/systemd/system/ && sudo systemctl enable --now botcentro-panel
 journalctl -u botcentro-bot -f
 ```
 

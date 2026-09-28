@@ -153,7 +153,20 @@ def run_load(*, out: Path, fetcher: SafeFetcher, client: InsForgeClient, store: 
     refs = recent(GacetaListing(fetcher), limit, pause, since)
     pending = [r for r in refs if r.document_key not in done or r.document_key in retry]
     totals: dict[str, Any] = {"listed": len(refs), "pending": len(pending), "processed": 0, "failed": 0}
+    already = len(refs) - len(pending)
+    status_path = out.with_suffix(".status.json")
     unbilled = 0
+
+    def write_status(state: str) -> None:
+        """Avance legible por el panel (etapa «Gacetas»); escritura atómica."""
+        from datetime import datetime, timezone
+        tmp = status_path.with_suffix(".tmp")
+        tmp.write_text(json.dumps({**totals, "state": state, "since": since.isoformat() if since else None,
+                                   "done": already + totals["processed"],
+                                   "updated_at": datetime.now(timezone.utc).isoformat()}))
+        tmp.replace(status_path)
+
+    write_status("running")
 
     def bill() -> None:
         nonlocal unbilled
@@ -181,10 +194,12 @@ def run_load(*, out: Path, fetcher: SafeFetcher, client: InsForgeClient, store: 
             sink.write(json.dumps(metrics, ensure_ascii=False) + "\n")
             sink.flush()
             print(json.dumps({**totals, "last": ref.document_key}), flush=True)
+            write_status("running")
             if unbilled >= ledger_every:
                 bill()
             time.sleep(pause)
     bill()
+    write_status("stopped" if totals.get("stopped") else "finished")
     return totals
 
 

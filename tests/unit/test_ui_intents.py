@@ -49,7 +49,7 @@ def test_search_keeps_original_text_and_never_corrects_numbers() -> None:
     ("cámara el 12 de agosto de 2026", Intent.DAY_OVERVIEW, {"corporation": "camara",
                                                             "expression": "12 de agosto de 2026"}),
     ("agenda mañana", Intent.AGENDA, {"expression": "manana"}),
-    ("agenda", Intent.AGENDA, {"expression": "esta semana"}),
+    ("agenda", Intent.AGENDA, {}),
     ("debates de salud", Intent.DISCUSSIONS, {"query": "salud"}),
 ])
 def test_day_agenda_and_debates(text, intent, params) -> None:

@@ -148,6 +148,8 @@ def normalize(code: str) -> None:
         _run_steps(client, "normalize_camara_pl", CAMARA_STEPS, set(CAMARA_STEPS), 100)
     else:
         sys.exit(f"{code} no tiene normalizador")
+    client.call("maintenance_refresh_project_activity", {})  # lista de proyectos del bot (I5)
+    print(json.dumps({"step": "project_activity", "refreshed": True}), flush=True)
 
 
 def qdrant_store():

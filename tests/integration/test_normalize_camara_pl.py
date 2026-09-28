@@ -59,6 +59,7 @@ def loaded(db: Db, tmp_path_factory):
     summary = runner.run(mode="backfill", scope={})
     assert summary.status == "partial"  # hay filas en cuarentena (sufijo contradictorio)
     _normalize(db.rpc(ingest))
+    db.execute("refresh materialized view public.project_activity")
     return ingest
 
 

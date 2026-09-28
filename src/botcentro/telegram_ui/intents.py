@@ -27,7 +27,7 @@ _ALIASES: dict[str, Intent] = {
     "proyectos": Intent.PROJECTS_LIST, "/proyectos": Intent.PROJECTS_LIST,
     "senadohoy": Intent.DAY_OVERVIEW, "senado hoy": Intent.DAY_OVERVIEW, "/senadohoy": Intent.DAY_OVERVIEW,
     "camarahoy": Intent.DAY_OVERVIEW, "camara hoy": Intent.DAY_OVERVIEW, "/camarahoy": Intent.DAY_OVERVIEW,
-    "/agenda": Intent.AGENDA, "discusiones": Intent.DISCUSSIONS, "/discusiones": Intent.DISCUSSIONS, "debates": Intent.DISCUSSIONS,
+    "/agenda": Intent.AGENDA, "agenda": Intent.AGENDA, "discusiones": Intent.DISCUSSIONS, "/discusiones": Intent.DISCUSSIONS, "debates": Intent.DISCUSSIONS,
     "votaciones": Intent.VOTINGS, "/votaciones": Intent.VOTINGS,
     "documentos": Intent.DOCUMENTS, "autores": Intent.PROJECT_PARTICIPANTS,
 }
@@ -39,8 +39,9 @@ _CONTEXTUAL = [
     (re.compile(r"^(?:y )?(?:sus |los )?documentos$|^muestrame el texto$"), Intent.DOCUMENTS),
     (re.compile(r"^(?:volver|regresar) al proyecto$"), Intent.BACK),
 ]
-_ORDINALS = {"primero": 1, "primer": 1, "segundo": 2, "tercero": 3, "tercer": 3, "cuarto": 4, "quinto": 5,
-             "sexto": 6, "septimo": 7, "octavo": 8}
+_ORDINALS = {"primero": 1, "primer": 1, "primera": 1, "segundo": 2, "segunda": 2, "tercero": 3, "tercer": 3,
+             "tercera": 3, "cuarto": 4, "cuarta": 4, "quinto": 5, "quinta": 5, "sexto": 6, "sexta": 6,
+             "septimo": 7, "septima": 7, "octavo": 8, "octava": 8}
 _ORDINAL_RE = re.compile(r"^(?:abre |abrir |ver |el |la |ese |esa )*(?:el |la )?(?P<word>" +
                          "|".join(_ORDINALS) + r")$")
 _OPEN_N_RE = re.compile(r"^(?:abre|abrir|ver|opcion|numero) (?:el |la |la opcion )?(?P<n>[1-8])$")

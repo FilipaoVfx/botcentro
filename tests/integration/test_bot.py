@@ -307,3 +307,54 @@ def test_debates_have_limited_coverage_and_search_only_actas(bot) -> None:
     [found] = bot.say("salud")  # respuesta a la captura abierta por «Debates»
     assert "Búsqueda en actas" in found["html"] and "no es la transcripción completa" in found["html"]
     assert {"key": "segment_kind", "match": {"value": "acta"}} in bot.vectors.calls[-1]["must"]
+
+
+# -- I5: reinicio, vencimiento y métricas ----------------------------------------------------------
+
+def test_context_survives_process_restart(bot) -> None:
+    """UI-T35: el contexto vive en Redis; un proceso nuevo retoma el proyecto abierto."""
+    from botcentro.telegram_ui.runtime import UiRuntime
+
+    bot.say("PL 396/2026 Cámara")
+    old = bot.runtime
+    bot.runtime = UiRuntime(transport=old.transport, state=old.state, app=old.app, intake=old.intake, rpc=old.rpc,
+                            bot_id=old.bot_id, pseudonym_key=old.key, worker_id="otro-proceso")
+    try:
+        [authors] = bot.say("quiénes lo presentaron")
+        assert "👥 Autores · PL 396/2026 Cámara" in authors["html"]
+    finally:
+        bot.runtime = old
+
+
+def test_expired_context_is_not_revived(bot) -> None:
+    """UI-T56: pasadas 24 h desde la captura, el proyecto activo no se reutiliza."""
+    from datetime import datetime, timedelta, timezone
+
+    bot.say("PL 396/2026 Cámara")
+    state = bot.runtime.state
+    ctx = bot.run(state.load(ALLOWED, ALLOWED))
+    ctx.expires_at = datetime.now(timezone.utc) - timedelta(minutes=1)
+    bot.run(state.redis.set(state._key("session", ALLOWED, ALLOWED), ctx.model_dump_json(), ex=60))
+    [reply] = bot.say("quiénes lo presentaron")
+    assert "¿De qué proyecto?" in reply["html"]
+
+
+def test_expired_button_reopens_home_without_data(bot) -> None:
+    [home] = bot.say("inicio")
+    data = home["keyboard"][0][0]["callback_data"]
+    bot.run(bot.runtime.state.redis.delete(f"{bot.runtime.state.prefix}:cb:{data[3:]}"))
+    bot.click(home, home["keyboard"][0][0]["text"])
+    assert "venció" in bot.transport.answers[-1]["text"]
+
+
+def test_interaction_metrics_reach_the_panel(bot) -> None:
+    import redis as sync_redis
+
+    from botcentro.telegram_ui.metrics import summarize
+    from tests.integration.bot_harness import REDIS_URL as URL
+
+    bot.say("inicio")
+    bot.run(__import__("asyncio").sleep(0.05))  # las métricas se registran en segundo plano
+    client = sync_redis.Redis.from_url(URL)
+    data = summarize(client, bot.runtime.metrics.prefix)
+    assert data["counts"].get("ui.view_rendered", 0) >= 1 and "text" in data["p95_ms"]

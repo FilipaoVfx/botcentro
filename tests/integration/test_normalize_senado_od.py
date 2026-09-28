@@ -65,6 +65,7 @@ def loaded(db: Db, tmp_path_factory) -> UUID:
             if step not in {"vote_observations", "current_votes", "attendance"} or not any(
                     v for k, v in counts.items() if k != "step"):
                 break
+    db.execute("refresh materialized view public.project_activity")
     return ingest
 
 

@@ -1,0 +1,240 @@
+{"id": "comandos-01", "group": "comandos", "split": "ajuste", "text": "proyectos", "intent": "projects.list"}
+{"id": "comandos-02", "group": "comandos", "split": "evaluacion", "text": "Proyectos", "intent": "projects.list"}
+{"id": "comandos-03", "group": "comandos", "split": "evaluacion", "text": "PROYECTOS", "intent": "projects.list"}
+{"id": "comandos-04", "group": "comandos", "split": "evaluacion", "text": "  proyectos  ", "intent": "projects.list"}
+{"id": "comandos-05", "group": "comandos", "split": "ajuste", "text": "/proyectos", "intent": "projects.list"}
+{"id": "comandos-06", "group": "comandos", "split": "evaluacion", "text": "proyctos", "intent": "projects.list"}
+{"id": "comandos-07", "group": "comandos", "split": "evaluacion", "text": "poryectos", "intent": "projects.list"}
+{"id": "comandos-08", "group": "comandos", "split": "evaluacion", "text": "proyecto s", "intent": "question.free"}
+{"id": "comandos-09", "group": "comandos", "split": "ajuste", "text": "/start", "intent": "home.open"}
+{"id": "comandos-10", "group": "comandos", "split": "evaluacion", "text": "/start@beeclanbot", "intent": "home.open"}
+{"id": "comandos-11", "group": "comandos", "split": "evaluacion", "text": "inicio", "intent": "home.open"}
+{"id": "comandos-12", "group": "comandos", "split": "evaluacion", "text": "Inicio", "intent": "home.open"}
+{"id": "comandos-13", "group": "comandos", "split": "ajuste", "text": "menú", "intent": "home.open"}
+{"id": "comandos-14", "group": "comandos", "split": "evaluacion", "text": "menu", "intent": "home.open"}
+{"id": "comandos-15", "group": "comandos", "split": "evaluacion", "text": "/menu", "intent": "home.open"}
+{"id": "comandos-16", "group": "comandos", "split": "evaluacion", "text": "/inicio", "intent": "home.open"}
+{"id": "comandos-17", "group": "comandos", "split": "ajuste", "text": "ayuda", "intent": "help.open"}
+{"id": "comandos-18", "group": "comandos", "split": "evaluacion", "text": "Ayuda", "intent": "help.open"}
+{"id": "comandos-19", "group": "comandos", "split": "evaluacion", "text": "/help", "intent": "help.open"}
+{"id": "comandos-20", "group": "comandos", "split": "evaluacion", "text": "/ayuda", "intent": "help.open"}
+{"id": "comandos-21", "group": "comandos", "split": "ajuste", "text": "ayda", "intent": "help.open"}
+{"id": "comandos-22", "group": "comandos", "split": "evaluacion", "text": "fuentes", "intent": "evidence.show"}
+{"id": "comandos-23", "group": "comandos", "split": "evaluacion", "text": "/fuentes", "intent": "sources.catalog"}
+{"id": "comandos-24", "group": "comandos", "split": "evaluacion", "text": "de dónde sale eso", "intent": "evidence.show"}
+{"id": "comandos-25", "group": "comandos", "split": "ajuste", "text": "¿de dónde sale eso?", "intent": "evidence.show"}
+{"id": "comandos-26", "group": "comandos", "split": "evaluacion", "text": "volver", "intent": "navigation.back"}
+{"id": "comandos-27", "group": "comandos", "split": "evaluacion", "text": "atrás", "intent": "navigation.back"}
+{"id": "comandos-28", "group": "comandos", "split": "evaluacion", "text": "atras", "intent": "navigation.back"}
+{"id": "comandos-29", "group": "comandos", "split": "ajuste", "text": "/volver", "intent": "navigation.back"}
+{"id": "comandos-30", "group": "comandos", "split": "evaluacion", "text": "cancelar", "intent": "interaction.cancel"}
+{"id": "comandos-31", "group": "comandos", "split": "evaluacion", "text": "/cancel", "intent": "interaction.cancel"}
+{"id": "comandos-32", "group": "comandos", "split": "evaluacion", "text": "/cancelar", "intent": "interaction.cancel"}
+{"id": "comandos-33", "group": "comandos", "split": "ajuste", "text": "actualizar", "intent": "view.refresh"}
+{"id": "comandos-34", "group": "comandos", "split": "evaluacion", "text": "senadohoy", "intent": "day.overview"}
+{"id": "comandos-35", "group": "comandos", "split": "evaluacion", "text": "Senado hoy", "intent": "day.overview"}
+{"id": "comandos-36", "group": "comandos", "split": "evaluacion", "text": "/senadohoy", "intent": "day.overview"}
+{"id": "comandos-37", "group": "comandos", "split": "ajuste", "text": "senado", "intent": "day.overview"}
+{"id": "comandos-38", "group": "comandos", "split": "evaluacion", "text": "camarahoy", "intent": "day.overview"}
+{"id": "comandos-39", "group": "comandos", "split": "evaluacion", "text": "cámara hoy", "intent": "day.overview"}
+{"id": "comandos-40", "group": "comandos", "split": "evaluacion", "text": "Cámara hoy", "intent": "day.overview"}
+{"id": "comandos-41", "group": "comandos", "split": "ajuste", "text": "/camarahoy", "intent": "day.overview"}
+{"id": "comandos-42", "group": "comandos", "split": "evaluacion", "text": "discusiones", "intent": "discussions.open"}
+{"id": "comandos-43", "group": "comandos", "split": "evaluacion", "text": "discuiones", "intent": "discussions.open"}
+{"id": "comandos-44", "group": "comandos", "split": "evaluacion", "text": "/discusiones", "intent": "discussions.open"}
+{"id": "comandos-45", "group": "comandos", "split": "ajuste", "text": "debates", "intent": "discussions.open"}
+{"id": "comandos-46", "group": "comandos", "split": "evaluacion", "text": "votaciones", "intent": "votings.list"}
+{"id": "comandos-47", "group": "comandos", "split": "evaluacion", "text": "Votaciones", "intent": "votings.list"}
+{"id": "comandos-48", "group": "comandos", "split": "evaluacion", "text": "votacines", "intent": "votings.list"}
+{"id": "comandos-49", "group": "comandos", "split": "ajuste", "text": "/votaciones", "intent": "votings.list"}
+{"id": "comandos-50", "group": "comandos", "split": "evaluacion", "text": "documentos", "intent": "documents.list"}
+{"id": "comandos-51", "group": "comandos", "split": "evaluacion", "text": "agenda", "intent": "agenda.list"}
+{"id": "comandos-52", "group": "comandos", "split": "evaluacion", "text": "/agenda", "intent": "agenda.list"}
+{"id": "comandos-53", "group": "comandos", "split": "ajuste", "text": "Agenda", "intent": "agenda.list"}
+{"id": "comandos-54", "group": "comandos", "split": "evaluacion", "text": "agnda", "intent": "agenda.list"}
+{"id": "comandos-55", "group": "comandos", "split": "evaluacion", "text": "autores", "intent": "project.participants"}
+{"id": "comandos-56", "group": "comandos", "split": "evaluacion", "text": "Menú", "intent": "home.open"}
+{"id": "comandos-57", "group": "comandos", "split": "ajuste", "text": "INICIO", "intent": "home.open"}
+{"id": "comandos-58", "group": "comandos", "split": "evaluacion", "text": "Fuentes", "intent": "evidence.show"}
+{"id": "comandos-59", "group": "comandos", "split": "evaluacion", "text": "Volver", "intent": "navigation.back"}
+{"id": "comandos-60", "group": "comandos", "split": "evaluacion", "text": "Cancelar", "intent": "interaction.cancel"}
+{"id": "filtros-01", "group": "filtros", "split": "ajuste", "text": "proyectos salud", "intent": "projects.search"}
+{"id": "filtros-02", "group": "filtros", "split": "evaluacion", "text": "proyectos de salud mental", "intent": "projects.search"}
+{"id": "filtros-03", "group": "filtros", "split": "evaluacion", "text": "buscar reforma laboral", "intent": "projects.search"}
+{"id": "filtros-04", "group": "filtros", "split": "evaluacion", "text": "proyectos sobre agua", "intent": "projects.search"}
+{"id": "filtros-05", "group": "filtros", "split": "ajuste", "text": "busca pensiones", "intent": "projects.search"}
+{"id": "filtros-06", "group": "filtros", "split": "evaluacion", "text": "proyectos del agro", "intent": "projects.search"}
+{"id": "filtros-07", "group": "filtros", "split": "evaluacion", "text": "proyectos de educación superior", "intent": "projects.search"}
+{"id": "filtros-08", "group": "filtros", "split": "evaluacion", "text": "proyectos sobre seguridad hídrica", "intent": "projects.search"}
+{"id": "filtros-09", "group": "filtros", "split": "ajuste", "text": "buscar vivienda", "intent": "projects.search"}
+{"id": "filtros-10", "group": "filtros", "split": "evaluacion", "text": "proyectos transporte", "intent": "projects.search"}
+{"id": "filtros-11", "group": "filtros", "split": "evaluacion", "text": "senado ayer", "intent": "day.overview"}
+{"id": "filtros-12", "group": "filtros", "split": "evaluacion", "text": "senado hoy", "intent": "day.overview"}
+{"id": "filtros-13", "group": "filtros", "split": "ajuste", "text": "cámara ayer", "intent": "day.overview"}
+{"id": "filtros-14", "group": "filtros", "split": "evaluacion", "text": "senado mañana", "intent": "day.overview"}
+{"id": "filtros-15", "group": "filtros", "split": "evaluacion", "text": "cámara el 12 de agosto de 2026", "intent": "day.overview"}
+{"id": "filtros-16", "group": "filtros", "split": "evaluacion", "text": "senado el 23 de septiembre de 2026", "intent": "day.overview"}
+{"id": "filtros-17", "group": "filtros", "split": "ajuste", "text": "senado el martes", "intent": "day.overview"}
+{"id": "filtros-18", "group": "filtros", "split": "evaluacion", "text": "cámara el lunes", "intent": "day.overview"}
+{"id": "filtros-19", "group": "filtros", "split": "evaluacion", "text": "Senado 2026-09-23", "intent": "day.overview"}
+{"id": "filtros-20", "group": "filtros", "split": "evaluacion", "text": "senado del 1 de septiembre de 2026", "intent": "day.overview"}
+{"id": "filtros-21", "group": "filtros", "split": "ajuste", "text": "agenda mañana", "intent": "agenda.list"}
+{"id": "filtros-22", "group": "filtros", "split": "evaluacion", "text": "agenda la próxima semana", "intent": "agenda.list"}
+{"id": "filtros-23", "group": "filtros", "split": "evaluacion", "text": "agenda esta semana", "intent": "agenda.list"}
+{"id": "filtros-24", "group": "filtros", "split": "evaluacion", "text": "agenda de hoy", "intent": "agenda.list"}
+{"id": "filtros-25", "group": "filtros", "split": "ajuste", "text": "agenda del 22 de septiembre de 2026", "intent": "agenda.list"}
+{"id": "filtros-26", "group": "filtros", "split": "evaluacion", "text": "agenda para mañana", "intent": "agenda.list"}
+{"id": "filtros-27", "group": "filtros", "split": "evaluacion", "text": "agenda el viernes", "intent": "agenda.list"}
+{"id": "filtros-28", "group": "filtros", "split": "evaluacion", "text": "agenda 2026-09-24", "intent": "agenda.list"}
+{"id": "filtros-29", "group": "filtros", "split": "ajuste", "text": "agenda ayer", "intent": "agenda.list"}
+{"id": "filtros-30", "group": "filtros", "split": "evaluacion", "text": "agenda pasado mañana", "intent": "agenda.list"}
+{"id": "filtros-31", "group": "filtros", "split": "evaluacion", "text": "debates de salud", "intent": "discussions.open"}
+{"id": "filtros-32", "group": "filtros", "split": "evaluacion", "text": "debates sobre educación", "intent": "discussions.open"}
+{"id": "filtros-33", "group": "filtros", "split": "ajuste", "text": "discusiones de pensiones", "intent": "discussions.open"}
+{"id": "filtros-34", "group": "filtros", "split": "evaluacion", "text": "debates del presupuesto", "intent": "discussions.open"}
+{"id": "filtros-35", "group": "filtros", "split": "evaluacion", "text": "discusiones sobre agua", "intent": "discussions.open"}
+{"id": "filtros-36", "group": "filtros", "split": "evaluacion", "text": "PL 178/2025 Senado", "intent": "question.free"}
+{"id": "filtros-37", "group": "filtros", "split": "ajuste", "text": "/proyecto 396 de 2026 Cámara", "intent": "question.free"}
+{"id": "filtros-38", "group": "filtros", "split": "evaluacion", "text": "PL 396/2026 Cámara", "intent": "question.free"}
+{"id": "filtros-39", "group": "filtros", "split": "evaluacion", "text": "proyecto de ley 178 de 2025 Senado", "intent": "question.free"}
+{"id": "filtros-40", "group": "filtros", "split": "evaluacion", "text": "¿En qué va el PL 178/2025 Senado?", "intent": "question.free"}
+{"id": "filtros-41", "group": "filtros", "split": "ajuste", "text": "¿qué dice el PL 396/2026 Cámara sobre el riego?", "intent": "question.free"}
+{"id": "filtros-42", "group": "filtros", "split": "evaluacion", "text": "¿Cómo ha votado Paloma Valencia?", "intent": "question.free"}
+{"id": "filtros-43", "group": "filtros", "split": "evaluacion", "text": "¿quién presentó el PL 396/2026 Cámara?", "intent": "question.free"}
+{"id": "filtros-44", "group": "filtros", "split": "evaluacion", "text": "votaciones del PL 178/2025 Senado", "intent": "question.free"}
+{"id": "filtros-45", "group": "filtros", "split": "ajuste", "text": "autores del PL 396/2026 Cámara", "intent": "question.free"}
+{"id": "filtros-46", "group": "filtros", "split": "evaluacion", "text": "¿qué proyectos hay sobre agua?", "intent": "question.free"}
+{"id": "filtros-47", "group": "filtros", "split": "evaluacion", "text": "PAL 5/2026 Cámara", "intent": "question.free"}
+{"id": "filtros-48", "group": "filtros", "split": "evaluacion", "text": "¿cuántos votos tuvo el PL 178/2025 Senado?", "intent": "question.free"}
+{"id": "filtros-49", "group": "filtros", "split": "ajuste", "text": "¿en qué comisión está el PL 396/2026 Cámara?", "intent": "question.free"}
+{"id": "filtros-50", "group": "filtros", "split": "evaluacion", "text": "Juan Carlos Lozada", "intent": "question.free"}
+{"id": "filtros-51", "group": "filtros", "split": "evaluacion", "text": "proyectos de Juan Carlos Lozada", "intent": "projects.search"}
+{"id": "filtros-52", "group": "filtros", "split": "evaluacion", "text": "proyectos de Paloma Valencia", "intent": "projects.search"}
+{"id": "filtros-53", "group": "filtros", "split": "ajuste", "text": "¿qué se votó ayer?", "intent": "question.free"}
+{"id": "filtros-54", "group": "filtros", "split": "evaluacion", "text": "¿qué pasó en el senado el 23 de septiembre?", "intent": "question.free"}
+{"id": "filtros-55", "group": "filtros", "split": "evaluacion", "text": "gacetas del PL 178/2025 Senado", "intent": "question.free"}
+{"id": "filtros-56", "group": "filtros", "split": "evaluacion", "text": "buscar ley de aguas", "intent": "projects.search"}
+{"id": "filtros-57", "group": "filtros", "split": "ajuste", "text": "proyectos minería", "intent": "projects.search"}
+{"id": "filtros-58", "group": "filtros", "split": "evaluacion", "text": "proyectos sobre cannabis", "intent": "projects.search"}
+{"id": "filtros-59", "group": "filtros", "split": "evaluacion", "text": "proyectos de la cámara sobre salud", "intent": "projects.search"}
+{"id": "filtros-60", "group": "filtros", "split": "evaluacion", "text": "busca proyectos de tránsito", "intent": "projects.search"}
+{"id": "seguimiento-01", "group": "seguimiento", "split": "ajuste", "text": "el segundo", "intent": "selection.ordinal"}
+{"id": "seguimiento-02", "group": "seguimiento", "split": "evaluacion", "text": "el primero", "intent": "selection.ordinal"}
+{"id": "seguimiento-03", "group": "seguimiento", "split": "evaluacion", "text": "el tercero", "intent": "selection.ordinal"}
+{"id": "seguimiento-04", "group": "seguimiento", "split": "evaluacion", "text": "el cuarto", "intent": "selection.ordinal"}
+{"id": "seguimiento-05", "group": "seguimiento", "split": "ajuste", "text": "el quinto", "intent": "selection.ordinal"}
+{"id": "seguimiento-06", "group": "seguimiento", "split": "evaluacion", "text": "abre el 2", "intent": "selection.ordinal"}
+{"id": "seguimiento-07", "group": "seguimiento", "split": "evaluacion", "text": "abre el 3", "intent": "selection.ordinal"}
+{"id": "seguimiento-08", "group": "seguimiento", "split": "evaluacion", "text": "abrir el 1", "intent": "selection.ordinal"}
+{"id": "seguimiento-09", "group": "seguimiento", "split": "ajuste", "text": "ver el quinto", "intent": "selection.ordinal"}
+{"id": "seguimiento-10", "group": "seguimiento", "split": "evaluacion", "text": "la segunda", "intent": "selection.ordinal"}
+{"id": "seguimiento-11", "group": "seguimiento", "split": "evaluacion", "text": "el sexto", "intent": "selection.ordinal"}
+{"id": "seguimiento-12", "group": "seguimiento", "split": "evaluacion", "text": "opción 4", "intent": "selection.ordinal"}
+{"id": "seguimiento-13", "group": "seguimiento", "split": "ajuste", "text": "número 2", "intent": "selection.ordinal"}
+{"id": "seguimiento-14", "group": "seguimiento", "split": "evaluacion", "text": "abre el primero", "intent": "selection.ordinal"}
+{"id": "seguimiento-15", "group": "seguimiento", "split": "evaluacion", "text": "ese segundo", "intent": "selection.ordinal"}
+{"id": "seguimiento-16", "group": "seguimiento", "split": "evaluacion", "text": "quiénes lo presentaron", "intent": "project.participants"}
+{"id": "seguimiento-17", "group": "seguimiento", "split": "ajuste", "text": "¿quiénes lo presentaron?", "intent": "project.participants"}
+{"id": "seguimiento-18", "group": "seguimiento", "split": "evaluacion", "text": "quien lo presento", "intent": "project.participants"}
+{"id": "seguimiento-19", "group": "seguimiento", "split": "evaluacion", "text": "sus autores", "intent": "project.participants"}
+{"id": "seguimiento-20", "group": "seguimiento", "split": "evaluacion", "text": "los autores", "intent": "project.participants"}
+{"id": "seguimiento-21", "group": "seguimiento", "split": "ajuste", "text": "y quiénes lo presentaron", "intent": "project.participants"}
+{"id": "seguimiento-22", "group": "seguimiento", "split": "evaluacion", "text": "quién lo radicó", "intent": "project.participants"}
+{"id": "seguimiento-23", "group": "seguimiento", "split": "evaluacion", "text": "autores", "intent": "project.participants"}
+{"id": "seguimiento-24", "group": "seguimiento", "split": "evaluacion", "text": "¿quiénes lo radicaron?", "intent": "project.participants"}
+{"id": "seguimiento-25", "group": "seguimiento", "split": "ajuste", "text": "y sus autores", "intent": "project.participants"}
+{"id": "seguimiento-26", "group": "seguimiento", "split": "evaluacion", "text": "sus votaciones", "intent": "votings.list"}
+{"id": "seguimiento-27", "group": "seguimiento", "split": "evaluacion", "text": "votaciones del proyecto", "intent": "votings.list"}
+{"id": "seguimiento-28", "group": "seguimiento", "split": "evaluacion", "text": "las votaciones", "intent": "votings.list"}
+{"id": "seguimiento-29", "group": "seguimiento", "split": "ajuste", "text": "y sus votaciones", "intent": "votings.list"}
+{"id": "seguimiento-30", "group": "seguimiento", "split": "evaluacion", "text": "votaciones", "intent": "votings.list"}
+{"id": "seguimiento-31", "group": "seguimiento", "split": "evaluacion", "text": "sus documentos", "intent": "documents.list"}
+{"id": "seguimiento-32", "group": "seguimiento", "split": "evaluacion", "text": "los documentos", "intent": "documents.list"}
+{"id": "seguimiento-33", "group": "seguimiento", "split": "ajuste", "text": "muéstrame el texto", "intent": "documents.list"}
+{"id": "seguimiento-34", "group": "seguimiento", "split": "evaluacion", "text": "documentos", "intent": "documents.list"}
+{"id": "seguimiento-35", "group": "seguimiento", "split": "evaluacion", "text": "y sus documentos", "intent": "documents.list"}
+{"id": "seguimiento-36", "group": "seguimiento", "split": "evaluacion", "text": "volver al proyecto", "intent": "navigation.back"}
+{"id": "seguimiento-37", "group": "seguimiento", "split": "ajuste", "text": "regresar al proyecto", "intent": "navigation.back"}
+{"id": "seguimiento-38", "group": "seguimiento", "split": "evaluacion", "text": "volver", "intent": "navigation.back"}
+{"id": "seguimiento-39", "group": "seguimiento", "split": "evaluacion", "text": "atrás", "intent": "navigation.back"}
+{"id": "seguimiento-40", "group": "seguimiento", "split": "evaluacion", "text": "cancelar", "intent": "interaction.cancel"}
+{"id": "seguimiento-41", "group": "seguimiento", "split": "ajuste", "text": "fuentes", "intent": "evidence.show"}
+{"id": "seguimiento-42", "group": "seguimiento", "split": "evaluacion", "text": "de dónde sale eso", "intent": "evidence.show"}
+{"id": "seguimiento-43", "group": "seguimiento", "split": "evaluacion", "text": "de dónde sale", "intent": "evidence.show"}
+{"id": "seguimiento-44", "group": "seguimiento", "split": "evaluacion", "text": "fuentes de esta respuesta", "intent": "evidence.show"}
+{"id": "seguimiento-45", "group": "seguimiento", "split": "ajuste", "text": "actualizar", "intent": "view.refresh"}
+{"id": "seguimiento-46", "group": "seguimiento", "split": "evaluacion", "text": "el octavo", "intent": "selection.ordinal"}
+{"id": "seguimiento-47", "group": "seguimiento", "split": "evaluacion", "text": "abre el 8", "intent": "selection.ordinal"}
+{"id": "seguimiento-48", "group": "seguimiento", "split": "evaluacion", "text": "el séptimo", "intent": "selection.ordinal"}
+{"id": "seguimiento-49", "group": "seguimiento", "split": "ajuste", "text": "la primera", "intent": "selection.ordinal"}
+{"id": "seguimiento-50", "group": "seguimiento", "split": "evaluacion", "text": "la tercera", "intent": "selection.ordinal"}
+{"id": "seguimiento-51", "group": "seguimiento", "split": "evaluacion", "text": "¿y sus votaciones?", "intent": "votings.list"}
+{"id": "seguimiento-52", "group": "seguimiento", "split": "evaluacion", "text": "¿y sus documentos?", "intent": "documents.list"}
+{"id": "seguimiento-53", "group": "seguimiento", "split": "ajuste", "text": "¿y los autores?", "intent": "project.participants"}
+{"id": "seguimiento-54", "group": "seguimiento", "split": "evaluacion", "text": "senadohoy", "intent": "day.overview"}
+{"id": "seguimiento-55", "group": "seguimiento", "split": "evaluacion", "text": "inicio", "intent": "home.open"}
+{"id": "seguimiento-56", "group": "seguimiento", "split": "evaluacion", "text": "menú", "intent": "home.open"}
+{"id": "seguimiento-57", "group": "seguimiento", "split": "ajuste", "text": "proyectos", "intent": "projects.list"}
+{"id": "seguimiento-58", "group": "seguimiento", "split": "evaluacion", "text": "agenda mañana", "intent": "agenda.list"}
+{"id": "seguimiento-59", "group": "seguimiento", "split": "evaluacion", "text": "el segundo.", "intent": "selection.ordinal"}
+{"id": "seguimiento-60", "group": "seguimiento", "split": "evaluacion", "text": "El Segundo", "intent": "selection.ordinal"}
+{"id": "adversarial-01", "group": "adversarial", "split": "ajuste", "text": "no encuentro proyectos", "intent": "question.free"}
+{"id": "adversarial-02", "group": "adversarial", "split": "evaluacion", "text": "el 249", "intent": "question.free"}
+{"id": "adversarial-03", "group": "adversarial", "split": "evaluacion", "text": "PL 249", "intent": "question.free"}
+{"id": "adversarial-04", "group": "adversarial", "split": "evaluacion", "text": "el 2026", "intent": "question.free"}
+{"id": "adversarial-05", "group": "adversarial", "split": "ajuste", "text": "¿cancelar la sesión afecta el proyecto?", "intent": "question.free"}
+{"id": "adversarial-06", "group": "adversarial", "split": "evaluacion", "text": "Paloma Valencia", "intent": "question.free"}
+{"id": "adversarial-07", "group": "adversarial", "split": "evaluacion", "text": "valencia", "intent": "question.free"}
+{"id": "adversarial-08", "group": "adversarial", "split": "evaluacion", "text": "proyectos 2026", "intent": "question.free"}
+{"id": "adversarial-09", "group": "adversarial", "split": "ajuste", "text": "agenda de salud", "intent": "question.free"}
+{"id": "adversarial-10", "group": "adversarial", "split": "evaluacion", "text": "senado aprobó la reforma", "intent": "question.free"}
+{"id": "adversarial-11", "group": "adversarial", "split": "evaluacion", "text": "<b>proyectos</b>", "intent": "question.free"}
+{"id": "adversarial-12", "group": "adversarial", "split": "evaluacion", "text": "proyectos<script>alert(1)</script>", "intent": "question.free"}
+{"id": "adversarial-13", "group": "adversarial", "split": "ajuste", "text": "🏛", "intent": "question.free"}
+{"id": "adversarial-14", "group": "adversarial", "split": "evaluacion", "text": "?", "intent": "question.free"}
+{"id": "adversarial-15", "group": "adversarial", "split": "evaluacion", "text": "¿El PL 178/2025 Senado se va a aprobar?", "intent": "question.free"}
+{"id": "adversarial-16", "group": "adversarial", "split": "evaluacion", "text": "¿por quién debo votar?", "intent": "question.free"}
+{"id": "adversarial-17", "group": "adversarial", "split": "ajuste", "text": "dame tu opinión sobre la reforma", "intent": "question.free"}
+{"id": "adversarial-18", "group": "adversarial", "split": "evaluacion", "text": "¿qué opina la gente de la reforma?", "intent": "question.free"}
+{"id": "adversarial-19", "group": "adversarial", "split": "evaluacion", "text": "necesito un abogado", "intent": "question.free"}
+{"id": "adversarial-20", "group": "adversarial", "split": "evaluacion", "text": "¿debo poner una tutela?", "intent": "question.free"}
+{"id": "adversarial-21", "group": "adversarial", "split": "ajuste", "text": "hola", "intent": "question.free"}
+{"id": "adversarial-22", "group": "adversarial", "split": "evaluacion", "text": "gracias", "intent": "question.free"}
+{"id": "adversarial-23", "group": "adversarial", "split": "evaluacion", "text": "jajaja", "intent": "question.free"}
+{"id": "adversarial-24", "group": "adversarial", "split": "evaluacion", "text": "asdfgh", "intent": "question.free"}
+{"id": "adversarial-25", "group": "adversarial", "split": "ajuste", "text": "123", "intent": "question.free"}
+{"id": "adversarial-26", "group": "adversarial", "split": "evaluacion", "text": "el 1000", "intent": "question.free"}
+{"id": "adversarial-27", "group": "adversarial", "split": "evaluacion", "text": "abre el 12", "intent": "question.free"}
+{"id": "adversarial-28", "group": "adversarial", "split": "evaluacion", "text": "el noveno", "intent": "question.free"}
+{"id": "adversarial-29", "group": "adversarial", "split": "ajuste", "text": "el 0", "intent": "question.free"}
+{"id": "adversarial-30", "group": "adversarial", "split": "evaluacion", "text": "volver a presentar el proyecto", "intent": "question.free"}
+{"id": "adversarial-31", "group": "adversarial", "split": "evaluacion", "text": "inicio de la legislatura", "intent": "question.free"}
+{"id": "adversarial-32", "group": "adversarial", "split": "evaluacion", "text": "ayuda humanitaria en el proyecto", "intent": "question.free"}
+{"id": "adversarial-33", "group": "adversarial", "split": "ajuste", "text": "fuentes de financiación del proyecto", "intent": "question.free"}
+{"id": "adversarial-34", "group": "adversarial", "split": "evaluacion", "text": "votaciones de la cámara en 2019", "intent": "question.free"}
+{"id": "adversarial-35", "group": "adversarial", "split": "evaluacion", "text": "documentos del conpes", "intent": "question.free"}
+{"id": "adversarial-36", "group": "adversarial", "split": "evaluacion", "text": "no quiero la agenda", "intent": "question.free"}
+{"id": "adversarial-37", "group": "adversarial", "split": "ajuste", "text": "agenda de la ministra", "intent": "question.free"}
+{"id": "adversarial-38", "group": "adversarial", "split": "evaluacion", "text": "senado de la república", "intent": "question.free"}
+{"id": "adversarial-39", "group": "adversarial", "split": "evaluacion", "text": "cámara de comercio", "intent": "question.free"}
+{"id": "adversarial-40", "group": "adversarial", "split": "evaluacion", "text": "debates", "intent": "discussions.open"}
+{"id": "adversarial-41", "group": "adversarial", "split": "ajuste", "text": "proyectos proyectos", "intent": "projects.search"}
+{"id": "adversarial-42", "group": "adversarial", "split": "evaluacion", "text": "buscar 178", "intent": "question.free"}
+{"id": "adversarial-43", "group": "adversarial", "split": "evaluacion", "text": "proyectos 178 de 2025", "intent": "question.free"}
+{"id": "adversarial-44", "group": "adversarial", "split": "evaluacion", "text": "el segundo proyecto de salud", "intent": "question.free"}
+{"id": "adversarial-45", "group": "adversarial", "split": "ajuste", "text": "Valencia Laserna", "intent": "question.free"}
+{"id": "adversarial-46", "group": "adversarial", "split": "evaluacion", "text": "Lozada", "intent": "question.free"}
+{"id": "adversarial-47", "group": "adversarial", "split": "evaluacion", "text": "PL 178/2025", "intent": "question.free"}
+{"id": "adversarial-48", "group": "adversarial", "split": "evaluacion", "text": "PL 178 Senado", "intent": "question.free"}
+{"id": "adversarial-49", "group": "adversarial", "split": "ajuste", "text": "¿cuál es el mejor congresista?", "intent": "question.free"}
+{"id": "adversarial-50", "group": "adversarial", "split": "evaluacion", "text": "predicción de la reforma pensional", "intent": "question.free"}
+{"id": "adversarial-51", "group": "adversarial", "split": "evaluacion", "text": "cancelar mi suscripción", "intent": "question.free"}
+{"id": "adversarial-52", "group": "adversarial", "split": "evaluacion", "text": "actualizar mis datos", "intent": "question.free"}
+{"id": "adversarial-53", "group": "adversarial", "split": "ajuste", "text": "menú del restaurante del congreso", "intent": "question.free"}
+{"id": "adversarial-54", "group": "adversarial", "split": "evaluacion", "text": "proyectos que no son de salud", "intent": "projects.search"}
+{"id": "adversarial-55", "group": "adversarial", "split": "evaluacion", "text": "no, me refiero al de Cámara", "intent": "question.free"}
+{"id": "adversarial-56", "group": "adversarial", "split": "evaluacion", "text": "mañana, no hoy", "intent": "question.free"}
+{"id": "adversarial-57", "group": "adversarial", "split": "ajuste", "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "intent": "question.free"}
+{"id": "adversarial-58", "group": "adversarial", "split": "evaluacion", "text": "   ", "intent": "question.free"}
+{"id": "adversarial-59", "group": "adversarial", "split": "evaluacion", "text": "senado ayer y hoy", "intent": "question.free"}
+{"id": "adversarial-60", "group": "adversarial", "split": "evaluacion", "text": "dime todo", "intent": "question.free"}
