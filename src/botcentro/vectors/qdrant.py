@@ -97,11 +97,14 @@ class QdrantStore:
     def info(self) -> dict[str, Any]:
         return dict(self._request("GET", f"/collections/{self.collection}"))
 
-    def scroll(self, *, offset: Any = None, limit: int = 256) -> tuple[list[dict[str, Any]], Any]:
-        """Página de puntos con vector y carga útil; devuelve (puntos, siguiente desplazamiento)."""
-        body: dict[str, Any] = {"limit": limit, "with_payload": True, "with_vector": True}
+    def scroll(self, *, offset: Any = None, limit: int = 256, flt: Mapping[str, Any] | None = None,
+               with_payload: bool | Sequence[str] = True, with_vector: bool = True) -> tuple[list[dict[str, Any]], Any]:
+        """Página de puntos; devuelve (puntos, siguiente desplazamiento)."""
+        body: dict[str, Any] = {"limit": limit, "with_payload": with_payload, "with_vector": with_vector}
         if offset is not None:
             body["offset"] = offset
+        if flt:
+            body["filter"] = flt
         result = self._request("POST", f"/collections/{self.collection}/points/scroll", body)
         return list(result["points"]), result.get("next_page_offset")
 

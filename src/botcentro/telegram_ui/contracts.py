@@ -22,6 +22,9 @@ class Intent(StrEnum):
     HELP = "help.open"
     PROJECTS_LIST = "projects.list"
     PROJECTS_SEARCH = "projects.search"
+    PROJECTS_FILTERS = "projects.filters"
+    FILTER_SET = "projects.filter_set"
+    SEARCH_PROMPT = "projects.search_prompt"
     PROJECT_RESOLVE = "projects.resolve"
     PROJECT_OPEN = "project.open"
     PROJECT_PARTICIPANTS = "project.participants"
@@ -75,6 +78,28 @@ class PageInfo(_Model):
     total: int | None = None  # None: desconocido, nunca 0 por defecto
 
 
+class ResultSet(_Model):
+    """Lista mostrada: los ordinales («el segundo») se resuelven contra estos IDs, nunca contra
+    una búsqueda nueva (UI-F09)."""
+
+    result_set_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
+    kind: Literal["projects", "persons", "votings", "documents"]
+    query: dict[str, Any] = Field(default_factory=dict)
+    item_ids: list[str]
+    labels: list[str]
+    details: list[str] = Field(default_factory=list)
+    title: str = ""
+    page_size: int = 5
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    def page_items(self, page: int) -> list[tuple[str, str]]:
+        start = (page - 1) * self.page_size
+        return list(zip(self.item_ids, self.labels))[start:start + self.page_size]
+
+    def pages(self) -> int:
+        return max(1, -(-len(self.item_ids) // self.page_size))
+
+
 ViewStatus = Literal["ready", "empty", "partial", "stale", "unavailable", "error", "loading"]
 
 
@@ -88,6 +113,7 @@ class ViewModel(_Model):
     active_project_id: str | None = None
     data_as_of: datetime | None = None
     context_label: str | None = None
+    new_result_set: ResultSet | None = None  # lista a guardar en Redis (no se muestra)
 
 
 class Frame(_Model):
@@ -108,6 +134,7 @@ class SessionContext(_Model):
     active_person_ids: list[str] = Field(default_factory=list)
     applied_filters: dict[str, Any] = Field(default_factory=dict)
     result_set_id: str | None = None
+    result_page: int = 1
     navigation_stack: list[Frame] = Field(default_factory=list)
     pending_clarification: dict[str, Any] | None = None
     captured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -123,26 +150,6 @@ class SessionContext(_Model):
             return None
         self.current = self.navigation_stack.pop()
         return self.current
-
-
-class ResultSet(_Model):
-    """Lista mostrada: los ordinales («el segundo») se resuelven contra estos IDs, nunca contra
-    una búsqueda nueva (UI-F09)."""
-
-    result_set_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
-    kind: Literal["projects", "persons", "votings", "documents"]
-    query: dict[str, Any] = Field(default_factory=dict)
-    item_ids: list[str]
-    labels: list[str]
-    page_size: int = 5
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    def page_items(self, page: int) -> list[tuple[str, str]]:
-        start = (page - 1) * self.page_size
-        return list(zip(self.item_ids, self.labels))[start:start + self.page_size]
-
-    def pages(self) -> int:
-        return max(1, -(-len(self.item_ids) // self.page_size))
 
 
 class CallbackRecord(_Model):

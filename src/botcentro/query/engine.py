@@ -39,6 +39,9 @@ class VectorSearch(Protocol):
     def search(self, vector: Sequence[float], *, limit: int = 8, flt: Any = None,
                with_payload: Any = True) -> list[dict[str, Any]]: ...
 
+    def scroll(self, *, offset: Any = None, limit: int = 256, flt: Any = None, with_payload: Any = True,
+               with_vector: bool = True) -> tuple[list[dict[str, Any]], Any]: ...
+
 
 @dataclass
 class Answer:
@@ -242,6 +245,29 @@ class AnswerEngine:
             foot.append("Fuentes: " + escape(", ".join(sources)))
         sections.append(Section(None, [" · ".join(foot)] if foot else []))
         return sections
+
+    def project_card(self, project_id: str) -> tuple[dict[str, Any], list[Section]]:
+        """Ficha por ID canónico (la interfaz nunca vuelve a resolver por número)."""
+        card = self.rpc.call("bot_project_card", {"p_project_id": project_id}) or {}
+        return card, (self._render_card(card) if card else [])
+
+    def project_documents(self, project_id: str, *, limit: int = 12) -> list[dict[str, Any]]:
+        """Gacetas indexadas con segmentos enlazados al proyecto, agrupadas por documento."""
+        if self.vectors is None:
+            return []
+        points, _ = self.vectors.scroll(limit=500, with_vector=False, flt={"must": [
+            {"key": "project_ids", "match": {"any": [project_id]}}, {"key": "doc_kind", "match": {"value": "gaceta"}}]},
+            with_payload=["document_key", "title", "source_url", "segment_kind", "pdf_page_start", "published_on"])
+        docs: dict[str, dict[str, Any]] = {}
+        for point in points:
+            p = point["payload"]
+            doc = docs.setdefault(p["document_key"], {"title": p.get("title"), "url": p.get("source_url"),
+                                                      "date": p.get("published_on"), "kinds": set(), "pages": set()})
+            doc["kinds"].add(p.get("segment_kind") or "otro")
+            if p.get("pdf_page_start"):
+                doc["pages"].add(int(p["pdf_page_start"]))
+        ordered = sorted(docs.values(), key=lambda d: d["date"] or "", reverse=True)
+        return ordered[:limit]
 
     # -- congresistas --------------------------------------------------------------------------
 

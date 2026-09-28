@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import os
-from datetime import datetime
+from datetime import date, datetime
 from itertools import count
 
 import pytest
@@ -59,6 +59,9 @@ class FakeVectors:
     def search(self, vector, *, limit=8, flt=None, with_payload=True):
         self.calls.append(flt)
         return self.hits[:limit]
+
+    def scroll(self, *, offset=None, limit=256, flt=None, with_payload=True, with_vector=True):
+        return [h for h in self.hits if h["payload"]["doc_kind"] == "gaceta"], None
 
 
 class Harness:
@@ -116,7 +119,7 @@ def bot(db: Db, loaded):  # noqa: F811
     harness_loop = asyncio.new_event_loop()
     redis = Redis.from_url(REDIS_URL)
     state = UiState(redis, bot_id=BOT_ID, namespace=f"test-{os.getpid()}")
-    runtime = UiRuntime(transport=transport, state=state, app=UiApplication(engine),
+    runtime = UiRuntime(transport=transport, state=state, app=UiApplication(engine, today=lambda: date(2026, 9, 28)),
                         intake=TelegramWebhook(WebhookSettings(BOT_ID, "no-se-usa", KEY, rate_limit_per_minute=500), rpc), rpc=rpc,
                         bot_id=BOT_ID, pseudonym_key=KEY, worker_id="test-bot")
     harness = Harness(runtime, transport, vectors)
@@ -179,9 +182,9 @@ def test_start_opens_home_with_only_available_sections(bot) -> None:
     """UI-T01/UI-F05: el menú solo ofrece lo que responde con datos; lo pendiente se explica por texto."""
     [home] = bot.say("/start")
     labels = keyboard_texts(home["keyboard"])
-    assert labels == ["🗓 Agenda", "🔗 Fuentes", "❓ Ayuda"]
-    [pending] = bot.say("proyectos")
-    assert "Todavía no tengo el explorador de proyectos" in pending["html"]
+    assert labels == ["📚 Proyectos", "🗓 Agenda", "🔗 Fuentes", "❓ Ayuda"]
+    [pending] = bot.say("senadohoy")
+    assert "Todavía no tengo la portada del día" in pending["html"]
 
 
 def test_button_edits_the_same_message_and_back_returns(bot) -> None:
@@ -240,8 +243,8 @@ def test_stale_render_does_not_overwrite_newer_view(bot) -> None:
     [home] = bot.say("inicio")
     original = runtime.app.handle
 
-    def concurrent_handle(action, ctx):
-        view = original(action, ctx)
+    def concurrent_handle(action, ctx, result_set=None):
+        view = original(action, ctx, result_set)
         other = asyncio.run_coroutine_threadsafe(runtime.state.load(ALLOWED, ALLOWED), bot.loop).result()
         assert asyncio.run_coroutine_threadsafe(runtime.state.save(ALLOWED, ALLOWED, other), bot.loop).result()
         return view
@@ -261,3 +264,86 @@ def test_session_compare_and_swap(bot) -> None:
     second = bot.run(state.load(ALLOWED, ALLOWED))
     assert bot.run(state.save(ALLOWED, ALLOWED, first)) is True
     assert bot.run(state.save(ALLOWED, ALLOWED, second)) is False
+
+
+# -- I2: proyectos (CU-01/02/03) ---------------------------------------------------------------
+
+def _texts(message) -> list[str]:
+    return keyboard_texts(message["keyboard"])
+
+
+def _last_view(bot) -> dict:
+    return bot.transport.edits[-1]
+
+
+def test_projects_list_orders_by_legislative_activity_and_opens_card(bot) -> None:
+    [lst] = bot.say("proyectos")
+    assert "Actividad reciente" in lst["html"] and "Orden: última actividad legislativa" in lst["html"]
+    first = next(t for t in _texts(lst) if t.startswith("1 · "))
+    bot.click(lst, first)
+    card = _last_view(bot)
+    assert card["id"] == lst["id"] and "Estado" in card["html"]
+    assert {"👥 Autores", "🗳 Votaciones", "📄 Documentos", "⬅️ Resultados"} <= set(keyboard_texts(card["keyboard"]))
+
+
+def test_contextual_question_uses_open_project(bot) -> None:
+    """UI-F11: «quiénes lo presentaron» tras abrir una ficha responde por ese expediente."""
+    [lst] = bot.say("proyectos")
+    bot.click(lst, next(t for t in _texts(lst) if t.startswith("1 · ")))
+    card = _last_view(bot)
+    label = card["html"].split("\n", 1)[0]
+    [authors] = bot.say("quiénes lo presentaron")
+    assert "👥 Autores" in authors["html"] and label.replace("<b>", "").replace("</b>", "")[:12] in authors["html"]
+
+
+def test_ordinal_opens_item_of_the_page_shown(bot) -> None:
+    """UI-T13: «el segundo» abre el ID del segundo resultado mostrado."""
+    [lst] = bot.say("proyectos")
+    second_label = next(t for t in _texts(lst) if t.startswith("2 · "))[4:].rstrip("…")
+    [card] = bot.say("el segundo")
+    assert second_label[:15] in card["html"] or "Estado" in card["html"]
+    [again] = bot.say("el octavo")
+    assert "elige un número entre 1 y" in again["html"]
+
+
+def test_ordinal_without_list_asks_instead_of_guessing(bot) -> None:
+    """UI-T14."""
+    bot.run(bot.runtime.state.clear(OTHER_ALLOWED, OTHER_ALLOWED))
+    [reply] = bot.say("el segundo", user=OTHER_ALLOWED)
+    assert "No tengo una lista vigente" in reply["html"]
+
+
+def test_filters_apply_immediately_and_pagination_keeps_snapshot(bot) -> None:
+    [lst] = bot.say("proyectos")
+    bot.click(lst, "🎛 Filtros")
+    filters = _last_view(bot)
+    bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": filters["keyboard"]}, "Todo")
+    all_view = _last_view(bot)
+    assert "Todo" in all_view["html"] and "Página 1 de" in all_view["html"]
+    bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": all_view["keyboard"]}, "Siguiente ➡️")
+    page2 = _last_view(bot)
+    assert "Página 2 de" in page2["html"] and "1 · " in keyboard_texts(page2["keyboard"])[0]
+    bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": page2["keyboard"]}, "⬅️ Anterior")
+    assert _last_view(bot)["html"] == all_view["html"]
+
+
+def test_search_by_title_words_and_fallback_to_meaning(db: Db, bot) -> None:
+    title = db.execute("select value_json ->> 'short_name' t from public.observations "
+                       "where predicate = 'project_profile' and value_json ->> 'short_name' ~ '^[A-ZÁÉÍÓÚÑ ]{6,}$' limit 1")[0]["t"]
+    word = max(title.split(), key=len).lower()
+    [found] = bot.say(f"proyectos {word}")
+    assert "Búsqueda «" in found["html"] and "1 · " in " ".join(_texts(found))
+    [fallback] = bot.say("proyectos zzzinexistente")
+    assert "Proyectos relacionados" in fallback["html"] or "No encontré" in fallback["html"]
+
+
+def test_project_documents_and_votings_views(bot) -> None:
+    [lst] = bot.say("proyectos")
+    bot.click(lst, next(t for t in _texts(lst) if t.startswith("1 · ")))
+    card = _last_view(bot)
+    bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": card["keyboard"]}, "📄 Documentos")
+    docs = _last_view(bot)
+    assert "📄 Documentos" in docs["html"] and "Gaceta 1382 de 2026" in docs["html"]
+    bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": docs["keyboard"]}, "📌 Ficha")
+    bot.click({"id": lst["id"], "chat": ALLOWED, "keyboard": _last_view(bot)["keyboard"]}, "🗳 Votaciones")
+    assert "🗳 Votaciones" in _last_view(bot)["html"]

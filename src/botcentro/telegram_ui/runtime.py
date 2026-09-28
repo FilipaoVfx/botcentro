@@ -114,8 +114,10 @@ class UiRuntime:
         started = self.clock()
         action = parse_text(begun[0]["question_text"] or "")
         ctx = await self.state.load(who.chat_id, who.user_id)
+        result_set = await self._result_set(who, action, ctx)
         try:
-            view = await asyncio.to_thread(self.app.handle, action, ctx)
+            view = await asyncio.to_thread(self.app.handle, action, ctx, result_set)
+            await self._store_result_set(who, view)
             status, support = _status(view)
         except Exception:  # noqa: BLE001 — se responde al usuario y se registra
             log.exception("fallo de la vista en la consulta %s", query_id)
@@ -180,12 +182,14 @@ class UiRuntime:
     async def _show(self, who: Principal, action: UiAction, message_id: int | None, started: float) -> None:
         ctx = await self.state.load(who.chat_id, who.user_id)
         revision = ctx.revision
-        view = await asyncio.to_thread(self.app.handle, action, ctx)
+        result_set = await self._result_set(who, action, ctx)
+        view = await asyncio.to_thread(self.app.handle, action, ctx, result_set)
         latest = await self.state.load(who.chat_id, who.user_id)
         if latest.revision != revision:
             # Otra interacción cambió la sesión mientras se armaba esta vista: no se pisa (UI-F28).
             self._event("ui.render_superseded", who, intent=action.intent.value)
             return
+        await self._store_result_set(who, view)
         keyboard = await self._keyboard(view, who, ctx)
         html = split_message(view.blocks or [view.title], self.message_limit)[0]
         edited = message_id is not None and await self.transport.edit(who.chat_id, message_id, html, keyboard)
@@ -195,6 +199,14 @@ class UiRuntime:
                     status=view.status, edited=bool(edited), ms=int((self.clock() - started) * 1000))
 
     # -- apoyo ---------------------------------------------------------------------------------
+
+    async def _result_set(self, who: Principal, action: UiAction, ctx: SessionContext):  # noqa: ANN202
+        rs_id = action.parameters.get("result_set_id") or ctx.result_set_id
+        return await self.state.get_result_set(who.chat_id, who.user_id, rs_id) if rs_id else None
+
+    async def _store_result_set(self, who: Principal, view: ViewModel) -> None:
+        if view.new_result_set is not None:
+            await self.state.save_result_set(who.chat_id, who.user_id, view.new_result_set)
 
     async def _authorized(self, who: Principal) -> bool:
         cached = await self.state.cached_authorization(who.user_hash)

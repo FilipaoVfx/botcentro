@@ -32,7 +32,7 @@ Módulos en `src/botcentro/telegram_ui/`:
 |---|---|
 | I0 — Inventario | ✅ Revisión de `centrorequirement.md` y DEC-18 |
 | I1 — Contratos, contexto y callbacks | ✅ Esta entrega |
-| I2 — Proyectos (explorador, filtros, ficha, contexto) | Pendiente |
+| I2 — Proyectos (explorador, filtros, ficha, contexto) | ✅ |
 | I3 — Portada del día, agenda y cronología | Pendiente |
 | I4 — Votaciones, documentos y fuentes por respuesta | Pendiente |
 | I5 — Robustez, observabilidad y corpus de 240 entradas | Pendiente |
@@ -54,3 +54,21 @@ Módulos en `src/botcentro/telegram_ui/`:
 | UI-F36 Observabilidad (parcial) | Eventos JSON `ui.*` en el log del servicio, con usuario seudonimizado y sin texto. Aún no llegan al panel |
 
 La cobertura de datos por caso de uso está en la sección «Brecha de datos» de la revisión (DEC-18). Debates, «Cámara hoy» y ponentes son P0 con cobertura limitada.
+
+## Requisitos cubiertos en I2
+
+| Requisito | Evidencia |
+|---|---|
+| UI-F06 Actividad reciente | `bot_projects_page`: orden por la última radicación o votación. Las fechas imposibles de la fuente se descartan (`valid_legislative_date`). `test_projects_list_orders_by_legislative_activity_and_opens_card` |
+| UI-F07 Búsqueda y filtros | Corporación, periodo y tipo se aplican de inmediato; «Limpiar» y ampliar el periodo cuando no hay resultados. Si el título no coincide, la búsqueda pasa a buscar por significado en fichas y gacetas. `test_filters_apply_immediately…` y `test_search_by_title_words…` |
+| UI-F08 Paginación estable | Se materializan hasta 200 IDs por lista en Redis (30 min); las páginas no repiten la consulta |
+| UI-F09 Ordinales | `test_ordinal_opens_item_of_the_page_shown` y `test_ordinal_without_list_asks_instead_of_guessing` |
+| UI-F10 Ficha | Botones de Autores, Votaciones, Documentos, Resultados e Inicio |
+| UI-F11 Contexto de proyecto | `test_contextual_question_uses_open_project` |
+| UI-F12 Participantes (limitado) | Autores con partido cuando la fuente lo trae. **Ponentes**: se declara que aún no están disponibles |
+| UI-F19/F20 (por proyecto) | Votaciones y gacetas del proyecto; sin datos, se explica la cobertura |
+
+## Pendientes conocidos de I2
+
+- **Latencia de la lista:** ~2 s con datos reales, en el límite de UI-O05. Hay que materializar la actividad por proyecto.
+- **Filtros sin tema ni estado:** falta un catálogo temático; el estado solo existe para la Cámara.
