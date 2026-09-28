@@ -90,6 +90,30 @@ Restricciones de InsForge:
 - Sin cambios de configuración de sesión: `set_config` y `SET LOCAL` se rechazan.
 - Las migraciones aplicadas son historia: no se editan.
 
+## Bot de Telegram
+
+Respuestas sin IA (DEC-16): plantillas deterministas sobre las lecturas `bot_*` de InsForge y los pasajes de Qdrant, siempre con su fuente.
+
+Qué entiende:
+- número de proyecto: ficha, estado, autores y votaciones;
+- «qué dice…»: pasajes de gacetas con página y enlace;
+- nombre de un congresista: proyectos como autor y votos;
+- agenda publicada;
+- búsqueda por tema.
+
+Rechaza predicciones, asesoría jurídica y recomendaciones de voto.
+
+```bash
+# .env: BOTCENTRO_TELEGRAM_BOT_TOKEN (de @BotFather), BOTCENTRO_QUERY_EMAIL/PASSWORD, BOTCENTRO_PSEUDONYM_KEY
+sudo cp ops/botcentro-bot.service /etc/systemd/system/ && sudo systemctl daemon-reload
+sudo systemctl enable --now botcentro-bot      # sondeo largo: no necesita URL pública
+journalctl -u botcentro-bot -f
+```
+
+Es un piloto privado:
+- Un usuario no autorizado recibe su identificador de Telegram.
+- Un administrador lo autoriza con `admin_authorize_telegram`, que guarda un seudónimo HMAC y queda en la auditoría.
+
 ## Índice vectorial (Qdrant autoalojado)
 
 Los vectores de documentos (fichas de Cámara y gacetas) viven en Qdrant, dentro del servidor del bot (DEC-15). InsForge conserva los documentos, los chunks citables y los enlaces a proyectos.

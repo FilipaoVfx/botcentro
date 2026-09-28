@@ -1,0 +1,19 @@
+# Bot de Telegram (DEC-16). Instalar: sudo cp ops/botcentro-bot.service /etc/systemd/system/ &&
+# sudo systemctl daemon-reload && sudo systemctl enable --now botcentro-bot
+[Unit]
+Description=botcentro: bot de Telegram (sondeo largo, sin IA)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/botcentro
+ExecStart=/root/botcentro/.venv/bin/python -m botcentro.cli bot
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+Environment=BOTCENTRO_MODEL_CACHE=/root/botcentro/var/models
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

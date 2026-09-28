@@ -208,6 +208,35 @@ def load_gacetas(since: str, skip_kinds: str, out: str, max_points: int, max_sto
     print(json.dumps(totals), flush=True)
 
 
+def run_bot() -> None:
+    """Bot de Telegram por sondeo largo (DEC-16): recibe, responde sin IA y registra entregas."""
+    import logging
+    import socket
+
+    from botcentro.config import _key
+    from botcentro.embeddings.e5 import E5SmallEmbedder
+    from botcentro.query.engine import AnswerEngine
+    from botcentro.telegram.bot import BotService
+    from botcentro.telegram.client import BotApi
+    from botcentro.telegram.webhook import TelegramWebhook, WebhookSettings
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    api = BotApi(_required("BOTCENTRO_TELEGRAM_BOT_TOKEN"))
+    me = api.get_me()
+    pseudonym_key = _key(os.environ, "BOTCENTRO_PSEUDONYM_KEY")
+    if pseudonym_key is None:
+        sys.exit("falta BOTCENTRO_PSEUDONYM_KEY en .env")
+    client = account_client("query")
+    settings = WebhookSettings(api.bot_id, "sondeo-largo", pseudonym_key,
+                               int(os.environ.get("BOTCENTRO_TELEGRAM_RATE_LIMIT", "10")))
+    embedder = E5SmallEmbedder()
+    engine = AnswerEngine(client, qdrant_store(), embedder.embed_query)
+    print(json.dumps({"bot": me.get("username"), "bot_id": api.bot_id}), flush=True)
+    BotService(api, TelegramWebhook(settings, client), client, engine,
+               worker_id=f"bot-{socket.gethostname()}",
+               message_limit=int(os.environ.get("BOTCENTRO_TELEGRAM_MESSAGE_LIMIT", "4096"))).run_forever()
+
+
 def pilot_gacetas(limit: int, out: str) -> None:
     from pathlib import Path
 
@@ -272,11 +301,14 @@ def main(argv: list[str] | None = None) -> None:
     g = sub.add_parser("pilot-gacetas", help="piloto SRC-03: gacetas recientes → OCR → Qdrant, con métricas")
     g.add_argument("--limit", type=int, default=200)
     g.add_argument("--out", default="var/pilot-gacetas.jsonl")
+    sub.add_parser("bot", help="ejecuta el bot de Telegram (sondeo largo, respuestas sin IA)")
     args = parser.parse_args(argv)
     if args.command == "verify-account":
         verify_account(args.who, args.code)
     elif args.command == "normalize":
         normalize(args.source)
+    elif args.command == "bot":
+        run_bot()
     elif args.command == "migrate-qdrant":
         migrate_qdrant(args.skip_kinds, args.source)
     elif args.command == "load-gacetas":

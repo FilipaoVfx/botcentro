@@ -90,6 +90,8 @@ def plan_query(text: str, now: datetime) -> QueryPlan:
             command, stripped = candidate, rest.strip()
     folded = fold(stripped)
     refs = tuple(parse_project_refs(stripped))
+    if command == "/proyecto" and not refs:  # «/proyecto 396 de 2026 Cámara»: el comando ya dice el tipo
+        refs = tuple(parse_project_refs(f"proyecto {stripped}"))
     period, expression = _period(folded, now)
 
     if command in {"/start", "/help", "/fuentes", "/privacidad"}:

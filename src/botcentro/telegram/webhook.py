@@ -112,7 +112,10 @@ class TelegramWebhook:
             # entregas de Telegram con un update que nunca será válido.
             log.error("update de Telegram con formato inválido")
             return WebhookResult("ignored")
+        return self.accept(update)
 
+    def accept(self, update: TgUpdate) -> WebhookResult:
+        """Registra un update ya autenticado (webhook) o recibido por sondeo largo (getUpdates)."""
         kind, user, chat, text, callback_id = _classify(update)
         if user is None or user.is_bot or chat is None:
             return WebhookResult("ignored")
