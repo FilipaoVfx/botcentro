@@ -22,7 +22,7 @@ class NoFetch:
 
 @pytest.fixture()
 def connector() -> SenadoOpenDataConnector:
-    return SenadoOpenDataConnector(NoFetch())  # type: ignore[arg-type]
+    return SenadoOpenDataConnector(NoFetch(), today=lambda: date(2026, 10, 15))  # type: ignore[arg-type]
 
 
 def snapshot(content: bytes) -> Fetched:
@@ -99,3 +99,15 @@ def test_unknown_vote_label_is_quarantined_and_missing_fields_flag_schema_change
     quarantined = [c for c in result.candidates if c.quarantine_reason]
     assert len(quarantined) == 1 and "Abstención" in quarantined[0].quarantine_reason
     assert result.schema_changed and result.issues[0].severity is IssueSeverity.SCHEMA_CHANGE
+
+
+def test_future_dates_are_never_requested() -> None:
+    connector = SenadoOpenDataConnector(NoFetch(), today=lambda: date(2026, 9, 28))  # type: ignore[arg-type]
+    cursor, last = connector.discover(Cursor(connector.version, SCOPE)).next_cursor, None
+    while True:
+        page = connector.discover(cursor)
+        last = page.items[0].hints
+        if not page.has_more:
+            break
+        cursor = page.next_cursor
+    assert last == {"from": "2026-09-22", "to": "2026-09-28"}

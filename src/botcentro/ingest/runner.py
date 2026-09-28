@@ -174,8 +174,8 @@ class IngestionRunner:
         # idempotente). Política/contenido/límites: caso de revisión.
         summary.failed += 1
         summary.errors.append(f"{item.logical_key}: {exc.code}")
+        # ingest_register_check ya suma el fallo al contador de la ejecución.
         self.store.register_check(run_id, item.logical_key, "error", http_status=exc.status, error_code=exc.code)
-        self.store.add_counters(run_id, failed=1)
         if exc.kind in (FailureKind.POLICY, FailureKind.RESOURCE_LIMIT, FailureKind.INVALID_CONTENT):
             self.store.open_review_case(
                 "quality", f"fetch:{self.source_id}:{item.logical_key}:{exc.code}",

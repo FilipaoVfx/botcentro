@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import date, datetime, timedelta
 from typing import Any
 
@@ -70,8 +70,9 @@ class SenadoOpenDataConnector:
     version = "0.1.0"
     parser_version = "senado-od-parser-1"
 
-    def __init__(self, fetcher: SafeFetcher) -> None:
+    def __init__(self, fetcher: SafeFetcher, *, today: Callable[[], date] | None = None) -> None:
         self._fetcher = fetcher
+        self._today = today or (lambda: datetime.now(BOGOTA).date())
 
     # -- §7.1 validate_source ------------------------------------------------------------------
     def validate_source(self, config: Mapping[str, Any]) -> ValidationReport:
@@ -84,7 +85,9 @@ class SenadoOpenDataConnector:
     def discover(self, cursor: Cursor) -> DiscoverPage:
         """Una página = catálogos (primera) o una ventana de fechas con sus tres conjuntos."""
         scope = cursor.scope
-        start, end = date.fromisoformat(scope["from"]), date.fromisoformat(scope["to"])
+        # La API rechaza (HTTP 400) rangos con fechas futuras: el alcance se recorta a hoy en Bogotá.
+        start = date.fromisoformat(scope["from"])
+        end = min(date.fromisoformat(scope["to"]), self._today())
         window = timedelta(days=int(scope.get("window_days", 7)))
         page = int(cursor.position.get("page", 0))
 
