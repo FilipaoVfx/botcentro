@@ -1,0 +1,696 @@
+# Requerimiento de integración: información pública, investigaciones y grandes casos
+
+**Versión:** 1.0 · **Fecha:** 29 de septiembre de 2026 · **Estado:** especificación para implementación por agente de código.
+
+**Producto:** bot de Telegram y panel web de información legislativa, territorial y de control público en Colombia. **Backend:** Python. **Estrategia:** fuentes oficiales, evidencia verificable, operación de bajo costo y ampliación gradual de cobertura.
+
+## 1. Instrucción de ejecución para el agente
+
+Implementar este requerimiento dentro del producto existente. Primero inspeccionar el repositorio real, sus instrucciones `AGENTS.md`, dependencias, migraciones, autenticación, pruebas, procesos de ingesta, bot y panel. Identificar componentes reutilizables y redactar un mapa de cambios antes de modificar código. Este documento no acredita que ese repositorio haya sido inspeccionado ni prescribe reemplazar su arquitectura.
+
+Conservar las funciones actuales de proyectos, Senado, Cámara, discusiones, búsqueda documental y monitoreo. Integrar las nuevas capacidades detrás de banderas de activación. No sustituir el framework del bot, la cola, el proveedor de autenticación o la base de datos sin una incompatibilidad documentada. No ejecutar dos consumidores del mismo token de Telegram. No copiar repositorios completos para resolver funciones puntuales.
+
+Entregar código, migraciones aditivas, pruebas, configuración de ejemplo sin secretos, documentación de operación, inventario de licencias, contratos de API y evidencia de los criterios de aceptación. Un conector simulado, una página que responde HTTP 200 o pruebas unitarias aisladas no constituyen una integración certificada.
+
+El agente debe realizar todo lo implementable con el repositorio disponible y señalar bloqueos concretos. No inventar credenciales, contratos comerciales, datos reales de investigaciones, cobertura nacional ni aprobaciones editoriales. Las decisiones operativas con valores iniciales están definidas aquí para evitar preguntas innecesarias.
+
+## 2. Relación con documentos anteriores
+
+Este documento amplía el PRD y SRS originales y los documentos de panel. Complementa [requerimientos.md](./requerimientos.md), dedicado a navegación Telegram. En conflictos sobre el nuevo módulo, prevalece este documento. En particular, **se incorpora seguimiento voluntario y alertas**, superando la exclusión anterior de suscripciones automáticas: ninguna suscripción se activa sin una acción explícita del usuario.
+
+La evidencia técnica de partida es [certificacion-repos-fuentes.md](./certificacion-repos-fuentes.md), con sus archivos [de consultas](./certificacion-evidencias.json) y [reproducciones](./certificacion-reproducciones.json). Las condiciones observadas corresponden al momento de auditoría; deben verificarse al implementar.
+
+**DEBE** es obligatorio; **DEBERÍA** admite alternativa documentada con equivalente control; **PUEDE** es opcional. P0 es necesario para el primer piloto; P1 amplía fuentes y experiencia después de superar sus controles; P2 es evolución futura. “Aprobado para piloto” no significa certificado para producción.
+
+## 3. Resultado esperado y alcance
+
+El ciudadano debe poder escribir o pulsar `proyectos`, `senadohoy`, `camarahoy`, `discusiones`, `investigaciones`, `grandes casos`, el nombre de una entidad o un municipio, y llegar a información estructurada con fecha, estado, evidencia y límites de cobertura.
+
+El producto abarcará Senado y Cámara —ambos forman el Congreso—, alcaldías y otros actores territoriales habilitados. Distinguirá institución, persona y periodo de ejercicio. Los grandes casos podrán relacionar partidos, personas, entidades públicas y contratistas, sin convertir una relación política, laboral o contractual en responsabilidad judicial.
+
+### 3.1 Entrega P0
+
+- Núcleo propio de fuentes, observaciones, documentos, versiones, actores, expedientes, eventos, afirmaciones y casos agregados.
+- Integración acotada de SECOP I, SECOP II contratos y procesos, SIRI y Relatoría de Procuraduría.
+- Ingreso asistido de publicaciones oficiales de Corte Suprema y otras autoridades, con revisión antes de publicar.
+- Catálogo navegable de grandes casos con buscador, filtros, ficha, cronología, expedientes relacionados y evidencia.
+- Perfiles de entidades, personas y partidos; relaciones verificadas y temporales; piloto de tres municipios seleccionados por disponibilidad documental.
+- Navegación Telegram privada, equivalencia entre texto y botones, seguimiento voluntario y digest de cambios publicados.
+- Integración del módulo en el panel operativo y editorial existente.
+- Controles de errores, cobertura, identidad, costos, auditoría y correcciones.
+
+### 3.2 Entrega P1 condicionada
+
+Activar CPNU automatizada únicamente después de validar su contrato, acceso permitido, paginación, identidad y errores. Ampliar Contraloría, Fiscalía, fuentes municipales y directorios oficiales tras evaluar cada fuente. Añadir grupos de Telegram, Mini App, visualización de relaciones y búsqueda semántica cuando exista necesidad medida.
+
+JEP, Consejo de Estado, cortes adicionales, gobernaciones y órganos territoriales son extensiones posibles del modelo, no fuentes ya auditadas. Incorporarlas mediante el mismo protocolo. La función de grandes casos no debe esperar estas automatizaciones: comienza con documentos oficiales revisados.
+
+### 3.3 Fuera de alcance inicial
+
+Calificar automáticamente culpabilidad, elaborar puntajes de corrupción, consultar masivamente antecedentes de ciudadanos privados, evadir captchas, automatizar compras de datos, inferir investigaciones reservadas, reemplazar documentos judiciales o prometer una base exhaustiva de todos los procesos del país.
+
+## 4. Decisiones vinculantes de la auditoría
+
+| Componente | Evidencia disponible | Decisión de integración |
+|---|---|---|
+| `26-jorge-01/pysecop` | SHA `f312cbb7947d1141f0b72ebc77d0e121b4744f6e`; 29 pruebas unitarias pasan; cuatro defectos reproducidos; 12 campos configurados de procesos no coinciden con metadatos observados | Reutilización selectiva condicionada a reparar errores, escape, signo numérico y mapeos. No adoptar como API interna del dominio |
+| `bryanmg20/secop2-etl-pipeline` | SHA `ef88c8ecb22d47271449cbd5df86ead51ec64f69`; 25 pruebas pasan; cinco pruebas con PostgreSQL no ejecutadas exitosamente | Aprovechar extracción y carga después de fijar cortes de ejecución, distinguir error de fin, preservar versiones y probar con PostgreSQL |
+| `SebasVSvargas/JudicialAIProject` | SHA `7f430ba473ac1b9251b628fd0d8f34b94533a04c`; cliente judicial identificado; sin validación funcional externa | Referencia de interfaz; reutilización de código sujeta a compatibilidad GPL-3.0 y pruebas reales |
+| `dacrypt/openquery` | SHA `e8eb5de46347bd5f8d4bed2f34cf2aff38b24540`; riesgos de búsqueda documental por nombre, vacíos silenciosos y límite fijo de contratos | Referencia de organización; no usar conectores como núcleo certificado |
+| `martinalmeida/antecedentes-defuncion-registraduria-colombia` | SHA `70f7511cb5efbad5a06fafc3db408e214297e803`; automatización frágil | Descartar como núcleo de producción |
+| `filiksyos/gitreverse` | SHA `5c075420caa874045040ba9a24cf1056b9e5b5b4`; genera contexto de repositorios; no se encontró licencia en checkout | Herramienta opcional de exploración; fuera de adquisición y certificación; no copiar código sin resolver permiso |
+
+Las pruebas excluyeron servicios externos de `pysecop`; el ETL no quedó validado de extremo a extremo con PostgreSQL. No se realizó auditoría completa de dependencias, carga, disponibilidad prolongada ni búsquedas personales judiciales.
+
+`pysecop` declara MIT, pero el aviso contiene un titular de ejemplo: aclarar el aviso antes de redistribuir. El ETL declara MIT; preservar avisos. GPL no impide por sí misma uso comercial, pero requiere evaluar las obligaciones de la forma de integración. Registrar versión, SHA, licencia, modificaciones y atribuciones de todo código incorporado.
+
+**INT-01:** los componentes externos quedan detrás de adaptadores propios; ningún controlador Telegram o vista web dependerá directamente de sus DataFrames o excepciones.
+
+**INT-02:** corregir los cuatro defectos reproducidos antes de habilitar reutilización: fallo total convertido en vacío; fallo parcial sin metadata; apóstrofe sin escape en filtros; pérdida del signo de valores negativos.
+
+**INT-03:** no afirmar que el ETL ignora modificaciones: sí usa actualizaciones y upsert. El cambio requerido es conservar historia, congelar el corte por ejecución y no tratar errores como terminación normal.
+
+## 5. Arquitectura lógica y límites
+
+```text
+Fuentes oficiales / carga documental asistida
+                 |
+       Adaptadores de adquisición
+                 |
+     Observaciones inmutables + originales
+                 |
+ Normalización / identidad / validación / evidencia
+                 |
+        Revisión y publicación
+                 |
+ PostgreSQL: dominio + versiones + proyecciones públicas
+          |                        |
+      API de lectura          Outbox de cambios
+          |                        |
+ Telegram / web             Alertas opt-in
+
+Panel administrativo -> comandos autorizados -> trabajos -> auditoría
+```
+
+**ARC-01:** mantener PostgreSQL como fuente estructurada de verdad cuando sea la base existente. Usar almacenamiento de objetos para originales y derivados; no cargar PDFs grandes en cada fila de lectura.
+
+**ARC-02:** separar adquisición, normalización, publicación y presentación. Un botón de usuario no ejecuta ingesta, scraping, consultas pagadas ni una migración.
+
+**ARC-03:** usar tareas durables con la infraestructura existente. Si no existe, seleccionar una única solución Python y documentar reintentos, persistencia, recuperación y cancelación. Redis no es obligatorio si la infraestructura resuelve sesiones y bloqueos de otra forma.
+
+**ARC-04:** todas las lecturas públicas se realizan sobre revisiones publicadas; los borradores y relaciones rechazadas no entran en búsqueda, resúmenes ni alertas.
+
+**ARC-05:** compartir servicios de dominio entre Telegram, panel y API. Los handlers traducen entradas y presentan resultados, sin replicar reglas legales o de identidad.
+
+## 6. Registro de fuentes y habilitación
+
+### 6.1 Fuentes iniciales
+
+| Fuente | Identificador / dirección | Uso permitido en el piloto | Límite principal |
+|---|---|---|---|
+| SECOP II contratos | `jbjy-vk9h` | Contratos, entidades, contratistas y cambios documentados | Contratación no acredita irregularidad |
+| SECOP II procesos | `p6dx-8zbt` | Procesos de compra y etapas disponibles | Requiere corregir mapeo de columnas |
+| SECOP I | `f789-7hwg` | Información contractual histórica disponible | Declarar filtros; no asumir que solo adjudicados cubre todo |
+| SIRI | `iaeu-rcn6` | Sanciones e inhabilidades registradas | No representa todas las investigaciones activas |
+| Relatoría PGN | `rhun-uf37` | Descubrimiento de documentos y decisiones | Índice documental, no censo de expedientes |
+| Corte Suprema: estados y boletines | Enlaces del apartado 29 | Descubrimiento y carga de evidencia oficial | Acceso al índice verificado; cadena documental pendiente |
+| CPNU | Portal oficial Rama Judicial | Consulta humana enlazada; adaptador desactivado por defecto | Automatización funcional no certificada |
+| Contraloría | Consulta oficial de boletines | Fuente candidata | Falló verificación TLS local; resolver sin desactivar TLS |
+| Fiscalía | Estadísticas y publicaciones oficiales | Contexto y documentos verificables | Estadísticas no permiten reconstruir cada investigación |
+
+Para Socrata, configurar metadatos `https://www.datos.gov.co/api/views/{dataset_id}.json` y datos `https://www.datos.gov.co/resource/{dataset_id}.json`. Cinco conjuntos respondieron a metadatos y muestras durante la auditoría. Esto no prueba cobertura total, extracción histórica completa o disponibilidad continua.
+
+**SRC-01:** cada fuente tendrá propietario institucional, URL, método, capacidades, cobertura declarada, restricciones conocidas, licencia/condiciones revisadas, versión de adaptador, frecuencia, presupuesto y responsable interno.
+
+**SRC-02:** separar estados de aprobación (`candidate`, `pilot`, `approved`, `suspended`), salud (`healthy`, `degraded`, `unavailable`, `unknown`) y cobertura (`complete_for_scope`, `partial`, `unknown`). Nunca derivar uno automáticamente del otro.
+
+**SRC-03:** declarar capacidades: descubrimiento, detalle, eventos, documentos, incremental, histórico, identificadores, borrados, totales y filtros. Una capacidad no soportada devuelve `unsupported`, no una lista vacía.
+
+**SRC-04:** comparar esquema físico al iniciar cada ejecución. Calcular huella sobre nombres y tipos, excluyendo fechas de actualización y conteos. Un campo crítico ausente detiene el adaptador; uno opcional genera degradación explícita.
+
+**SRC-05:** mantener mapeos versionados. No resolver columnas por similitud de nombre sin prueba de equivalencia semántica. Conservar el valor original junto al normalizado cuando exista ambigüedad.
+
+**SRC-06:** registrar `dataset_updated_at`, `observed_at` y fechas propias del registro por separado. Mostrar frescura de la información consultada, no sustituirla por la fecha global del conjunto.
+
+## 7. Modelo conceptual
+
+### 7.1 Actores, territorios y periodos
+
+**DAT-01:** un actor puede ser persona, entidad pública, partido/movimiento, organización privada u otra organización tipificada. El cargo no es una persona nueva. Una alcaldía es distinta de cada alcalde que la dirige.
+
+**DAT-02:** los cargos y afiliaciones serán relaciones temporales con inicio, fin, precisión de fechas, fuente y revisión. “Miembro del partido X durante los hechos” y “miembro actual” son consultas diferentes.
+
+**DAT-03:** usar identificadores territoriales oficiales cuando estén disponibles. Conservar código, nombre, nivel, departamento y vigencia. Municipios homónimos siempre requieren contexto territorial.
+
+**DAT-04:** guardar identificadores como cadenas en el dominio. Preservar tipo y valor fuente. No eliminar ceros, dígito de verificación o caracteres sin regla documentada. El campo `nit_entidad` observado en SECOP II es numérico en metadatos; el adaptador debe convertirlo de forma controlada sin usar flotantes para identidad.
+
+**DAT-05:** nombres normalizados y similitud sirven para proponer coincidencias, no para fusionar personas. Una coincidencia débil entra en revisión. Diferencias de documento o tipo impiden fusión automática.
+
+**DAT-06:** almacenar importes con `Decimal`/`NUMERIC`, signo y moneda explícita. Desconocido es `null`; cero es un valor conocido. No sumar monedas distintas sin conversión aprobada y trazable. Separar valor inicial, adiciones, pagos y valor vigente.
+
+### 7.2 Casos agregados y expedientes
+
+**CAS-01:** un gran caso es una agrupación editorial de hechos y expedientes con relevancia pública. No equivale a un radicado ni a una declaración de responsabilidad. Tendrá UUID, slug estable, título neutral, aliases, resumen, alcance, temas, territorios, criterios de relevancia, cobertura, revisión y evidencia.
+
+**CAS-02:** un caso puede contener varios expedientes penales, disciplinarios, fiscales o administrativos. Un expediente puede relacionarse con más de un caso mediante vínculo justificado. La cronología identifica siempre a qué expediente pertenece cada evento.
+
+**CAS-03:** cada expediente tendrá autoridad, jurisdicción, identificador fuente, radicado original, radicado normalizado cuando proceda, enlace oficial, estado original, clasificación interna, fecha de última verificación y restricciones. La regla de 23 dígitos no se aplica universalmente a todas las autoridades.
+
+**CAS-04:** establecer unicidad por autoridad/sistema e identificador verificado, no solo por nombre o radicado reducido. Cambios de número, remisiones y acumulaciones conservan relaciones y trazabilidad.
+
+**CAS-05:** la portada del caso resume ramas: por ejemplo, “2 expedientes con actuaciones recientes; 1 archivado; estado de 1 sin verificar”. No sintetizar una única fase procesal cuando las ramas divergen.
+
+**CAS-06:** “Investigaciones activas” incluye únicamente expedientes con estado vigente documentado dentro del umbral de frescura configurado por fuente. Si supera el umbral o no existe evidencia suficiente, mostrar “último estado conocido” o “por verificar”; no confirmar vigencia por ausencia de cierre.
+
+**CAS-07:** seleccionar casos destacados con criterios editoriales registrados: alcance institucional, recursos públicos, impacto territorial, multiplicidad de expedientes o relevancia de decisiones oficiales. El orden no será un puntaje de culpabilidad. Mostrar motivo de destaque y fecha de revisión.
+
+**CAS-08:** permitir listar y filtrar por autoridad, jurisdicción, territorio, tema, etapa documentada, actor relacionado, tipo de relación y periodo. Separar “recientemente publicado en el sistema” de “actuación reciente”.
+
+### 7.3 Participación y estados
+
+**REL-01:** una participación tendrá sujeto, expediente/caso, rol original, rol normalizado, fecha/periodo, evidencia y estado editorial. Roles posibles incluyen investigado, imputado, acusado, condenado, absuelto, denunciante, testigo, víctima, entidad afectada, contratante, contratista y mencionado. La disponibilidad de cada rol depende de la fuente y jurisdicción.
+
+**REL-02:** conservar el texto de la autoridad y un diccionario de equivalencias versionado por jurisdicción. No trasladar automáticamente “sancionado” a “condenado”, “indagación” a “acusación”, ni “mencionado” a “investigado”.
+
+**REL-03:** afiliación partidaria y vínculo laboral son relaciones de contexto independientes. La ficha de un partido enumera relaciones concretas y aclara si el partido es sujeto procesal o aparece por afiliación de personas.
+
+**REL-04:** firmeza, recursos y fase procesal son dimensiones separadas. Una sentencia no se presenta como ejecutoriada si la fuente no lo acredita. Una decisión parcial no cierra todas las ramas.
+
+**REL-05:** un cambio de rol no borra el anterior: se conserva la historia y se actualiza la proyección vigente. Archivos, absoluciones, revocatorias y correcciones reciben visibilidad equivalente a los cambios incriminatorios.
+
+## 8. Esquema persistente mínimo
+
+Los nombres son propuestos; adaptar a convenciones existentes conservando semántica y restricciones. UUID como identificador público estable. `created_at` y `updated_at` de auditoría no sustituyen fechas de los hechos.
+
+| Tabla lógica | Campos y restricciones principales |
+|---|---|
+| `sources` | Clave única, capacidades, estados independientes, política de acceso y frecuencia |
+| `source_schema_versions` | Fuente, huella, campos/tipos, mapeo, fecha, resultado de validación |
+| `ingestion_runs` | Fuente, versión, alcance, cortes congelados, estado, contadores, cobertura, error |
+| `ingestion_checkpoints` | Ejecución, cursor/opción de página, última transacción persistida; único por partición |
+| `source_observations` | Fuente, clave nativa, hash canónico, payload restringido, ejecución, fecha; unicidad fuente+clave+hash |
+| `documents` | Identidad documental, URL oficial, tipo, autoridad, políticas de acceso |
+| `document_versions` | Documento, hash de bytes, ubicación privada, captura, MIME, tamaño, parser y texto; inmutable |
+| `evidence_spans` | Versión documental, página/sección/rango, extracto y hash; posición verificable |
+| `actors` | Tipo, nombre visible, alias controlado, estado de revisión |
+| `actor_identifiers` | Actor, emisor, tipo, valor protegido/normalizado y evidencia; acceso restringido |
+| `territories` | Código, nivel, padre, nombre y vigencia |
+| `positions` | Actor persona, entidad/cargo, territorio, periodo y evidencia |
+| `affiliations` | Persona, organización, tipo, vigencia y evidencia |
+| `cases` | Slug único, título neutral, criterios de destaque, revisión pública activa |
+| `case_revisions` | Caso, número, contenido, estado editorial, autor/revisor y fechas |
+| `proceedings` | Autoridad, jurisdicción, identificadores, estado original y normalizado, verificación |
+| `case_proceedings` | Caso, expediente, justificación, evidencia y revisión; pareja única |
+| `participations` | Actor, expediente, rol, vigencia, afirmación que lo sustenta |
+| `events` | Expediente, tipo, fecha con precisión, publicación fuente, observación y evidencia |
+| `claims` | Sujeto/predicado/objeto o texto acotado, evidencia, vigencia, confianza técnica y estado editorial |
+| `claim_evidence` | Afirmación, evidencia, apoyo/contradicción; pareja única por función |
+| `contracts` | Fuente+ID nativo, entidad, contratista, moneda, revisión vigente, enlace oficial |
+| `contract_versions` | Contrato, hash, importes/fechas/estado y observación; inmutable |
+| `case_contracts` | Caso/expediente, contrato, motivo y evidencia; no implica irregularidad |
+| `identity_candidates` | Registros candidatos, señales, conflictos, resolución y auditoría |
+| `editorial_reviews` | Objeto+revisión, decisión, justificación, revisor, evidencia considerada |
+| `subscriptions` | Usuario, objeto, canal, frecuencia, zona, consentimiento, activo; unicidad por usuario+objeto+canal |
+| `outbox_events` | Cambio publicable, revisión, tipo y payload mínimo; creado en transacción con publicación |
+| `notification_deliveries` | Destinatario+evento, intentos, estado, mensaje remoto y resultado ambiguo |
+| `bot_sessions` | Usuario+chat+tema, intención, snapshot, cursor, revisión y expiración |
+| `admin_commands` | Actor autorizado, tipo, idempotency key, trabajo y resultado |
+| `audit_log` | Actor, acción, objeto, revisiones anterior/nueva, razón y correlación; escritura append-only |
+
+**DB-01:** añadir claves foráneas, unicidad e índices para fuente+ID, caso+fecha de evento, actor+rol, territorio, suscripciones activas y pendientes de revisión. Verificar planes de consulta con datos representativos.
+
+**DB-02:** fusión y separación de identidades generan historial de resolución y redirects. No destruir observaciones ni cambiar silenciosamente sus sujetos originales. Las proyecciones se pueden reconstruir.
+
+**DB-03:** usar control optimista de versión en edición y publicación; rechazar revisiones desactualizadas con conflicto explícito. Prohibir que la misma publicación genere dos eventos outbox equivalentes.
+
+## 9. Evidencia, documentos y publicación
+
+**EVI-01:** toda afirmación pública sobre participación, fase, sanción, valor o cambio debe enlazar evidencia recuperable: registro oficial versionado o documento y fragmento. Una URL de inicio genérica no respalda un hecho específico.
+
+**EVI-02:** conservar `occurred_at`, `published_at`, `observed_at`, `ingested_at` y `verified_at`. Las fechas sin hora conservan precisión de día; no inventar medianoche UTC. Presentar fechas locales en `America/Bogota` cuando corresponda.
+
+**EVI-03:** descargar originales solo cuando las condiciones de acceso lo permitan. Aplicar límites de tamaño, tiempo y páginas, validar MIME y contenido, aislar parsing y bloquear destinos de red internos. Revalidar cada redirección para prevenir SSRF.
+
+**EVI-04:** el mismo URL con distintos bytes crea una versión. El mismo documento sin cambios no genera nuevas alertas. Guardar hash del original y del texto normalizado; documentar algoritmo y versión del parser.
+
+**EVI-05:** OCR es un derivado con confianza y localización. Los números de radicado, identidades y decisiones extraídos por OCR requieren validación antes de publicar. Un PDF ilegible entra en cuarentena, no desaparece de la lista de pendientes.
+
+**EVI-06:** fuente caída conserva el último dato válido con advertencia de frescura. Fuente retirada activa revisión de acceso y evidencia; no inferir absolución, falsedad o inexistencia a partir de un 404.
+
+**EVI-07:** estados editoriales: `draft -> pending_review -> published`; rechazo retorna a `draft` con motivo; nuevas versiones reemplazan mediante `superseded`; retirada usa `retracted` con motivo público cuando proceda. Una versión publicada es inmutable.
+
+**EVI-08:** resolver conflictos conservando ambas evidencias. La autoridad competente, fecha, alcance y documento específico pesan más que cantidad de menciones; no usar votación de fuentes ni elegir automáticamente la más reciente si trata otra rama.
+
+**EVI-09:** cualquier modelo de lenguaje solo propone extracción o redacción con evidencia identificada. No adjudica identidades, responsabilidad, firmeza ni publicación. Versionar modelo/prompt cuando se use y permitir operación sin IA de pago.
+
+**EVI-10:** para producción, nuevas atribuciones sensibles de participación requieren revisión por una persona distinta del autor/editor. El entorno de desarrollo puede usar un revisor de prueba, sin habilitar publicación pública. Correcciones urgentes pueden ocultar una afirmación mediante permiso específico y auditoría mientras se completa revisión.
+
+## 10. Contrato de adaptadores y resultados
+
+Crear tipos Python propios, con validación en fronteras. Pydantic es adecuado si ya está presente; no añadirlo solo para duplicar un esquema existente. La interfaz mínima comprende `capabilities`, `validate_schema`, `fetch_page`, `fetch_detail` opcional y `fetch_document` opcional.
+
+Ejemplo de respuesta interna; datos deliberadamente sintéticos:
+
+```json
+{
+  "schema_version": "1.0",
+  "source_id": "secop_ii_contracts",
+  "status": "partial",
+  "items": [{"source_record_id": "SYN-CONTRACT-001", "observation_id": "obs-example-001"}],
+  "pagination": {"next_cursor": "opaque-example", "returned_count": 1, "known_total": null},
+  "coverage": {
+    "scope": {"municipalities": ["SYN-MUNICIPALITY"], "period_from": "2026-01-01"},
+    "complete_for_scope": false,
+    "reason_codes": ["UPSTREAM_TIMEOUT"],
+    "last_successful_sync_at": "2026-09-28T18:00:00Z"
+  },
+  "errors": [{"code": "UPSTREAM_TIMEOUT", "retryable": true, "safe_message": "Una fuente no respondió"}],
+  "trace_id": "trace-example-001"
+}
+```
+
+**CON-01:** estados `ok`, `empty`, `partial`, `unavailable`, `unsupported`. `empty` requiere respuesta válida y ausencia de resultados dentro del alcance consultado. Si una rama falla y otra devuelve registros, usar `partial`. Si todas fallan, `unavailable`.
+
+**CON-02:** errores tipificados mínimos: timeout, rate limit, autenticación, acceso restringido, esquema incompatible, parseo, contenido inválido, presupuesto agotado, fuente no disponible y capacidad no soportada. Separar mensaje seguro para usuario de detalle restringido de diagnóstico.
+
+**CON-03:** `returned_count` describe esta página; `known_total` es nulo si no se conoce. No presentar el tamaño de una muestra o un límite de 200 registros como total real.
+
+**CON-04:** cursores son opacos, versionados, ligados a filtros, orden, alcance autorizado y snapshot. Firmarlos o almacenarlos en servidor. Un cursor vencido solicita refrescar, no se reutiliza con filtros distintos.
+
+**CON-05:** distinguir completitud de página, de ejecución y de respuesta multifuente. La API pública comunica alcance, fecha y fuentes fallidas aunque tenga resultados útiles.
+
+## 11. Ingesta incremental, recuperación y consistencia
+
+**ING-01:** una ejecución fija al inicio límite inferior, límite superior, filtros, versión de esquema y orden. Los datos cargados durante el trabajo no deben mover su límite inferior. Usar solapamiento configurable, inicialmente tres días cuando la fuente tenga fecha de modificación fiable.
+
+**ING-02:** preferir cursor nativo o paginación por clave estable. Si solo existe offset, definir orden determinista con desempate único, corte fijo y reconciliación. No afirmar snapshot consistente si la fuente no lo garantiza. Cambios concurrentes requieren repetición/reconciliación acotada.
+
+**ING-03:** persistir página, observaciones, versiones y checkpoint dentro de una transacción coherente. Repetir una página tras caída no duplica registros ni eventos. Avanzar watermark global solo cuando termine el alcance completo validado.
+
+**ING-04:** límites de filas, solicitudes o duración producen `partial` con continuación, nunca éxito completo. Una excepción de extracción no equivale a página final vacía. Mantener contadores recibidos, válidos, rechazados, cambiados y sin cambios.
+
+**ING-05:** respetar `Retry-After`, aplicar backoff exponencial con jitter y máximo de cinco intentos por solicitud. Reintentar errores transitorios; fallos de autenticación, esquema o validación requieren acción distinta. No bloquear indefinidamente trabajadores.
+
+**ING-06:** comenzar con una solicitud concurrente por fuente y adaptar a límites documentados. Circuit breaker y pausa manual evitan tormentas de reintentos. No eludir mecanismos de acceso ni desactivar validación TLS.
+
+**ING-07:** trabajos `queued -> running -> succeeded|partial|failed|cancelled`. Pausa de fuente impide nuevos trabajos; cancelación coopera en límites de página. Usar lease y token de generación para impedir que un trabajador antiguo confirme después de ser reemplazado.
+
+**ING-08:** programar reconciliación semanal de alcance piloto, configurable según costo. Ausencia en una página filtrada no equivale a borrado. Solo tombstone por señal explícita o reconciliación completa con revisión del significado de ausencia.
+
+**ING-09:** distinguir `:id` de Socrata de la identidad de negocio. Una republicación del dataset puede cambiar identificadores técnicos; usar identificador de contrato/proceso verificado y registrar estrategia de reconciliación.
+
+**ING-10:** consultas SoQL se construyen con campos y operadores permitidos y escape específico probado. Nunca aceptar SQL/SoQL generado libremente por usuarios o modelos. Probar apóstrofes, Unicode, listas vacías, límites y caracteres especiales.
+
+### 11.1 Reglas específicas de contratación
+
+No heredar silenciosamente filtros de “adjudicado” o “fecha de firma no nula”. Si el piloto los utiliza, declararlos como alcance; los contratos sin firma deben poder representarse si existen en fuente. Capturar enlaces oficiales y descripción necesaria para evidencia. Mantener historia de cambios; un upsert de estado vigente no reemplaza las versiones.
+
+Para procesos de SECOP II, comprobar mapeo real de fechas y precios antes de cargar. La auditoría detectó 12 campos configurados inexistentes, no un cambio histórico demostrado. Adjuntar pruebas del esquema utilizado en la implementación.
+
+### 11.2 Entrada documental asistida
+
+El editor selecciona fuente, URL/documento y expediente/caso candidato. El sistema valida acceso, conserva original, extrae texto y propone afirmaciones. El editor revisa localización, identidad, rol, fechas y relación con el caso; el revisor aprueba una revisión concreta. Carga asistida no significa publicación automática.
+
+## 12. Búsqueda, preguntas y cobertura
+
+**BUS-01:** resolver primero identificadores exactos y aliases aprobados; luego búsqueda textual de PostgreSQL. La búsqueda semántica es opcional y nunca reemplaza filtros estructurados ni controles de publicación.
+
+**BUS-02:** búsquedas por partido o alcaldía devolverán el tipo de relación: entidad afectada, contratante, persona afiliada durante cierto periodo o sujeto procesal. No titular “casos del partido” sin explicar por qué aparece.
+
+**BUS-03:** consultas “cuántos” explicitan el universo: “12 expedientes publicados en nuestra cobertura”, no “12 investigaciones en Colombia” cuando no exista censo completo.
+
+**BUS-04:** combinar fuentes con deduplicación por identidad verificada. Dos noticias de la misma actuación no son dos eventos; eventos de distintos expedientes en igual fecha sí pueden ser distintos.
+
+**BUS-05:** cada respuesta incluye fecha de verificación, enlace de evidencia y aviso breve si cobertura parcial o estado vencido. La ausencia se comunica como “No encontramos registros en las fuentes y periodo consultados”.
+
+**BUS-06:** el ranking usa relevancia textual, filtros, fecha y criterios editoriales públicos. No ordenar por gravedad inferida, afiliación ideológica ni volumen de menciones como indicio de culpabilidad.
+
+## 13. Experiencia Telegram
+
+### 13.1 Menú y equivalencia de entradas
+
+Menú principal: `Proyectos`, `Senado hoy`, `Cámara hoy`, `Discusiones`, `Investigaciones`, `Grandes casos`, `Entidades y territorios`, `Mis seguimientos` y `Ayuda y cobertura`. Mostrar secciones nuevas solo cuando tengan contenido o una explicación útil de disponibilidad.
+
+| Entrada del usuario o botón | Intención | Respuesta inicial |
+|---|---|---|
+| `proyectos`, `/proyectos` | `legislation.projects.list` | Actividad reciente y filtros; conservar flujo existente |
+| `senadohoy`, `senado hoy` | `legislation.today.senate` | Agenda, hechos ocurridos y publicaciones separados |
+| `camarahoy`, `cámara hoy` | `legislation.today.house` | Igual criterio, corporación correcta |
+| `discusiones` | `legislation.discussions.list` | Debates/discusiones legislativas; no reinterpretar como chat social |
+| `investigaciones`, `/investigaciones` | `proceedings.list` | Filtros de autoridad, territorio y estado documentado |
+| `grandes casos`, `casos`, `/casos` | `cases.list` | Destacados, recientes y buscador |
+| `alcaldía de …` | `actors.resolve` | Resolver municipio y entidad; ofrecer casos, contratos y cargos |
+| Nombre de persona/partido/entidad | `actors.search` | Desambiguación si hay más de una coincidencia |
+| `el segundo`, `ver 2` | `navigation.select` | Resolver sobre snapshot visible de esa sesión |
+| `seguir`, botón Seguir | `subscriptions.create` | Confirmar objeto y frecuencia; consentimiento explícito |
+| `dejar de seguir`, `/seguimientos` | `subscriptions.manage` | Gestionar y cancelar idempotentemente |
+
+**BOT-01:** texto y botones invocan la misma intención de dominio. Normalizar mayúsculas, espacios y tildes para enrutamiento, conservando la consulta original. No adivinar entidades ambiguas.
+
+**BOT-02:** usar teclados inline y edición del mensaje de navegación cuando proceda. Una pregunta nueva puede crear un mensaje nuevo. Paginar cinco resultados por defecto; el tamaño será configurable y consistente con el snapshot.
+
+**BOT-03:** ficha de caso: título neutral, resumen breve, última verificación, cobertura, ramas y fuente principal. Botones: `Cronología`, `Expedientes`, `Actores y relaciones`, `Contratos`, `Fuentes`, `Seguir`, `Volver`.
+
+**BOT-04:** ficha de expediente: autoridad, jurisdicción, radicado, último estado conocido y fecha, firmeza si consta, actores con rol, actuaciones y documentos. Evitar mezclar actuaciones de diferentes expedientes.
+
+**BOT-05:** ficha de entidad o municipio: identidad territorial, periodos/cargos verificables, contratos cubiertos, casos relacionados y motivo de relación. La selección de un alcalde no sustituye silenciosamente la de la alcaldía.
+
+**BOT-06:** “hoy” usa Bogotá por defecto y declara el criterio temporal. Una noticia publicada hoy sobre una actuación pasada no se presenta como hecho ocurrido hoy. Si no hay actividad, indicar cobertura y ofrecer periodo anterior.
+
+**BOT-07:** contestar callbacks rápidamente antes de operaciones lentas. Usar tokens cortos que cumplan límites vigentes de Bot API; no incluir documentos personales ni estado completo del negocio en el payload. Escapar texto y enlaces conforme al modo de formato elegido.
+
+**BOT-08:** aislar sesión por usuario, chat y tema cuando aplique. Guardar revisión, filtros y orden. Un botón viejo ofrece refrescar; un ordinal sin lista vigente solicita selección. Un botón reenviado no puede actuar con permisos de su autor original.
+
+**BOT-09:** botones de lectura no alteran seguimientos. Doble clic en Seguir o Dejar de seguir es idempotente. Los renderizadores no crean trabajos, ejecutan consultas pagadas ni publican contenidos.
+
+**BOT-10:** manejar mensaje eliminado/no editable, bloqueo del bot, rate limits, formato inválido y red inestable. Si no se puede editar, enviar una nueva ficha y marcar el ancla anterior obsoleta. Mantener alternativa textual accesible sin depender solo de color o emoji.
+
+**BOT-11:** conservar el framework existente. En proyecto nuevo, evaluar aiogram 3 y aiogram-dialog compatible, fijando versiones verificadas. Las pantallas no deben depender de funcionalidades recientes de Telegram sin fallback.
+
+### 13.2 Flujos completos y casos límite
+
+**F-01 — Descubrimiento:** usuario pulsa Grandes casos → lista de cinco con fecha → abre uno → revisa cronología → abre actuación → obtiene documento y fragmento → vuelve a la misma página y filtros.
+
+**F-02 — Investigación por territorio:** escribe `investigaciones alcaldía San Pedro` → el sistema presenta municipios homónimos con departamento → selecciona uno → ve relaciones con la alcaldía y filtros de personas/periodos. Si la fuente no cubre el territorio, explica el vacío sin afirmar ausencia de investigaciones.
+
+**F-03 — Partido relacionado:** escribe nombre del partido → perfil → Casos relacionados → cada resultado indica afiliación temporal de una persona o relación directa del partido. El usuario puede filtrar solo actuaciones donde la organización sea sujeto procesal documentado.
+
+**F-04 — Caso con ramas contradictorias:** un expediente archivado y otro en investigación → ficha muestra ambas ramas y sus fechas; no declara el caso totalmente cerrado o culpabilidad global.
+
+**F-05 — Interrupción:** usuario abre la tercera página, una fuente falla → se conserva contenido publicado disponible con aviso de cobertura; reintentar lectura no genera nueva ingesta por usuario.
+
+**F-06 — Seguimiento y corrección:** usuario sigue caso → se publica actuación → se programa digest → antes de enviarlo se corrige la identidad → se invalida contenido pendiente y se genera notificación de corrección para quien recibió la versión errónea.
+
+**F-07 — Contexto perdido:** escribe `el segundo` después de vencer sesión → no resolver sobre una nueva lista potencialmente distinta; ofrecer refrescar la selección.
+
+**F-08 — Búsqueda sensible:** pregunta `¿X es corrupto?` → no emitir calificación; ofrecer estados y decisiones verificadas asociados a una identidad desambiguada, con límites de cobertura.
+
+## 14. Seguimientos y notificaciones
+
+**SUB-01:** seguir casos, expedientes, contratos o actores/entidades exige acción explícita. Mostrar alcance y frecuencia antes de completar el alta. Predeterminado: resumen diario a las 18:00, Bogotá, editable por usuario. Sin seguimientos activos no hay alertas.
+
+**SUB-02:** un seguimiento de actor incluye cambios publicados en relaciones verificadas, no todas las coincidencias de nombre. La incorporación de un nuevo vínculo sensible requiere revisión antes de generar alerta.
+
+**SUB-03:** publicar y crear evento outbox dentro de la misma transacción. Deduplicar entrega por usuario, evento y canal. Agrupar eventos equivalentes y limitar resúmenes para evitar inundación.
+
+**SUB-04:** volver a comprobar consentimiento, revisión vigente y visibilidad antes de enviar. Cancelar mensajes pendientes obsoletos, retirados o afectados por una separación de identidades.
+
+**SUB-05:** distinguir `pending`, `sending`, `sent`, `failed`, `suppressed` y `unknown_delivery`. Telegram puede aceptar un mensaje aunque se pierda la respuesta; no prometer entrega exactamente una vez. Registrar ambigüedad y evitar reintentos ciegos ilimitados.
+
+**SUB-06:** permitir desactivar todo y borrar preferencias. Bloqueo del bot suspende entregas. Respetar ventana silenciosa; por defecto 21:00–08:00. Notificaciones inmediatas serán opt-in P1; correcciones se priorizan dentro de la próxima ventana permitida.
+
+**SUB-07:** adquisición compartida por fuente, no por suscriptor. Mil seguidores de un caso no deben generar mil consultas externas.
+
+## 15. Panel web operativo y editorial
+
+Integrar estas vistas en el panel existente, compartiendo autenticación, diseño y navegación. Si aún no existe panel, implementar primero las vistas mínimas de fuente, ejecución, revisión y caso; no retrasar integridad por gráficos decorativos.
+
+| Vista | Información y acciones necesarias |
+|---|---|
+| Resumen operativo | Fuentes caídas/degradadas, trabajos activos, retraso, revisiones pendientes, presupuesto y alertas |
+| Fuentes | Capacidades, cobertura, esquema, frecuencia, última ejecución, errores; pausar/reanudar y lanzar alcance acotado |
+| Ejecuciones | Cortes, versión, páginas, contadores, checkpoints, errores y cancelación |
+| Calidad | Identidades ambiguas, campos inválidos, documentos sin evidencia, conflictos y duplicados |
+| Mesa editorial | Diferencias de revisión, fragmentos fuente, aprobación/rechazo con motivo |
+| Grandes casos | Crear agrupación, vincular expedientes, destaque, relaciones y previsualización pública |
+| Actores y territorios | Homónimos, cargos, afiliaciones, fusiones y separaciones auditadas |
+| Alertas | Outbox, entregas, supresiones, ambiguas, reintentos y correcciones |
+| Auditoría | Actor, acción, antes/después, evidencia y correlación; exportación autorizada |
+
+**ADM-01:** roles mínimos: administrador, operador de fuentes, editor, revisor/publicador y lector de auditoría. Los permisos se aplican en servidor; ocultar un botón no constituye autorización.
+
+**ADM-02:** el operador puede pausar/reintentar, no publicar atribuciones sensibles salvo permiso editorial adicional. El editor no aprueba su propia nueva atribución sensible en producción. Administrador gestiona permisos y configuración; excepciones quedan auditadas.
+
+**ADM-03:** comandos durables devuelven identificador y estado real. “Encolado” no se muestra como “Completado”. Reintentos de un comando con igual clave no crean trabajos duplicados.
+
+**ADM-04:** preferir SSE para progreso si la plataforma lo soporta; polling como fallback. Reconectar mediante revisión/snapshot, sin duplicar trabajos ni perder eventos. La interfaz no accede directamente a colas ni secretos privilegiados.
+
+**ADM-05:** comparador editorial muestra afirmación, documento, página/fragmento, cambio propuesto, identidad y efectos sobre seguimientos. La acción Publicar opera sobre una revisión exacta.
+
+## 16. API interna propuesta
+
+Rutas orientativas bajo `/api/v1`; adaptar convenciones existentes, documentando equivalencias. Son contratos del producto, no endpoints afirmados de proveedores externos.
+
+| Método/ruta | Función |
+|---|---|
+| `GET /cases` | Búsqueda y filtros, cursor, cobertura y facetas |
+| `GET /cases/{id}` | Revisión publicada, ramas y evidencia principal |
+| `GET /cases/{id}/timeline` | Eventos ordenados, criterio temporal y paginación |
+| `GET /cases/{id}/proceedings` | Expedientes vinculados y motivo |
+| `GET /cases/{id}/actors` | Actores, roles y relaciones temporales |
+| `GET /proceedings/{id}` | Estado y evidencia por expediente |
+| `GET /actors` / `GET /actors/{id}` | Resolver actores y consultar perfil |
+| `GET /contracts` / `GET /contracts/{id}` | Contratos cubiertos y versiones públicas |
+| `GET /evidence/{id}` | Localización y enlace autorizado, sin exponer almacenamiento privado |
+| `GET /coverage` | Fuentes, alcance, frescura y limitaciones |
+| `POST /subscriptions` | Alta idempotente con consentimiento y objeto |
+| `GET /subscriptions` / `DELETE /subscriptions/{id}` | Preferencias del usuario autenticado |
+| `POST /admin/sources/{id}/runs` | Crear ejecución con alcance y presupuesto |
+| `POST /admin/jobs/{id}/cancel` | Solicitar cancelación cooperativa |
+| `POST /admin/revisions/{id}/submit` | Solicitar revisión |
+| `POST /admin/revisions/{id}/publish` | Publicar versión aprobada con control de concurrencia |
+| `POST /admin/revisions/{id}/retract` | Retirada justificada y corrección |
+| `POST /admin/identities/merge` / `split` | Resolución controlada y trazable |
+
+**API-01:** respuestas de lista incluyen `items`, `next_cursor`, `returned_count`, `known_total`, `coverage`, `as_of` y `trace_id`. No divulgar IDs internos de documentos personales.
+
+**API-02:** errores: 400 entrada inválida, 401/403 autorización, 404 recurso inexistente o no visible, 409 conflicto de revisión/idempotencia, 429 límite y 503 dependencia necesaria no disponible. Una consulta que puede responder parcialmente usa respuesta válida con `partial`, no oculta el fallo.
+
+**API-03:** operaciones asíncronas devuelven 202 con trabajo y ubicación de estado. Idempotency key ligada a actor, operación y hash de payload; misma clave con otro payload devuelve conflicto.
+
+**API-04:** autorización por objeto en todos los recursos, también evidencia y suscripciones. Vincular identidad Telegram con comprobación de autenticidad del canal; no confiar en un `user_id` arbitrario enviado por el navegador.
+
+## 17. Seguridad, privacidad y correcciones
+
+**SEG-01:** secretos solo en configuración protegida; nunca en frontend, registros, callbacks o repositorio. Rotar y limitar permisos de tokens. TLS validado en todas las conexiones.
+
+**SEG-02:** minimizar documentos de identidad. Cuando sean necesarios para resolución, restringirlos, cifrarlos conforme a infraestructura y presentar valores enmascarados. No registrar payloads personales completos en logs ni telemetría.
+
+**SEG-03:** separar contenido de fuentes de instrucciones del sistema. HTML, PDFs y repositorios son datos no confiables: no ejecutar comandos, seguir instrucciones incrustadas ni permitir que cambien permisos o publicación.
+
+**SEG-04:** sanitizar contenido mostrado, limitar carga y extracción, restringir extensiones y destinos de descarga, impedir archivos ejecutables y descompresión descontrolada. Aplicar cuotas por usuario y operaciones administrativas.
+
+**SEG-05:** ofrecer canal de reporte de error con referencia de afirmación. Registrar recepción, análisis, decisión, corrección y revisión relacionada. Correcciones deben invalidar cachés, índices y mensajes aún pendientes.
+
+**SEG-06:** retención inicial configurable: sesión de navegación 30 minutos; texto conversacional necesario para contexto hasta 24 horas; logs operativos 30 días. Conservar evidencia y auditoría conforme a política documentada de finalidad, acceso y eliminación, no indefinidamente por defecto. Los backups siguen la misma política y controles.
+
+**SEG-07:** revisar condiciones de reutilización y exposición de cada fuente antes de activarla. Información públicamente consultable no implica autorización irrestricta de redistribución. Si la copia no procede, conservar referencia y metadatos permitidos y comunicar limitaciones.
+
+## 18. Costos y configuración inicial
+
+**COS-01:** presupuesto para proveedores comerciales y modelos de pago: cero por defecto. Adaptadores comerciales deshabilitados. El producto debe operar con extracción determinista y revisión humana.
+
+**COS-02:** si posteriormente se habilita un proveedor, exigir configuración explícita de credencial, tarifa verificable, presupuesto diario/mensual, capacidades y base de uso. Reservar presupuesto de forma atómica antes de llamar; circuit breaker al agotarlo.
+
+**COS-03:** ninguna interacción ciudadana puede habilitar gasto. Cachear resultados públicos por revisión, compartir consultas y deduplicar descargas. Exponer solicitudes, bytes, almacenamiento, tiempo de procesamiento y estimación de gasto.
+
+| Configuración | Valor inicial / regla |
+|---|---|
+| `FEATURE_CASES` | Desactivada hasta cumplir aceptación P0 |
+| `FEATURE_SUBSCRIPTIONS` | Desactivada hasta validar outbox, consentimiento y correcciones |
+| `ENABLE_CPNU_AUTOMATION` | `false` |
+| `ENABLE_COMMERCIAL_PROVIDERS` | `false` |
+| `PAID_MONTHLY_BUDGET` | `0` |
+| `SOURCE_CONCURRENCY` | `1` por fuente |
+| `HTTP_TIMEOUT_SECONDS` | Conexión 10; respuesta 30; descarga documental configurable hasta 60 |
+| `HTTP_MAX_ATTEMPTS` | `5`, con backoff y límite total de ejecución |
+| `INCREMENTAL_LOOKBACK_DAYS` | `3` si existe modificación fiable |
+| `PILOT_MAX_RUN_ROWS` | `10000`; exceder produce parcial con continuación |
+| `PILOT_MAX_RUN_REQUESTS` | `100` |
+| `PILOT_MAX_RUN_MINUTES` | `30` |
+| `DOCUMENT_MAX_MB` | `20`; documentos mayores pasan a revisión de descarga |
+| `DOCUMENT_MAX_PAGES` | `300` por tarea; segmentar o revisar los mayores |
+| `BOT_PAGE_SIZE` | `5` |
+| `BOT_SESSION_TTL_MINUTES` | `30` |
+| `DIGEST_TIMEZONE` / `DIGEST_HOUR` | `America/Bogota` / `18:00` |
+| Frecuencia inicial SECOP | Cada 12 horas dentro del alcance piloto |
+| Frecuencia SIRI/Relatoría e índices | Diaria; ajustar a frecuencia real de publicación |
+| Umbral de advertencia de sincronización | Dos intervalos programados sin éxito |
+
+El umbral operativo de sincronización no certifica vigencia jurídica. Cada tipo de afirmación tendrá política editorial de revalidación; inicial: revisión semanal de casos destacados y ante toda nueva evidencia relevante. Los límites anteriores son decisiones del producto, no cuotas oficiales de las fuentes ni promesas de un free tier.
+
+## 19. Observabilidad y objetivos de calidad
+
+**OBS-01:** correlacionar solicitud, fuente, ejecución, documento, revisión, comando, evento outbox y entrega. Logs estructurados con códigos de error; métricas sin etiquetas de alta cardinalidad con nombres personales.
+
+**OBS-02:** métricas mínimas: tasa de éxito/parcial/error por fuente; retraso de ingesta; cambios de esquema; filas rechazadas; duplicados; documentos sin extracción; pendientes de identidad y revisión; edad de evidencia; fallos/ambigüedad de entrega; gasto y almacenamiento.
+
+**OBS-03:** alertar al operador por incompatibilidad de esquema, dos intervalos sin sincronización, presupuesto agotado, cola detenida o intento de publicar sin evidencia. Una fuente externa caída no se contabiliza igual que caída de la API propia.
+
+**NFR-01:** objetivo de disponibilidad mensual de API/bot propio 99,5%, medido aparte de fuentes externas. Durante outages se debe servir el último contenido publicado con fecha y límites, cuando sea posible.
+
+**NFR-02:** objetivo p95 de lecturas estructuradas locales ≤1,5 s y búsqueda local ≤3 s, sin descargas de fuentes en el camino crítico. Medir con 20 usuarios concurrentes, al menos 100.000 contratos sintéticos, índices efectivos y perfil de referencia 2 vCPU/4 GB excluyendo OCR y LLM. Si la infraestructura real difiere, publicar resultados y ajustar antes de prometer rendimiento.
+
+**NFR-03:** 100% de afirmaciones públicas sensibles con evidencia y revisión; cero fusiones automáticas basadas solo en nombre; cero atribuciones públicas provenientes de borrador; 100% de fallos de fuente visibles en cobertura.
+
+**NFR-04:** objetivo de exactitud ≥99% sobre 150 consultas estructuradas con resultado esperado y ≥95% de abstención/desambiguación en 50 casos ambiguos o sin información. Reportar tamaño del conjunto, errores y denominador; no extrapolar esos valores a toda la realidad nacional.
+
+**NFR-05:** backups automáticos y restauración ensayada antes del piloto público. Objetivos iniciales RPO ≤24 h y RTO ≤4 h para datos persistentes; checkpoints y outbox deben permitir recuperación sin duplicar hechos publicados.
+
+## 20. Migración y convivencia
+
+**MIG-01:** inventariar entidades ya existentes y mapearlas antes de crear duplicados. Introducir tablas/columnas de forma aditiva, con índices y backfill por lotes. No eliminar ni renombrar estructuras productivas sin plan de compatibilidad.
+
+**MIG-02:** ejecutar conectores inicialmente en modo sombra: ingieren y comparan, pero no publican ni notifican. Medir diferencias frente a datos actuales y explicar cambios.
+
+**MIG-03:** conservar IDs públicos y vínculos de proyectos legislativos. Aliases/redirects resuelven fusiones aprobadas; sesiones viejas se invalidan si una separación cambia el significado del objeto.
+
+**MIG-04:** rollback desactiva módulos, cronogramas y entregas nuevas sin borrar evidencia. Las revisiones anteriores pueden volver a ser activas mediante nueva acción auditada, no modificando silenciosamente el historial.
+
+**MIG-05:** probar despliegue con workers de versión anterior y nueva durante ventana de actualización. Versionar mensajes de cola y tolerar campos adicionales; no desplegar consumidor que desconozca un payload ya producido.
+
+## 21. Pruebas y aceptación obligatoria
+
+Usar datos sintéticos para identidades y casos en tests. Construir un corpus documental real de piloto únicamente con fuentes verificadas y revisión humana. Las pruebas deben demostrar comportamiento, no copiar funciones de implementación. Incluir PostgreSQL real en integración cuando se prueban transacciones, restricciones y reanudación.
+
+| ID | Escenario | Resultado exigido / requisitos |
+|---|---|---|
+| T-01 | Todas las fuentes fallan | `unavailable`, sin “sin resultados”; CON-01 |
+| T-02 | Una fuente falla, otra devuelve datos | `partial` y fuente fallida identificada; CON-05 |
+| T-03 | Respuesta válida vacía | `empty` con alcance; BUS-05 |
+| T-04 | Filtro contiene `D'ANGELO` | Consulta segura y semántica correcta; INT-02, ING-10 |
+| T-05 | Importe `-12.50` | Conserva signo y precisión; DAT-06 |
+| T-06 | Campo crítico desaparece | Bloquea con error de esquema; SRC-04 |
+| T-07 | Campo opcional desaparece | Degradación visible, sin valores inventados; SRC-05 |
+| T-08 | Campo de procesos no existe | Mapeo rechazado antes de ingesta; INT-02 |
+| T-09 | Una página falla a mitad de ejecución | No avanza watermark global ni marca éxito; ING-04 |
+| T-10 | Caída después de persistir y antes de confirmar | Reanudación sin duplicados; ING-03 |
+| T-11 | Se insertan cambios durante paginación | Corte inicial permanece fijo; ING-01 |
+| T-12 | Carga mueve máximo timestamp de BD | No omite páginas pendientes; prueba PostgreSQL del riesgo ETL |
+| T-13 | Más resultados que límite de ejecución | Estado parcial y continuación; ING-04 |
+| T-14 | Repetición de misma observación | Sin nueva versión ni alerta; EVI-04 |
+| T-15 | Mismo URL, documento modificado | Nueva versión y revisión; EVI-04 |
+| T-16 | Falta registro en página filtrada | No borra contrato/expediente; ING-08 |
+| T-17 | Contrato sin firma o no adjudicado | Incluido o exclusión declarada; sección 11.1 |
+| T-18 | ID cambia de tipo en fuente | No pierde ceros/DV ni fusiona indebidamente; DAT-04 |
+| T-19 | Dos personas homónimas | Desambiguación, sin fusión por nombre; DAT-05 |
+| T-20 | Persona cambia de alcaldía/partido | Historia por periodo; DAT-02 |
+| T-21 | Partido aparece por afiliación | No se presenta como investigado; REL-03 |
+| T-22 | Testigo mencionado en decisión | No se transforma en acusado; REL-01 |
+| T-23 | Sentencia recurrida | Firmeza separada y explícita; REL-04 |
+| T-24 | Caso con ramas activas y archivadas | Resumen por expediente, sin cierre global falso; CAS-05 |
+| T-25 | Estado antiguo sin nueva evidencia | Último estado conocido, no “activo” confirmado; CAS-06 |
+| T-26 | Dos publicaciones de igual actuación | Deduplicación con ambas fuentes; BUS-04 |
+| T-27 | Dos expedientes con misma fecha | Ambos eventos preservados; CAS-02 |
+| T-28 | Documento ilegible/OCR ambiguo | Cuarentena y revisión; EVI-05 |
+| T-29 | Fuentes se contradicen | Mantiene conflicto y revisión; EVI-08 |
+| T-30 | Publicar sin evidencia | Rechazo de dominio, no solo de interfaz; EVI-01 |
+| T-31 | Editor intenta aprobar su atribución | Denegado en producción; EVI-10 |
+| T-32 | Publicar una revisión obsoleta | Conflicto sin sobrescribir; DB-03 |
+| T-33 | `proyectos` por texto y botón | Misma intención y resultados; BOT-01 |
+| T-34 | `senadohoy` / `camarahoy` | Corporación correcta y fechas separadas; BOT-06 |
+| T-35 | `discusiones` | Conserva búsqueda legislativa; tabla de intenciones |
+| T-36 | Municipio homónimo | Solicita selección de territorio; F-02 |
+| T-37 | Volver desde documento a lista | Conserva filtros, página y orden; F-01 |
+| T-38 | Botón vencido / ordinal sin snapshot | Refresca o aclara; nunca elige otro objeto; BOT-08 |
+| T-39 | Callback de otro usuario | No altera sesión/seguimiento ajeno; BOT-08 |
+| T-40 | Mensaje no editable | Nueva ficha y ancla actualizada; BOT-10 |
+| T-41 | Doble clic en Seguir | Una suscripción y consentimiento; SUB-01 |
+| T-42 | Publicación nueva para varios seguidores | Un evento y entregas únicas; SUB-03 |
+| T-43 | Cancelar antes del digest | No envía; SUB-04 |
+| T-44 | Corrección antes de enviar | Suprime versión vieja; F-06 |
+| T-45 | Corrección después de enviar | Genera comunicación correctiva pertinente; SEG-05 |
+| T-46 | Timeout tras posible envío Telegram | Estado ambiguo y política acotada; SUB-05 |
+| T-47 | Lectura de borrador por API/búsqueda | No visible sin autorización; ARC-04 |
+| T-48 | ID de suscripción de otro usuario | Acceso denegado; API-04 |
+| T-49 | URL redirige a red privada | Descarga bloqueada; EVI-03 |
+| T-50 | Instrucción maliciosa dentro de PDF | No altera flujo ni permisos; SEG-03 |
+| T-51 | Presupuesto de pago cero | Ninguna llamada comercial/LLM de pago; COS-01 |
+| T-52 | Dos trabajos reservan último saldo | Solo reserva válida puede llamar; COS-02 |
+| T-53 | Worker pierde lease y luego termina | No confirma trabajo antiguo; ING-07 |
+| T-54 | Error TLS | Visible; nunca verify=false; ING-06 |
+| T-55 | Comando reintentado con misma clave | Una ejecución; API-03 |
+| T-56 | Restauración de respaldo | Recupera datos, outbox y trazabilidad; NFR-05 |
+| T-57 | Rollback de feature flags | Núcleo anterior funciona y evidencia permanece; MIG-04 |
+| T-58 | Búsqueda de conteos | Denominador y cobertura explícitos; BUS-03 |
+| T-59 | Consulta “¿es corrupto?” | Estados verificables sin calificación inferida; F-08 |
+| T-60 | Prueba de rendimiento y 150 consultas | Resultados documentados frente a NFR-02/NFR-04 |
+
+Además, conservar y ejecutar las pruebas existentes del producto. La batería original de los repositorios puede complementar, pero nunca sustituir estas pruebas. Las cinco pruebas de entidades del ETL pendientes deben ejecutarse en una base preparada o reemplazarse por pruebas equivalentes del componente incorporado; documentar alcance exacto.
+
+## 22. Corpus y piloto verificable
+
+Construir un corpus inicial de **cinco grandes casos**, al menos **15 expedientes**, **tres jurisdicciones cuando exista evidencia suficiente**, **tres municipios** y relaciones con personas, entidades y partidos documentadas. Es una meta de validación editorial, no obligación de inventar vínculos para completar cantidades. Si la evidencia disponible no permite cumplirla, registrar el vacío y mantener contenido insuficiente fuera de publicación.
+
+Incluir casos de archivo/absolución, decisión no firme, ramas divergentes, homonimia, corrección de identidad y documentos actualizados. Los escenarios sensibles faltantes se cubren con fixtures sintéticos claramente identificados, separados del corpus público.
+
+Realizar al menos siete días de observación técnica de conectores dentro de un piloto general de 14 días. Registrar corridas previstas/ejecutadas, tiempos, errores, recuperación, cambios de esquema, costos, revisión editorial y experiencia Telegram. Un periodo sin cambios en fuentes no demuestra detección de cambios: complementarlo con pruebas controladas.
+
+## 23. Hoja de ruta con puertas de aceptación
+
+| Fase | Entregable | Condición para avanzar |
+|---|---|---|
+| 0. Inspección | Mapa de arquitectura real, contratos existentes, cambios, licencias y riesgos | Identificados puntos de integración; sin duplicar infraestructura |
+| 1. Núcleo | Modelo, migraciones, evidencia, estados, contratos y configuración | Transacciones, identidad, versión y autorización probadas |
+| 2. Fuentes | SECOP/SIRI/Relatoría acotados, ingesta asistida y registro de fuentes | Defectos auditados cubiertos; error/parcial/vacío inequívocos |
+| 3. Casos | Agrupación, relaciones, cronología y flujo editorial | Corpus revisado; ninguna afirmación sensible sin evidencia |
+| 4. Canales | API, Telegram, panel y seguimientos | Paridad texto/botón; autorización y outbox validados |
+| 5. Piloto | Observación técnica y editorial, restauración, carga y costos | Criterios P0 satisfechos o limitaciones bloqueantes resueltas |
+| 6. Expansión | CPNU y otras fuentes, más municipios, P1 | Certificación particular de cada adaptador y evidencia de necesidad |
+
+No asignar fechas de calendario ficticias antes de conocer código, equipo y datos. El agente puede estimar esfuerzo tras la fase 0. Ninguna fase se considera terminada por crear tablas vacías o pantallas sin contratos funcionales.
+
+## 24. Protocolo de aprobación de nuevas fuentes
+
+1. Identificar autoridad, finalidad, cobertura, condiciones, canales disponibles y restricciones.
+2. Probar metadatos, búsqueda, detalle, documentos, paginación, errores, identidad y límites con alcance mínimo autorizado.
+3. Guardar evidencia reproducible, evitando exposición innecesaria de datos personales.
+4. Documentar esquema, identificadores, semántica de estados, frescura y escenarios de ausencia.
+5. Implementar adaptador propio y pruebas contractuales con fixtures versionados.
+6. Observar en modo sombra, comparar muestra revisada manualmente y medir costo.
+7. Aprobar capacidades específicas, no todo el proveedor de forma indiscriminada.
+8. Mantener fecha de reevaluación y suspender automáticamente ante cambios críticos.
+
+Para CoreSoft, Verifik y Solverio: primero medir el vacío que resolverían, verificar endpoints y respuestas actuales, límites, licencia, tratamiento de datos, costo por consulta y política de errores. No asumir que una API de antecedentes descubre todas las investigaciones ni reconstruye grandes casos. No comprar ni integrar por el solo hecho de devolver JSON.
+
+## 25. Entregables que debe devolver el agente de código
+
+- Mapa de integración y decisiones tomadas sobre el repositorio real.
+- Migraciones y mecanismo seguro de backfill/reversión operativa.
+- Adaptadores con versiones, esquema, capacidades y fixtures reproducibles.
+- Servicios de identidad, evidencia, casos, publicación y seguimiento.
+- API documentada y cambios de Telegram/panel con ejemplos sintéticos.
+- Pruebas automatizadas, resultados, limitaciones y trazabilidad contra esta matriz.
+- Configuración de ejemplo y banderas, sin credenciales ni datos personales reales.
+- Manual para pausar fuente, recuperar ejecución, revisar identidad, corregir publicación, restaurar respaldo y gestionar entrega ambigua.
+- Inventario de componentes/licencias y código reutilizado con modificaciones.
+- Informe de cobertura y costos observados; fuentes aprobadas, condicionadas y pendientes.
+
+## 26. Definición de terminado
+
+La integración P0 está terminada cuando se puede recorrer desde una publicación oficial hasta su observación, documento, afirmación, revisión, caso, consulta Telegram y eventual alerta, con trazabilidad completa; las funciones legislativas anteriores siguen operativas; las pruebas obligatorias pasan; no existen atribuciones sensibles sin evidencia; se probó recuperación; se conoce el costo; y el piloto informa honestamente cobertura y pendientes.
+
+**No es terminado:** mostrar datos mock como reales; ocultar fallos como vacíos; listar personas por coincidencia de nombre; llamar a todas las ramas “investigaciones activas”; importar un scraper sin controlar licencia/errores; marcar éxito al agotar un límite; presentar una fuente candidata como certificada; o declarar cobertura nacional desde una muestra.
+
+## 27. Decisiones predeterminadas para desbloquear implementación
+
+Ante dudas no bloqueantes: reutilizar infraestructura existente; elegir extracción determinista; mantener fuente nueva en modo sombra; conservar dato original; devolver cobertura parcial; solicitar desambiguación de identidad; publicar únicamente contenido revisado; conservar historia; limitar alcance al piloto; dejar proveedores pagados deshabilitados.
+
+Ante una duda que cambie significado jurídico, identidad, licencia o acceso, no inventar una solución: poner el registro o adaptador en estado pendiente, documentar qué evidencia falta y continuar con módulos independientes. Los nombres concretos de municipios y casos se seleccionan durante preparación editorial según evidencia disponible, no mediante generación automática.
+
+## 28. Trazabilidad resumida de objetivos
+
+| Objetivo del producto | Requisitos principales | Evidencia de aceptación |
+|---|---|---|
+| Grandes investigaciones fácilmente listables | CAS-01 a CAS-08, BUS-01 a BUS-06, BOT-03 | F-01, T-24 a T-27, corpus piloto |
+| Incluir Cámara, Senado y alcaldías | DAT-01 a DAT-03, BOT-01/BOT-05/BOT-06 | T-20, T-33 a T-36 |
+| Mostrar partidos y entidades sin atribuciones falsas | REL-01 a REL-05, EVI-01/EVI-10 | T-19 a T-25, T-30/T-31 |
+| Menús dinámicos Python | ARC-05, BOT-01 a BOT-11 | T-33 a T-41 |
+| Ingesta confiable y monitoreable | SRC-01 a SRC-06, ING-01 a ING-10, OBS-01 a OBS-03 | T-01 a T-18, T-53/T-54 |
+| Seguimiento de cambios y correcciones | SUB-01 a SUB-07, SEG-05 | T-41 a T-46 |
+| Bajo costo | COS-01 a COS-03, límites de configuración | T-51/T-52, reporte piloto |
+| Integración segura en el producto actual | INT-01 a INT-03, MIG-01 a MIG-05 | Suite existente, T-47 a T-57 |
+
+## 29. Referencias y límites de evidencia
+
+- [Auditoría técnica local](./certificacion-repos-fuentes.md), [evidencias de consultas](./certificacion-evidencias.json) y [reproducciones](./certificacion-reproducciones.json): fundamento de decisiones sobre repositorios y fuentes, al 29 de septiembre de 2026.
+- [Datos abiertos de Colombia Compra Eficiente](https://www.colombiacompra.gov.co/transparencia/datos-abiertos/conjuntos-de-datos-abiertos): catálogo oficial de contratación.
+- [Metadatos SECOP II contratos](https://www.datos.gov.co/api/views/jbjy-vk9h.json), [procesos](https://www.datos.gov.co/api/views/p6dx-8zbt.json), [SECOP I](https://www.datos.gov.co/api/views/f789-7hwg.json), [SIRI](https://www.datos.gov.co/api/views/iaeu-rcn6.json) y [Relatoría PGN](https://www.datos.gov.co/api/views/rhun-uf37.json): verificar esquema al implementar.
+- [Estados de Sala Especial de Instrucción](https://cortesuprema.gov.co/notificaciones-sala-especial-de-instruccion-estados/) y [boletines de Sala de Casación Penal](https://cortesuprema.gov.co/sala-de-casacion-penal-relatoria-boletines/): descubrimiento de publicaciones; acceso a índices no certifica extracción completa.
+- [Portal CPNU](https://consultaprocesos.ramajudicial.gov.co/Procesos/Index): consulta oficial; no se declara automatización certificada.
+- [Introducción oficial a SIRI](https://apps.procuraduria.gov.co/portal/siri_introduccion.page): distinguir registros de sanciones/inhabilidades del universo de investigaciones.
+- [Telegram Bot API](https://core.telegram.org/bots/api): validar límites de mensajes, botones, callbacks y compatibilidad del SDK elegido; responder callbacks para cerrar el indicador de espera del cliente.
+- [Paginación Socrata con offset](https://dev.socrata.com/docs/queries/offset.html) y [app tokens](https://dev.socrata.com/docs/app-tokens.html): revisar orden, límites y autenticación de aplicación sin asumir cuotas fijas.
+- [Licencias de repositorios en GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository): referencia para revisar permisos de reutilización.
+
+Este documento fija comportamiento de software y criterios internos de calidad. No acredita exhaustividad de fuentes, resultados de pruebas aún pendientes ni hechos de investigaciones particulares. Los ejemplos son sintéticos y no deben sembrarse en la base pública como información real.
