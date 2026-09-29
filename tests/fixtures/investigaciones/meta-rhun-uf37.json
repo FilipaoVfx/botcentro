@@ -1,0 +1,40 @@
+{
+"id": "rhun-uf37",
+"name": "Datos abiertos de la Relatoría de la Procuraduría General de la Nación",
+"rowsUpdatedAt": 1790663067,
+"license": {
+"name": "Creative Commons Attribution | Share Alike 4.0 International",
+"logoUrl": "images/licenses/cc30bysa.png",
+"termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+},
+"columns": [
+{
+"fieldName": "tipo_documento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "n_mero_documento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "dependencia",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tema",
+"dataTypeName": "text"
+},
+{
+"fieldName": "subtema",
+"dataTypeName": "text"
+},
+{
+"fieldName": "url_documento",
+"dataTypeName": "url"
+},
+{
+"fieldName": "fecha_documento",
+"dataTypeName": "calendar_date"
+}
+]
+}

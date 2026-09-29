@@ -1,0 +1,108 @@
+{
+"id": "iaeu-rcn6",
+"name": "Antecedentes de SIRI",
+"rowsUpdatedAt": 1790665901,
+"license": {
+"name": "Creative Commons Attribution | Share Alike 4.0 International",
+"logoUrl": "images/licenses/cc30bysa.png",
+"termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+},
+"columns": [
+{
+"fieldName": "numero_siri",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_inhabilidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "calidad_persona",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_identificacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_tipo_identificacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "numero_identificacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "primer_apellido",
+"dataTypeName": "text"
+},
+{
+"fieldName": "segundo_apellido",
+"dataTypeName": "text"
+},
+{
+"fieldName": "primer_nombre",
+"dataTypeName": "text"
+},
+{
+"fieldName": "segundo_nombre",
+"dataTypeName": "text"
+},
+{
+"fieldName": "cargo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "lugar_hechos_departamento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "lugar_hechos_municipio",
+"dataTypeName": "text"
+},
+{
+"fieldName": "sanciones",
+"dataTypeName": "text"
+},
+{
+"fieldName": "duracion_anos",
+"dataTypeName": "text"
+},
+{
+"fieldName": "duracion_mes",
+"dataTypeName": "text"
+},
+{
+"fieldName": "duracion_dias",
+"dataTypeName": "text"
+},
+{
+"fieldName": "providencia",
+"dataTypeName": "text"
+},
+{
+"fieldName": "autoridad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_efectos_juridicos",
+"dataTypeName": "text"
+},
+{
+"fieldName": "numero_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "entidad_sancionado",
+"dataTypeName": "text"
+},
+{
+"fieldName": "entidad_departamento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "entidad_municipio",
+"dataTypeName": "text"
+}
+]
+}

@@ -121,7 +121,7 @@ class UiRuntime:
         ctx = await self.state.load(who.chat_id, who.user_id)
         result_set = await self._result_set(who, action, ctx)
         try:
-            view = await asyncio.to_thread(self.app.handle, action, ctx, result_set)
+            view = await asyncio.to_thread(self.app.handle, action, ctx, result_set, user_hash=who.user_hash)
             await self._store_result_set(who, view)
             status, support = _status(view)
         except Exception:  # noqa: BLE001 — se responde al usuario y se registra
@@ -188,7 +188,7 @@ class UiRuntime:
         ctx = await self.state.load(who.chat_id, who.user_id)
         revision = ctx.revision
         result_set = await self._result_set(who, action, ctx)
-        view = await asyncio.to_thread(self.app.handle, action, ctx, result_set)
+        view = await asyncio.to_thread(self.app.handle, action, ctx, result_set, user_hash=who.user_hash)
         latest = await self.state.load(who.chat_id, who.user_id)
         if latest.revision != revision:
             # Otra interacción cambió la sesión mientras se armaba esta vista: no se pisa (UI-F28).

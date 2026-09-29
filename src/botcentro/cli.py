@@ -87,7 +87,18 @@ def _resumable_cursor(client: InsForgeClient, source_id: str, version: str, scop
     return None
 
 
-def ingest(code: str, start: str, end: str, window_days: int, reparse: bool = False) -> None:
+def _socrata_connector(adapter: str, fetcher: SafeFetcher):  # noqa: ANN202
+    from botcentro.investigations.connector import SocrataConnector
+    from botcentro.investigations.datasets import SPECS
+
+    return SocrataConnector(fetcher, SPECS[adapter])
+
+
+def ingest(code: str, start: str, end: str, window_days: int, reparse: bool = False,
+           filters: dict[str, Any] | None = None, max_pages: int = 1000) -> None:
+    from botcentro.investigations.datasets import MAPPING_VERSION, SPECS
+    from botcentro.investigations.socrata import SchemaIncompatible
+
     client = account_client("ingest")
     source = client.select("sources", {"code": f"eq.{code}", "select": "*"})
     if not source:
@@ -96,25 +107,48 @@ def ingest(code: str, start: str, end: str, window_days: int, reparse: bool = Fa
     if source["state"] not in ("active", "degraded"):
         sys.exit(f"{code} está en estado {source['state']}: no admite ingesta productiva")
     policy = client.select("source_policies", {"id": f"eq.{source['policy_id']}", "select": "*"})[0]
-    connector_cls = CONNECTORS.get(source["adapter"])
-    if connector_cls is None:
+    socrata = source["adapter"] in SPECS
+    if not socrata and CONNECTORS.get(source["adapter"]) is None:
         sys.exit(f"adaptador {source['adapter']} sin implementación")
 
     guard = UrlGuard(UrlPolicy.for_domains(source["allowed_domains"]))
     with SafeFetcher(guard) as fetcher:
+        connector = _socrata_connector(source["adapter"], fetcher) if socrata else CONNECTORS[source["adapter"]](fetcher)
+        if socrata:
+            # Esquema antes de la primera página (SRC-04): un campo crítico ausente detiene la carga.
+            try:
+                report = connector.validate_source({})
+            except SchemaIncompatible as exc:
+                client.call("ingest_register_schema", {
+                    "p_source_code": code, "p_fingerprint": exc.fingerprint, "p_fields": {}, "p_mapping_version": MAPPING_VERSION,
+                    "p_result": "incompatible", "p_missing_critical": exc.missing_critical, "p_missing_optional": [],
+                    "p_dataset_updated_at": None})
+                sys.exit(f"{code}: esquema incompatible ({exc}); carga detenida")
+            schema = connector.schema
+            client.call("ingest_register_schema", {
+                "p_source_code": code, "p_fingerprint": schema.fingerprint, "p_fields": schema.fields,
+                "p_mapping_version": MAPPING_VERSION, "p_result": schema.result, "p_missing_critical": [],
+                "p_missing_optional": schema.missing_optional,
+                "p_dataset_updated_at": schema.dataset_updated_at.isoformat() if schema.dataset_updated_at else None})
+            for line in report.diagnostics:
+                print(f"degradado: {line}", file=sys.stderr)
         runner = IngestionRunner(
             source_id=source["id"],
-            connector=connector_cls(fetcher),
+            connector=connector,
             store=IngestStore(client),
             objects=LocalObjectStore(os.environ.get("BOTCENTRO_OBJECT_STORE_DIR", "var/objects")),
             profile=_profile(policy),
             reparse=reparse,
         )
-        scope = {"from": start, "to": end, "window_days": window_days}
-        previous = _resumable_cursor(client, source["id"], connector_cls.version, scope)
+        scope = {"from": start, "to": end, "window_days": window_days, **(filters or {})}
+        previous = _resumable_cursor(client, source["id"], connector.version, scope)
         if previous:
             print(f"reanudando desde {previous['position']}", file=sys.stderr)
-        summary = runner.run(mode="backfill", scope=scope, previous_cursor=previous)
+        summary = runner.run(mode="backfill", scope=scope, previous_cursor=previous, max_pages=max_pages)
+    if socrata:
+        client.call("ingest_source_status", {
+            "p_source_code": code, "p_health": "healthy" if summary.status != "failed" else "unavailable",
+            "p_coverage": "complete_for_scope" if summary.status == "succeeded" else "partial"})
     print(json.dumps({k: str(v) if k == "run_id" else v for k, v in summary.__dict__.items()}, ensure_ascii=False, indent=1))
 
 
@@ -125,6 +159,8 @@ BATCHED_STEPS = {"vote_observations", "current_votes", "attendance"}
 
 
 CAMARA_STEPS = ("projects", "status", "authors")
+INVESTIGATION_STEPS = {"SRC-20": "territories", "SRC-15": "contracts", "SRC-17": "contracts", "SRC-18": "siri",
+                       "SRC-19": "documents"}
 
 
 def _run_steps(client: InsForgeClient, fn: str, steps: Sequence[str], batched: set[str], batch: int) -> None:
@@ -146,6 +182,9 @@ def normalize(code: str) -> None:
         _run_steps(client, "normalize_senado_od", NORMALIZE_STEPS, BATCHED_STEPS, 20000)
     elif code == "SRC-06":
         _run_steps(client, "normalize_camara_pl", CAMARA_STEPS, set(CAMARA_STEPS), 100)
+    elif code in INVESTIGATION_STEPS:
+        _run_steps(client, "normalize_investigations", (INVESTIGATION_STEPS[code],), {INVESTIGATION_STEPS[code]}, 60)
+        return
     else:
         sys.exit(f"{code} no tiene normalizador")
     client.call("maintenance_refresh_project_activity", {})  # lista de proyectos del bot (I5)
@@ -225,6 +264,8 @@ def run_bot() -> None:
     from botcentro.telegram.webhook import TelegramWebhook, WebhookSettings
     from botcentro.telegram_ui.aiogram_adapter import AiogramTransport, make_bot, run_polling
     from botcentro.telegram_ui.app import UiApplication
+    from botcentro.telegram_ui.digest import DigestWorker
+    from botcentro.telegram_ui.investigations import InvestigationViews
     from botcentro.telegram_ui.runtime import UiRuntime
     from botcentro.telegram_ui.state import UiState
 
@@ -246,14 +287,17 @@ def run_bot() -> None:
     async def main() -> None:
         redis = Redis.from_url(_required("BOTCENTRO_REDIS_URL"))
         bot = make_bot(token)
-        runtime = UiRuntime(transport=AiogramTransport(bot), state=UiState(redis, bot_id=bot_id),
-                            app=UiApplication(engine), intake=TelegramWebhook(settings, client), rpc=client,
+        transport = AiogramTransport(bot)
+        state = UiState(redis, bot_id=bot_id)
+        app = UiApplication(engine, investigations=InvestigationViews(client, bot_id=bot_id))
+        runtime = UiRuntime(transport=transport, state=state,
+                            app=app, intake=TelegramWebhook(settings, client), rpc=client,
                             bot_id=bot_id, pseudonym_key=pseudonym_key, worker_id=f"bot-{socket.gethostname()}",
                             message_limit=int(os.environ.get("BOTCENTRO_TELEGRAM_MESSAGE_LIMIT", "4096")))
         me = await bot.get_me()
         print(json.dumps({"bot": me.username, "bot_id": bot_id, "adapter": "aiogram"}), flush=True)
         try:
-            await run_polling(bot, runtime)
+            await run_polling(bot, runtime, digest=DigestWorker(client, transport, redis, prefix=state.prefix))
         finally:
             await bot.session.close()
             await redis.aclose()
@@ -307,6 +351,8 @@ def main(argv: list[str] | None = None) -> None:
     i.add_argument("--to", dest="end", required=True)
     i.add_argument("--window-days", type=int, default=7)
     i.add_argument("--reparse", action="store_true", help="reinterpreta capturas sin cambios (nuevo parser)")
+    i.add_argument("--filters", default="{}", help='alcance adicional en JSON, p. ej. {"territories": [...]}')
+    i.add_argument("--max-pages", type=int, default=1000)
     n = sub.add_parser("normalize", help="convierte observaciones publicadas en entidades (idempotente)")
     n.add_argument("source")
     f = sub.add_parser("index-fichas", help="documenta e indexa (e5-small) las fichas de proyecto de SRC-06")
@@ -344,7 +390,8 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "index-fichas":
         index_fichas(args.batch)
     else:
-        ingest(args.source, args.start, args.end, args.window_days, args.reparse)
+        ingest(args.source, args.start, args.end, args.window_days, args.reparse, json.loads(args.filters),
+               args.max_pages)
 
 
 if __name__ == "__main__":

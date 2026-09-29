@@ -113,3 +113,76 @@ def test_security_headers_and_spa_fallback(client: TestClient) -> None:
     assert response.status_code == 200 and "panel" in response.text
     assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
     assert response.headers["x-frame-options"] == "DENY"
+
+
+# -- acciones editoriales de investigaciones --------------------------------------------------------
+
+class CommandInsForge(FakeInsForge):
+    """admin_command_begin recuerda claves: misma clave y contenido ⇒ repetición; otro contenido ⇒ 409."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.commands: dict[str, dict] = {}
+
+    def __call__(self, request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        body = json.loads(request.content or b"{}")
+        if path.endswith("/admin_command_begin"):
+            self.rpc_calls.append(("admin_command_begin", request.headers["authorization"], body))
+            known = self.commands.get(body["p_key"])
+            if known and known["hash"] != body["p_payload_hash"]:
+                return httpx.Response(409, json={"code": "BC409", "message": "clave reutilizada"})
+            if known:
+                return httpx.Response(200, json={"command_id": "k", "replayed": True, "state": "succeeded",
+                                                 "result": known["result"]})
+            self.commands[body["p_key"]] = {"hash": body["p_payload_hash"], "result": None}
+            return httpx.Response(200, json={"command_id": body["p_key"], "replayed": False, "state": "accepted"})
+        if path.endswith("/admin_command_finish"):
+            self.commands[body["p_command_id"]]["result"] = body["p_result"]
+            return httpx.Response(200, json=None)
+        if path.endswith("/reviewer_decide_claim"):
+            self.rpc_calls.append(("reviewer_decide_claim", request.headers["authorization"], body))
+            return httpx.Response(200, json="published")
+        return super().__call__(request)
+
+
+@pytest.fixture()
+def cmd_client(tmp_path) -> tuple[TestClient, CommandInsForge]:
+    fake = CommandInsForge()
+    (tmp_path / "index.html").write_text("<!doctype html>")
+    store = SessionStore(InsForgeAuth("https://x.insforge.app", transport=httpx.MockTransport(fake)))
+    return TestClient(create_panel_app(store, dist=tmp_path, secure_cookie=False)), fake
+
+
+CLAIM_URL = "/v1/admin/ops/investigations/claims/0b6a4c8e-7d7e-4d57-9f39-0cf1d1b0a001/decision"
+DECISION = {"expected_version": 2, "decision": "approve", "reason": "verificado en la fuente"}
+
+
+def test_editorial_action_requires_csrf_and_idempotency_key(cmd_client) -> None:  # noqa: ANN001
+    client, fake = cmd_client
+    _login(client)
+    assert client.post(CLAIM_URL, json=DECISION).status_code == 403
+    response = client.post(CLAIM_URL, json=DECISION, headers=CSRF)
+    assert response.status_code == 428 and not any(c[0] == "reviewer_decide_claim" for c in fake.rpc_calls)
+
+
+def test_editorial_action_is_idempotent(cmd_client) -> None:  # noqa: ANN001
+    """T-55: repetir la misma petición no vuelve a decidir; otra decisión con la misma clave es conflicto."""
+    client, fake = cmd_client
+    _login(client)
+    headers = {**CSRF, "Idempotency-Key": "decision-0001"}
+    first = client.post(CLAIM_URL, json=DECISION, headers=headers)
+    again = client.post(CLAIM_URL, json=DECISION, headers=headers)
+    assert first.json()["result"] == "published" and again.json()["replayed"] is True
+    assert sum(1 for c in fake.rpc_calls if c[0] == "reviewer_decide_claim") == 1
+    conflict = client.post(CLAIM_URL, json={**DECISION, "decision": "reject"}, headers=headers)
+    assert conflict.status_code == 409
+
+
+def test_assisted_document_rejects_foreign_sources(cmd_client) -> None:  # noqa: ANN001
+    client, _ = cmd_client
+    _login(client)
+    response = client.post("/v1/admin/ops/investigations/documents", headers={**CSRF, "Idempotency-Key": "doc-00001"},
+                           json={"source_code": "SRC-03", "url": "https://x.gov.co/a.pdf", "title": "Boletín",
+                                 "document_type": "boletin"})
+    assert response.status_code == 422 and response.json()["code"] == "SOURCE_NOT_ASSISTED"

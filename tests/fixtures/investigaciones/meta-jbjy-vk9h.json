@@ -1,0 +1,392 @@
+{
+"id": "jbjy-vk9h",
+"name": "SECOP II - Contratos Electrónicos",
+"rowsUpdatedAt": 1790671360,
+"license": {
+"name": "Creative Commons Attribution | Share Alike 4.0 International",
+"logoUrl": "images/licenses/cc30bysa.png",
+"termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+},
+"columns": [
+{
+"fieldName": "nombre_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nit_entidad",
+"dataTypeName": "number"
+},
+{
+"fieldName": "departamento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ciudad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "localizaci_n",
+"dataTypeName": "text"
+},
+{
+"fieldName": "orden",
+"dataTypeName": "text"
+},
+{
+"fieldName": "sector",
+"dataTypeName": "text"
+},
+{
+"fieldName": "rama",
+"dataTypeName": "text"
+},
+{
+"fieldName": "entidad_centralizada",
+"dataTypeName": "text"
+},
+{
+"fieldName": "proceso_de_compra",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "referencia_del_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "estado_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "codigo_de_categoria_principal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "descripcion_del_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "modalidad_de_contratacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "justificacion_modalidad_de",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_de_firma",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_inicio_del_contrato",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_fin_del_contrato",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "condiciones_de_entrega",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipodocproveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "documento_proveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "proveedor_adjudicado",
+"dataTypeName": "text"
+},
+{
+"fieldName": "es_grupo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "es_pyme",
+"dataTypeName": "text"
+},
+{
+"fieldName": "habilita_pago_adelantado",
+"dataTypeName": "text"
+},
+{
+"fieldName": "liquidaci_n",
+"dataTypeName": "text"
+},
+{
+"fieldName": "obligaci_n_ambiental",
+"dataTypeName": "text"
+},
+{
+"fieldName": "obligaciones_postconsumo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "reversion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "origen_de_los_recursos",
+"dataTypeName": "text"
+},
+{
+"fieldName": "destino_gasto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "valor_del_contrato",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_de_pago_adelantado",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_facturado",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_pendiente_de_pago",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_pagado",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_amortizado",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_pendiente_de",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_pendiente_de_ejecucion",
+"dataTypeName": "number"
+},
+{
+"fieldName": "saldo_cdp",
+"dataTypeName": "number"
+},
+{
+"fieldName": "saldo_vigencia",
+"dataTypeName": "number"
+},
+{
+"fieldName": "espostconflicto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "dias_adicionados",
+"dataTypeName": "number"
+},
+{
+"fieldName": "puntos_del_acuerdo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "pilares_del_acuerdo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "urlproceso",
+"dataTypeName": "url"
+},
+{
+"fieldName": "nombre_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nacionalidad_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "domicilio_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_identificaci_n_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "identificaci_n_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "g_nero_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "presupuesto_general_de_la_nacion_pgn",
+"dataTypeName": "number"
+},
+{
+"fieldName": "sistema_general_de_participaciones",
+"dataTypeName": "number"
+},
+{
+"fieldName": "sistema_general_de_regal_as",
+"dataTypeName": "number"
+},
+{
+"fieldName": "recursos_propios_alcald_as_gobernaciones_y_resguardos_ind_genas_",
+"dataTypeName": "number"
+},
+{
+"fieldName": "recursos_de_credito",
+"dataTypeName": "number"
+},
+{
+"fieldName": "recursos_propios",
+"dataTypeName": "number"
+},
+{
+"fieldName": "ultima_actualizacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "codigo_entidad",
+"dataTypeName": "number"
+},
+{
+"fieldName": "codigo_proveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_inicio_liquidacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_fin_liquidacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "objeto_del_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "duraci_n_del_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_del_banco",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_cuenta",
+"dataTypeName": "text"
+},
+{
+"fieldName": "n_mero_de_cuenta",
+"dataTypeName": "text"
+},
+{
+"fieldName": "el_contrato_puede_ser_prorrogado",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_de_notificaci_n_de_prorrogaci_n",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "nombre_ordenador_del_gasto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_documento_ordenador_del_gasto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "n_mero_de_documento_ordenador_del_gasto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_supervisor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_documento_supervisor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "n_mero_de_documento_supervisor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_ordenador_de_pago",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_documento_ordenador_de_pago",
+"dataTypeName": "text"
+},
+{
+"fieldName": "n_mero_de_documento_ordenador_de_pago",
+"dataTypeName": "text"
+},
+{
+"fieldName": "documentos_tipo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "descripcion_documentos_tipo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "direcci_n_de_ejecuci_n_del_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "criterios_de_sostenibilidad_ambiental",
+"dataTypeName": "text"
+},
+{
+"fieldName": "requisitos_ambientales_en_las_especificaciones_t_cnicas",
+"dataTypeName": "text"
+},
+{
+"fieldName": "criterios_ambientales_en_la_evaluaci_n_de_las_ofertas",
+"dataTypeName": "text"
+},
+{
+"fieldName": "obligaciones_contractuales_o_poscontractuales_a_nivel_ambiental",
+"dataTypeName": "text"
+},
+{
+"fieldName": "uso_de_etiquetado_ecol_gico",
+"dataTypeName": "text"
+},
+{
+"fieldName": "obligaciones_posconsumo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_inicio_obligaciones_posconsumo",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_fin_obligaciones_posconsumo",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_inicio_reversi_n",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_fin_reversi_n",
+"dataTypeName": "calendar_date"
+}
+]
+}

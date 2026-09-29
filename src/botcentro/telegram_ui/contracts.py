@@ -46,6 +46,26 @@ class Intent(StrEnum):
     CANCEL = "interaction.cancel"
     REFRESH = "view.refresh"
     QUESTION = "question.free"
+    # Investigaciones y grandes casos (investigaciones §13; detrás de FEATURE_CASES / FEATURE_SUBSCRIPTIONS)
+    CASES = "cases.list"
+    CASE_OPEN = "case.open"
+    CASE_TIMELINE = "case.timeline"
+    CASE_PROCEEDINGS = "case.proceedings"
+    CASE_ACTORS = "case.actors"
+    CASE_CONTRACTS = "case.contracts"
+    PROCEEDINGS = "proceedings.list"
+    PROCEEDING_OPEN = "proceeding.open"
+    ACTOR_OPEN = "actor.open"
+    ACTORS_SEARCH = "actors.search"
+    TERRITORIES = "territories.open"
+    TERRITORY_RESOLVE = "territory.resolve"
+    TERRITORY_OPEN = "territory.open"
+    SUBSCRIPTIONS = "subscriptions.manage"
+    SUBSCRIBE = "subscriptions.create"
+    SUBSCRIBE_CONFIRM = "subscriptions.confirm"
+    UNSUBSCRIBE = "subscriptions.delete"
+    UNSUBSCRIBE_ALL = "subscriptions.delete_all"
+    COVERAGE = "coverage.show"
 
 
 class _Model(BaseModel):

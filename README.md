@@ -178,6 +178,23 @@ BOTCENTRO_INSFORGE_URL=https://tbv7i4p3.us-east.insforge.app \
   .venv/bin/uvicorn botcentro.panel.server:app --port 8710
 ```
 
+## Investigaciones y grandes casos (piloto)
+
+Módulo de `investigaciones` (DEC-19). Lo que incluye:
+
+- **Fuentes.** Fuentes de datos.gov.co en modo sombra: SECOP II/I, SIRI, Relatoría PGN y DIVIPOLA. Tienen adaptadores Socrata propios en `src/botcentro/investigations/`, con validación de esquema, corte congelado y límites que terminan en «parcial».
+- **Flujo editorial.** Las afirmaciones requieren evidencia y un revisor distinto del autor en producción. Los casos van por revisiones.
+- **Lecturas públicas.** Solo muestran lo publicado.
+- **Bot.** Investigaciones, Grandes casos, Entidades y territorios (con desambiguación de homónimos), Mis seguimientos y Cobertura. Cada sección solo aparece con su bandera activa. El resumen diario sale a las 18:00 de Bogotá y respeta la ventana silenciosa de 21:00 a 08:00.
+- **Panel.** La vista **Investigaciones** reúne fuentes, cola editorial, casos, carga documental asistida (sin guardar PDF), banderas y entregas. Cada acción usa CSRF y una clave de idempotencia.
+
+Documentación:
+
+- [Viabilidad y mapa](docs/investigaciones/00-mapa-y-viabilidad.md)
+- [Manual de operación](docs/investigaciones/01-manual-operacion.md)
+- [Trazabilidad T-01..T-60](docs/investigaciones/02-trazabilidad-pruebas.md)
+- [Licencias, cobertura y costos](docs/investigaciones/03-licencias-cobertura-costos.md)
+
 ## Seguridad
 
 - Invariantes verificadas en el proyecto remoto:

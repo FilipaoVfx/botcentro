@@ -1,0 +1,328 @@
+{
+"id": "f789-7hwg",
+"name": "SECOP I - Procesos de Compra Pública",
+"rowsUpdatedAt": 1790677170,
+"license": {
+"name": "Creative Commons Attribution | Share Alike 4.0 International",
+"logoUrl": "images/licenses/cc30bysa.png",
+"termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+},
+"columns": [
+{
+"fieldName": "uid",
+"dataTypeName": "text"
+},
+{
+"fieldName": "anno_cargue_secop",
+"dataTypeName": "number"
+},
+{
+"fieldName": "anno_firma_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nivel_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "orden_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nit_de_la_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "c_digo_de_la_entidad",
+"dataTypeName": "number"
+},
+{
+"fieldName": "id_modalidad",
+"dataTypeName": "number"
+},
+{
+"fieldName": "modalidad_de_contratacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "estado_del_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "causal_de_otras_formas_de",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_regimen_de_contratacion",
+"dataTypeName": "number"
+},
+{
+"fieldName": "nombre_regimen_de_contratacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_objeto_a_contratar",
+"dataTypeName": "number"
+},
+{
+"fieldName": "objeto_a_contratar",
+"dataTypeName": "text"
+},
+{
+"fieldName": "detalle_del_objeto_a_contratar",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "municipio_de_obtencion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "municipio_de_entrega",
+"dataTypeName": "text"
+},
+{
+"fieldName": "municipios_ejecucion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_de_cargue_en_el_secop",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "numero_de_constancia",
+"dataTypeName": "text"
+},
+{
+"fieldName": "numero_de_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "numero_de_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "cuantia_proceso",
+"dataTypeName": "number"
+},
+{
+"fieldName": "id_grupo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_grupo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_familia",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_familia",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_clase",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_clase",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_adjudicacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_identifi_del_contratista",
+"dataTypeName": "text"
+},
+{
+"fieldName": "identificacion_del_contratista",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nom_razon_social_contratista",
+"dataTypeName": "text"
+},
+{
+"fieldName": "dpto_y_muni_contratista",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_doc_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "identific_representante_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_del_represen_legal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_de_firma_del_contrato",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_ini_ejec_contrato",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "plazo_de_ejec_del_contrato",
+"dataTypeName": "number"
+},
+{
+"fieldName": "rango_de_ejec_del_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tiempo_adiciones_en_dias",
+"dataTypeName": "number"
+},
+{
+"fieldName": "tiempo_adiciones_en_meses",
+"dataTypeName": "number"
+},
+{
+"fieldName": "fecha_fin_ejec_contrato",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "compromiso_presupuestal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "cuantia_contrato",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_total_de_adiciones",
+"dataTypeName": "number"
+},
+{
+"fieldName": "valor_contrato_con_adiciones",
+"dataTypeName": "number"
+},
+{
+"fieldName": "objeto_del_contrato_a_la",
+"dataTypeName": "text"
+},
+{
+"fieldName": "proponentes_seleccionados",
+"dataTypeName": "text"
+},
+{
+"fieldName": "calificacion_definitiva",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_sub_unidad_ejecutora",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_sub_unidad_ejecutora",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ruta_proceso_en_secop_i",
+"dataTypeName": "url"
+},
+{
+"fieldName": "moneda",
+"dataTypeName": "text"
+},
+{
+"fieldName": "es_postconflicto",
+"dataTypeName": "number"
+},
+{
+"fieldName": "marcacion_adiciones",
+"dataTypeName": "number"
+},
+{
+"fieldName": "posicion_rubro",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_rubro",
+"dataTypeName": "text"
+},
+{
+"fieldName": "valor_rubro",
+"dataTypeName": "number"
+},
+{
+"fieldName": "sexo_replegal",
+"dataTypeName": "text"
+},
+{
+"fieldName": "pilar_acuerdo_paz",
+"dataTypeName": "text"
+},
+{
+"fieldName": "punto_acuerdo_paz",
+"dataTypeName": "text"
+},
+{
+"fieldName": "municipio_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "departamento_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ultima_actualizacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_liquidacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "cumpledecreto248",
+"dataTypeName": "text"
+},
+{
+"fieldName": "incluyebienesdecreto248",
+"dataTypeName": "text"
+},
+{
+"fieldName": "cumple_sentencia_t302",
+"dataTypeName": "text"
+},
+{
+"fieldName": "es_mipyme",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tama_o_mipyme",
+"dataTypeName": "text"
+},
+{
+"fieldName": "codigo_bpin",
+"dataTypeName": "text"
+},
+{
+"fieldName": "destino_gasto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "pliegos_tipo",
+"dataTypeName": "text"
+},
+{
+"fieldName": "sector_pliegos_tipo",
+"dataTypeName": "text"
+}
+]
+}

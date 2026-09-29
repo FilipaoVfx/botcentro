@@ -30,6 +30,12 @@ _ALIASES: dict[str, Intent] = {
     "/agenda": Intent.AGENDA, "agenda": Intent.AGENDA, "discusiones": Intent.DISCUSSIONS, "/discusiones": Intent.DISCUSSIONS, "debates": Intent.DISCUSSIONS,
     "votaciones": Intent.VOTINGS, "/votaciones": Intent.VOTINGS,
     "documentos": Intent.DOCUMENTS, "autores": Intent.PROJECT_PARTICIPANTS,
+    "investigaciones": Intent.PROCEEDINGS, "/investigaciones": Intent.PROCEEDINGS,
+    "grandes casos": Intent.CASES, "casos": Intent.CASES, "/casos": Intent.CASES, "gran caso": Intent.CASES,
+    "entidades y territorios": Intent.TERRITORIES, "territorios": Intent.TERRITORIES, "/territorios": Intent.TERRITORIES,
+    "entidades": Intent.TERRITORIES, "mis seguimientos": Intent.SUBSCRIPTIONS, "seguimientos": Intent.SUBSCRIPTIONS,
+    "/seguimientos": Intent.SUBSCRIPTIONS, "seguir": Intent.SUBSCRIBE, "dejar de seguir": Intent.UNSUBSCRIBE,
+    "cobertura": Intent.COVERAGE, "ayuda y cobertura": Intent.COVERAGE,
 }
 _NAV_WORDS = sorted({k for k in _ALIASES if " " not in k and not k.startswith("/")})
 _CONTEXTUAL = [
@@ -46,6 +52,9 @@ _ORDINAL_RE = re.compile(r"^(?:abre |abrir |ver |el |la |ese |esa )*(?:el |la )?
                          "|".join(_ORDINALS) + r")$")
 _OPEN_N_RE = re.compile(r"^(?:abre|abrir|ver|opcion|numero) (?:el |la |la opcion )?(?P<n>[1-8])$")
 _SEARCH_RE = re.compile(r"^(?:proyectos?|buscar|busca) (?:de |sobre |del |de la )?(?P<q>.{2,60})$")
+_TERRITORY_RE = re.compile(r"^(?:investigaciones |casos |contratos )?(?:de |en )?(?:la )?(?:alcaldia|municipio|gobernacion) "
+                           r"(?:de |del )?(?P<name>[a-z][a-z .'-]{2,60})$")
+_CASES_SEARCH_RE = re.compile(r"^(?:grandes casos|casos|investigaciones) (?:de |sobre |del |en )?(?P<q>[a-z][a-z .'-]{2,60})$")
 _DAY_RE = re.compile(r"^(?P<corp>senado|camara)(?: (?:el |del |de )?(?P<when>.+))?$")
 _AGENDA_RE = re.compile(r"^agenda(?: (?:de |del |para |el )?(?P<when>.+))?$")
 _DISCUSSION_SEARCH_RE = re.compile(r"^(?:discusiones|debates) (?:de |sobre |del )?(?P<q>.{3,60})$")
@@ -81,6 +90,12 @@ def parse_text(text: str) -> UiAction:
             params = {"corporation": _corporation(command) or "senado"}
         return UiAction(intent=intent, entry_point="command" if command.startswith("/") else "text",
                         parameters=params, parameter_origins={k: "explicit" for k in params})
+    if m := _TERRITORY_RE.match(folded):
+        return UiAction(intent=Intent.TERRITORY_RESOLVE, entry_point="text", parameters={"name": m["name"].strip(), "text": raw},
+                        parameter_origins={"name": "explicit"})
+    if m := _CASES_SEARCH_RE.match(folded):
+        return UiAction(intent=Intent.CASES, entry_point="text", parameters={"query": m["q"].strip(), "text": raw},
+                        parameter_origins={"query": "explicit"})
     if (m := _DAY_RE.match(folded)) and _is_date_expression(m["when"] or "hoy"):
         return UiAction(intent=Intent.DAY_OVERVIEW, entry_point="text",
                         parameters={"corporation": m["corp"], "expression": m["when"] or "hoy"},

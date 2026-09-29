@@ -72,6 +72,9 @@ class DiscoverPage:
     items: Sequence[DiscoveredItem]
     next_cursor: Cursor
     has_more: bool
+    # Límite de ejecución alcanzado (filas, solicitudes, minutos): la ejecución termina en
+    # `partial` y el cursor queda listo para continuar; nunca cuenta como éxito completo (ING-04).
+    limit_reached: str | None = None
 
 
 class IssueSeverity(StrEnum):

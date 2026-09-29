@@ -4,6 +4,7 @@ import {
   DatabaseZap,
   FileStack,
   Gauge,
+  Gavel,
   History,
   Layers,
   LogOut,
@@ -22,6 +23,7 @@ import { formatClock, formatRelative, formatSeconds, useNow } from "./lib/time";
 import type { Capabilities } from "./lib/types";
 import { Departures } from "./views/Departures";
 import { Login } from "./views/Login";
+import { Investigations } from "./views/Investigations";
 import { Alerts, Audit, Costs, Documents, Processes, Queries, Review, Runs } from "./views/Operations";
 import { SourceDetail, Sources } from "./views/Sources";
 
@@ -33,6 +35,7 @@ const NAV = [
   { href: "/documentos", label: "Documentos", Icon: FileStack },
   { href: "/consultas", label: "Consultas", Icon: MessageSquareText },
   { href: "/revision", label: "Revisión", Icon: ScanSearch },
+  { href: "/investigaciones", label: "Investigaciones", Icon: Gavel },
   { href: "/alertas", label: "Alertas", Icon: Siren },
   { href: "/costos", label: "Costos", Icon: Coins },
   { href: "/auditoria", label: "Auditoría", Icon: Radio },
@@ -118,6 +121,7 @@ function Shell({ caps, onSignedOut }: { caps: Capabilities; onSignedOut: () => v
   else if (path === "/documentos") view = <Documents now={now} />;
   else if (path === "/consultas") view = <Queries now={now} />;
   else if (path === "/revision") view = <Review caps={caps} now={now} />;
+  else if (path === "/investigaciones") view = <Investigations now={now} />;
   else if (path === "/alertas") view = <Alerts caps={caps} now={now} />;
   else if (path === "/costos") view = <Costs now={now} />;
   else if (path === "/auditoria") view = <Audit now={now} />;

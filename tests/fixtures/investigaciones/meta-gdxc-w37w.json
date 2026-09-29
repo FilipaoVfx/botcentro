@@ -1,0 +1,40 @@
+{
+"id": "gdxc-w37w",
+"name": "DIVIPOLA- Códigos municipios",
+"rowsUpdatedAt": 1737751472,
+"license": {
+"name": "Creative Commons Attribution | Share Alike 4.0 International",
+"logoUrl": "images/licenses/cc30bysa.png",
+"termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+},
+"columns": [
+{
+"fieldName": "cod_dpto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "dpto",
+"dataTypeName": "text"
+},
+{
+"fieldName": "cod_mpio",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nom_mpio",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_municipio",
+"dataTypeName": "text"
+},
+{
+"fieldName": "longitud",
+"dataTypeName": "text"
+},
+{
+"fieldName": "latitud",
+"dataTypeName": "text"
+}
+]
+}

@@ -65,6 +65,7 @@ class IngestionRunner:
         run_id = self.store.start_run(self.source_id, mode, self.connector.version,
                                       coverage_scope_id=coverage_scope_id, cursor_before=cursor.to_json())
         summary = RunSummary(run_id)
+        exhausted = False  # la fuente dijo que no hay más: solo entonces puede ser éxito completo
         try:
             for _ in range(max_pages):
                 page = self.connector.discover(cursor)
@@ -75,7 +76,11 @@ class IngestionRunner:
                     self._process_item(run_id, item, summary)
                 self.store.commit_cursor(run_id, page.next_cursor)
                 cursor = page.next_cursor
+                if page.limit_reached:
+                    summary.errors.append(f"LIMIT_REACHED: {page.limit_reached}")
+                    break
                 if not page.has_more:
+                    exhausted = True
                     break
         except SourceSuspended as exc:
             summary.status = "failed"
@@ -86,9 +91,11 @@ class IngestionRunner:
             self.store.finish_run(run_id, "failed", "UNEXPECTED_ERROR")
             raise
 
-        if summary.failed or summary.quarantined:
+        if not exhausted and not any(e.startswith("LIMIT_REACHED") for e in summary.errors):
+            summary.errors.append(f"LIMIT_REACHED: se agotaron {max_pages} páginas; continúa desde el cursor")
+        if summary.failed or summary.quarantined or not exhausted:
             summary.status = "partial"
-        self.store.finish_run(run_id, summary.status)
+        self.store.finish_run(run_id, summary.status, None if exhausted else "LIMIT_REACHED")
         return summary
 
     def _process_item(self, run_id: UUID, item: DiscoveredItem, summary: RunSummary) -> None:

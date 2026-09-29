@@ -28,6 +28,11 @@ _UNSUPPORTED = [
      "no hago recomendaciones de voto ni califico congresistas"),
     (re.compile(r"\b(que opina la gente|apoyo popular|sentimiento)\b"),
      "no mido opinión pública ni apoyo político"),
+    # F-08 / T-59: no se califica a personas; se ofrecen decisiones y estados verificados.
+    (re.compile(r"\b(es|son|fue|era|sera) (un |una |el mas |la mas )?(corrupt\w*|ladron\w*|culpable|delincuente|criminal|"
+                r"bandid\w*|rata|mafios\w*)\b"),
+     "no califico a personas ni entidades como corruptas o culpables; puedo mostrarte decisiones y estados "
+     "verificados de expedientes publicados, con sus fuentes y límites de cobertura"),
 ]
 _COMPARISON = re.compile(r"\b(compar\w*|diferencias?|que cambio|cambios entre|versus|vs\.?)\b")
 _AGENDA = re.compile(r"\b(agenda|orden del dia|se (?:discutira|debatira|votara)|sesion(?:es)?|que se discute|citad[oa]s?)\b")

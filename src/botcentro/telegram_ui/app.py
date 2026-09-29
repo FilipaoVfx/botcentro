@@ -23,6 +23,7 @@ from html import unescape as html_unescape
 
 from botcentro.telegram_ui.contracts import (Button, Frame, Intent, PageInfo, ResultSet, SessionContext, UiAction,
                                              ViewModel)
+from botcentro.telegram_ui.investigations import INVESTIGATION_INTENTS, InvestigationViews
 
 HOME_BUTTON = Button(label="🏠 Inicio", intent=Intent.HOME)
 HELP_BUTTON = Button(label="❓ Ayuda", intent=Intent.HELP)
@@ -35,7 +36,8 @@ IMPLEMENTED = frozenset({
     Intent.VOTING_OPEN, Intent.VOTINGS_PERSON, Intent.VOTE_PERSON_PROMPT, Intent.EVIDENCE,
 })
 _NO_EVIDENCE_VIEWS = {"home", "help", "sources", "evidence", "cancel", "filters", "search_prompt", "unavailable",
-                      "clarify", "expired"}
+                      "clarify", "expired", "subscribe_prompt", "subscribed", "subscriptions", "confirm", "coverage",
+                      "territory_search"}
 _ENGINE_FALLBACK = frozenset({Intent.PROJECTS_SEARCH})
 _PENDING_LABELS = {
     Intent.DAY_OVERVIEW: "la portada del día", Intent.DISCUSSIONS: "los debates legislativos",
@@ -60,33 +62,40 @@ def _clip(text: str | None, limit: int) -> str:
 
 class UiApplication:
     def __init__(self, engine: AnswerEngine, *, is_available: Callable[[Intent], bool] | None = None,
-                 today: Callable[[], date] | None = None) -> None:
+                 today: Callable[[], date] | None = None, investigations: InvestigationViews | None = None) -> None:
         self.engine = engine
         self.rpc = engine.rpc
-        self.is_available = is_available or (lambda intent: intent in IMPLEMENTED)
+        self.investigations = investigations
+        base = is_available or (lambda intent: intent in IMPLEMENTED)
+        # Investigaciones: visibles solo con su bandera encendida (FEATURE_CASES / FEATURE_SUBSCRIPTIONS).
+        self.is_available = lambda intent: (investigations.available(intent) if investigations is not None
+                                            and intent in INVESTIGATION_INTENTS else base(intent))
         self.today = today or (lambda: datetime.now(BOGOTA).date())
 
     # -- entrada -------------------------------------------------------------------------------
 
-    def handle(self, action: UiAction, ctx: SessionContext, result_set: ResultSet | None = None) -> ViewModel:
-        """Aplica la acción sobre el contexto (se modifica en sitio) y devuelve la vista."""
+    def handle(self, action: UiAction, ctx: SessionContext, result_set: ResultSet | None = None, *,
+               user_hash: str | None = None) -> ViewModel:
+        """Aplica la acción sobre el contexto (se modifica en sitio) y devuelve la vista. `user_hash` es la
+        identidad seudónima de quien actúa (seguimientos); nunca se toma de parámetros del botón."""
         intent = action.intent
         if intent is Intent.BACK:
             frame = ctx.pop()
             if frame is None:
                 return self._home(ctx)
             return self._render(UiAction(intent=frame.intent, entry_point="button", parameters=frame.params), ctx,
-                                result_set, push=False)
+                                result_set, push=False, user_hash=user_hash)
         if intent is Intent.REFRESH:
             if ctx.current is None:
                 return self._home(ctx)
             return self._render(UiAction(intent=ctx.current.intent, entry_point="button",
-                                         parameters=ctx.current.params), ctx, result_set, push=False)
+                                         parameters=ctx.current.params), ctx, result_set, push=False,
+                                user_hash=user_hash)
         if intent is Intent.CANCEL:
             ctx.pending_clarification = None
             return ViewModel(view_type="cancel", title="Listo", blocks=["Cancelé la selección en curso."],
                              rows=[[HOME_BUTTON, HELP_BUTTON]])
-        return self._render(action, ctx, result_set, push=True)
+        return self._render(action, ctx, result_set, push=True, user_hash=user_hash)
 
     def _track_evidence(self, view: ViewModel, ctx: SessionContext) -> ViewModel:
         """Fuentes de esta respuesta: enlaces citados en la vista más las fuentes declaradas (CU-11)."""
@@ -105,26 +114,32 @@ class UiApplication:
                 view.rows.insert(max(len(view.rows) - 1, 0), [Button(label="🔗 Fuentes", intent=Intent.EVIDENCE)])
         return view
 
-    def _render(self, action: UiAction, ctx: SessionContext, result_set: ResultSet | None, *, push: bool) -> ViewModel:
+    def _render(self, action: UiAction, ctx: SessionContext, result_set: ResultSet | None, *, push: bool,
+                user_hash: str | None = None) -> ViewModel:
         intent = action.intent
         params = dict(action.parameters)
         # Captura de búsqueda: tras «🔎 Buscar», un texto breve sin números es el término buscado;
         # cualquier intención explícita distinta la suspende (§19.3).
         if ctx.pending_clarification and ctx.pending_clarification.get("expect") in ("search", "discussion",
-                                                                                     "vote_person"):
+                                                                                     "vote_person", "territory"):
             expect = ctx.pending_clarification["expect"]
             ctx.pending_clarification = None
             text = params.get("text", "")
             if intent is Intent.QUESTION and text and len(text.split()) <= 6 and not any(c.isdigit() for c in text):
                 intent, params = {"search": (Intent.PROJECTS_SEARCH, {"query": text, "text": text}),
                                   "discussion": (Intent.DISCUSSIONS, {"query": text, "text": text}),
-                                  "vote_person": (Intent.VOTINGS_PERSON, {"name": text})}[expect]
+                                  "vote_person": (Intent.VOTINGS_PERSON, {"name": text}),
+                                  "territory": (Intent.TERRITORY_RESOLVE, {"name": text, "text": text})}[expect]
         if not self.is_available(intent) and intent in _ENGINE_FALLBACK and params.get("text"):
             intent, params = Intent.QUESTION, {"text": params["text"]}
         if not self.is_available(intent):
+            if self.investigations is not None and intent in INVESTIGATION_INTENTS:
+                return self.investigations.unavailable(intent)
             return self._not_yet(intent)
 
-        if intent is Intent.HOME:
+        if intent in INVESTIGATION_INTENTS and self.investigations is not None:
+            view, push = self.investigations.render(intent, params, ctx, result_set, user_hash)
+        elif intent is Intent.HOME:
             ctx.navigation_stack = []
             ctx.applied_filters = {}
             view = self._home(ctx)
@@ -216,6 +231,7 @@ class UiApplication:
                  Button(label="🏛 Senado hoy", intent=Intent.DAY_OVERVIEW, params={"corporation": "senado"})],
                 [Button(label="🗳 Votaciones", intent=Intent.VOTINGS), Button(label="🗓 Agenda", intent=Intent.AGENDA)],
                 [Button(label="💬 Debates", intent=Intent.DISCUSSIONS)],
+                *(self.investigations.home_rows() if self.investigations is not None else []),
                 [Button(label="🔗 Fuentes", intent=Intent.SOURCES), HELP_BUTTON]]
         return ViewModel(view_type="home", title="🏛 Tu explorador legislativo", blocks=render_sections([Section(
             "🏛 Tu explorador legislativo", [

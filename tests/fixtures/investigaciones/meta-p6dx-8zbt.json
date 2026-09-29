@@ -1,0 +1,248 @@
+{
+"id": "p6dx-8zbt",
+"name": "SECOP II - Procesos de Contratación",
+"rowsUpdatedAt": 1790696769,
+"license": {
+"name": "Creative Commons Attribution | Share Alike 4.0 International",
+"logoUrl": "images/licenses/cc30bysa.png",
+"termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+},
+"columns": [
+{
+"fieldName": "entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nit_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "departamento_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ciudad_entidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ordenentidad",
+"dataTypeName": "text"
+},
+{
+"fieldName": "codigo_pci",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_del_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "referencia_del_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ppi",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_del_portafolio",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_del_procedimiento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "descripci_n_del_procedimiento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fase",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_de_publicacion_del",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_ultima_publicaci",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_publicacion_fase",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_publicacion_fase_1",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_publicacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_publicacion_fase_2",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_publicacion_fase_3",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "precio_base",
+"dataTypeName": "number"
+},
+{
+"fieldName": "modalidad_de_contratacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "justificaci_n_modalidad_de",
+"dataTypeName": "text"
+},
+{
+"fieldName": "duracion",
+"dataTypeName": "number"
+},
+{
+"fieldName": "unidad_de_duracion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_de_recepcion_de",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_apertura_de_respuesta",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "fecha_de_apertura_efectiva",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "ciudad_de_la_unidad_de",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_de_la_unidad_de",
+"dataTypeName": "text"
+},
+{
+"fieldName": "proveedores_invitados",
+"dataTypeName": "number"
+},
+{
+"fieldName": "proveedores_con_invitacion",
+"dataTypeName": "number"
+},
+{
+"fieldName": "visualizaciones_del",
+"dataTypeName": "number"
+},
+{
+"fieldName": "proveedores_que_manifestaron",
+"dataTypeName": "number"
+},
+{
+"fieldName": "respuestas_al_procedimiento",
+"dataTypeName": "number"
+},
+{
+"fieldName": "respuestas_externas",
+"dataTypeName": "number"
+},
+{
+"fieldName": "conteo_de_respuestas_a_ofertas",
+"dataTypeName": "number"
+},
+{
+"fieldName": "proveedores_unicos_con",
+"dataTypeName": "number"
+},
+{
+"fieldName": "numero_de_lotes",
+"dataTypeName": "number"
+},
+{
+"fieldName": "estado_del_procedimiento",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_estado_del_procedimiento",
+"dataTypeName": "number"
+},
+{
+"fieldName": "adjudicado",
+"dataTypeName": "text"
+},
+{
+"fieldName": "id_adjudicacion",
+"dataTypeName": "text"
+},
+{
+"fieldName": "codigoproveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "departamento_proveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "ciudad_proveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "fecha_adjudicacion",
+"dataTypeName": "calendar_date"
+},
+{
+"fieldName": "valor_total_adjudicacion",
+"dataTypeName": "number"
+},
+{
+"fieldName": "nombre_del_adjudicador",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nombre_del_proveedor",
+"dataTypeName": "text"
+},
+{
+"fieldName": "nit_del_proveedor_adjudicado",
+"dataTypeName": "text"
+},
+{
+"fieldName": "codigo_principal_de_categoria",
+"dataTypeName": "text"
+},
+{
+"fieldName": "estado_de_apertura_del_proceso",
+"dataTypeName": "text"
+},
+{
+"fieldName": "tipo_de_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "subtipo_de_contrato",
+"dataTypeName": "text"
+},
+{
+"fieldName": "categorias_adicionales",
+"dataTypeName": "text"
+},
+{
+"fieldName": "urlproceso",
+"dataTypeName": "url"
+},
+{
+"fieldName": "codigo_entidad",
+"dataTypeName": "number"
+},
+{
+"fieldName": "estado_resumen",
+"dataTypeName": "text"
+}
+]
+}

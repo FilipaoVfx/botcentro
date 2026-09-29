@@ -108,7 +108,8 @@ def make_bot(token: str) -> Bot:
     return Bot(token, default=DefaultBotProperties(parse_mode=ParseMode.HTML, link_preview_is_disabled=True))
 
 
-async def run_polling(bot: Bot, runtime: UiRuntime, *, drain_every: float = 30.0) -> None:
+async def run_polling(bot: Bot, runtime: UiRuntime, *, drain_every: float = 30.0, digest=None,  # noqa: ANN001
+                      digest_every: float = 60.0) -> None:
     await bot.delete_webhook(drop_pending_updates=False)
     await bot.set_my_commands([BotCommand(command=c, description=d) for c, d in COMMANDS])
     dispatcher = build_dispatcher(runtime)
@@ -121,8 +122,19 @@ async def run_polling(bot: Bot, runtime: UiRuntime, *, drain_every: float = 30.0
             except Exception:  # noqa: BLE001
                 log.exception("fallo drenando la cola")
 
-    task = asyncio.create_task(periodic_drain())
+    async def periodic_digest() -> None:  # resumen diario y correcciones (DigestWorker)
+        while True:
+            await asyncio.sleep(digest_every)
+            try:
+                await digest.tick()
+            except Exception:  # noqa: BLE001
+                log.exception("fallo en el resumen de seguimientos")
+
+    tasks = [asyncio.create_task(periodic_drain())]
+    if digest is not None:
+        tasks.append(asyncio.create_task(periodic_digest()))
     try:
         await dispatcher.start_polling(bot, allowed_updates=["message", "callback_query"], handle_signals=True)
     finally:
-        task.cancel()
+        for task in tasks:
+            task.cancel()

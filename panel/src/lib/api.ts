@@ -30,12 +30,12 @@ export async function getJSON<T>(path: string): Promise<T> {
   return parse<T>(await fetch(path, { credentials: "same-origin", headers: { Accept: "application/json" } }));
 }
 
-export async function postJSON<T>(path: string, body: unknown): Promise<T> {
+export async function postJSON<T>(path: string, body: unknown, extraHeaders: Record<string, string> = {}): Promise<T> {
   return parse<T>(
     await fetch(path, {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", "X-Botcentro-Panel": "1" },
+      headers: { "Content-Type": "application/json", "X-Botcentro-Panel": "1", ...extraHeaders },
       body: JSON.stringify(body),
     }),
   );

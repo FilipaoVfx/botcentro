@@ -43,7 +43,10 @@ VIEWS: dict[str, tuple[str, set[str]]] = {
     "review-cases": ("ops_review_cases", {"state", "limit"}),
     "costs": ("ops_costs", set()),
     "audit": ("ops_audit", {"limit"}),
+    "investigations": ("ops_investigations", set()),
 }
+IDEMPOTENCY_HEADER = "idempotency-key"
+_IDEM_RE = re.compile(r"^[A-Za-z0-9_.:-]{8,80}$")
 JOB_STATES = {"pending", "leased", "retry_wait", "succeeded", "dead_letter", "cancelled"}
 CASE_STATES = {"open", "in_review", "resolved", "dismissed"}
 
@@ -58,6 +61,35 @@ class CodeRequest(BaseModel):
 class SessionRequest(BaseModel):
     email: str
     code: str
+
+
+class Decision(BaseModel):
+    expected_version: int
+    decision: str
+    reason: str
+
+
+class Retraction(BaseModel):
+    reason: str
+
+
+class FlagChange(BaseModel):
+    enabled: bool
+    reason: str
+
+
+class AssistedDocument(BaseModel):
+    source_code: str
+    url: str
+    title: str
+    document_type: str
+
+
+class EvidencePassage(BaseModel):
+    revision_id: UUID
+    page: int
+    char_start: int
+    char_end: int
 
 
 class RateLimiter:
@@ -176,6 +208,89 @@ def build_router(store: SessionStore, *, secure_cookie: bool = True, enrich=None
 
         return StreamingResponse(events(), media_type="text/event-stream",
                                  headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
+
+    # -- acciones editoriales de investigaciones (investigaciones §15; ADM-03) -----------------------
+    # Cada acción exige CSRF y una clave de idempotencia: repetir la misma petición devuelve el mismo
+    # resultado y reutilizar la clave con otro contenido es un conflicto. Los permisos (editor,
+    # revisor, admin; revisor distinto del autor en producción) los decide la función SQL.
+
+    async def command(request: Request, kind: str, payload: dict[str, Any], run) -> JSONResponse:  # noqa: ANN001
+        session = current(request)
+        key = request.headers.get(IDEMPOTENCY_HEADER, "")
+        if not _IDEM_RE.match(key):
+            return _error("IDEMPOTENCY_KEY", "Falta la cabecera Idempotency-Key.", 428, request)
+        digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+        begun = await run_in_threadpool(store.rpc, session, "admin_command_begin",
+                                        {"p_type": kind, "p_key": key, "p_payload_hash": digest})
+        if begun.get("replayed"):
+            return JSONResponse({"result": begun.get("result"), "state": begun.get("state"), "replayed": True,
+                                 "request_id": request.state.request_id})
+        try:
+            result = await run_in_threadpool(run, session)
+        except BotcentroError as exc:
+            await run_in_threadpool(store.rpc, session, "admin_command_finish",
+                                    {"p_command_id": begun["command_id"], "p_state": "rejected",
+                                     "p_result": {"code": exc.code}})
+            raise
+        await run_in_threadpool(store.rpc, session, "admin_command_finish",
+                                {"p_command_id": begun["command_id"], "p_state": "succeeded", "p_result": {"value": result}})
+        return JSONResponse({"result": result, "replayed": False, "request_id": request.state.request_id})
+
+    @router.post("/ops/investigations/claims/{claim_id}/decision", dependencies=[Depends(require_csrf)])
+    async def decide_claim(claim_id: UUID, body: Decision, request: Request) -> JSONResponse:
+        params = {"p_claim_id": claim_id, "p_expected_version": body.expected_version, "p_decision": body.decision,
+                  "p_reason": body.reason}
+        return await command(request, "claim.decide", params,
+                             lambda s: store.rpc(s, "reviewer_decide_claim", params))
+
+    @router.post("/ops/investigations/claims/{claim_id}/retract", dependencies=[Depends(require_csrf)])
+    async def retract_claim(claim_id: UUID, body: Retraction, request: Request) -> JSONResponse:
+        params = {"p_claim_id": claim_id, "p_reason": body.reason}
+        return await command(request, "claim.retract", params,
+                             lambda s: store.rpc(s, "reviewer_retract_claim", params))
+
+    @router.post("/ops/investigations/case-revisions/{revision_id}/decision", dependencies=[Depends(require_csrf)])
+    async def decide_case(revision_id: UUID, body: Decision, request: Request) -> JSONResponse:
+        params = {"p_revision_id": revision_id, "p_expected_latest": body.expected_version, "p_decision": body.decision,
+                  "p_reason": body.reason}
+        return await command(request, "case.decide", params,
+                             lambda s: store.rpc(s, "reviewer_decide_case_revision", params))
+
+    @router.post("/ops/investigations/flags/{key}", dependencies=[Depends(require_csrf)])
+    async def set_flag(key: str, body: FlagChange, request: Request) -> JSONResponse:
+        params = {"p_key": key, "p_enabled": body.enabled, "p_reason": body.reason}
+        return await command(request, "flag.set", params, lambda s: store.rpc(s, "admin_set_feature_flag", params))
+
+    @router.post("/ops/investigations/documents", dependencies=[Depends(require_csrf)])
+    async def assisted_document(body: AssistedDocument, request: Request) -> JSONResponse:
+        from botcentro.http.fetcher import SafeFetcher
+        from botcentro.investigations.assisted import ASSISTED_SOURCES, AssistedError, AssistedRequest, register_document
+        from botcentro.security.url_guard import UrlGuard, UrlPolicy
+
+        req = AssistedRequest(body.source_code, body.url, body.title, body.document_type)
+        try:
+            req.validate()
+        except AssistedError as exc:
+            return _error(exc.code, str(exc), 422, request)
+
+        def run(session: PanelSession) -> dict[str, Any]:
+            class SessionRpc:  # el registro se hace con el JWT del editor
+                def call(self, fn: str, params: dict[str, Any]) -> Any:
+                    return store.rpc(session, fn, params)
+            with SafeFetcher(UrlGuard(UrlPolicy.for_domains(ASSISTED_SOURCES[req.source_code]))) as fetcher:
+                try:
+                    return register_document(SessionRpc(), fetcher, req)  # type: ignore[arg-type]
+                except AssistedError as exc:
+                    raise BotcentroError(exc.code, str(exc), status=422) from exc
+
+        return await command(request, "document.register", body.model_dump(), run)
+
+    @router.post("/ops/investigations/evidence", dependencies=[Depends(require_csrf)])
+    async def evidence_passage(body: EvidencePassage, request: Request) -> JSONResponse:
+        params = {"p_revision_id": body.revision_id, "p_page": body.page, "p_char_start": body.char_start,
+                  "p_char_end": body.char_end}
+        return await command(request, "evidence.create", params,
+                             lambda s: store.rpc(s, "editor_create_evidence_passage", params))
 
     @router.get("/ops/{view}")
     async def read_view(view: str, request: Request) -> JSONResponse:
