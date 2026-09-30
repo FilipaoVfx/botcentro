@@ -180,15 +180,25 @@ class UiRuntime:
             await self.transport.answer_callback(callback_id, "Tu acceso al piloto no está vigente.", alert=True)
             self._event("ui.callback_rejected", who, reason="unauthorized")
             return
-        await self.transport.answer_callback(callback_id)  # acuse antes del trabajo lento (UI-O04)
+        # Acuse en paralelo con la vista (UI-O04): cierra el indicador de espera sin sumar un viaje de ida y
+        # vuelta a Telegram (~80 ms) antes de construir y editar el mensaje.
+        ack = asyncio.create_task(self.transport.answer_callback(callback_id))
         action = UiAction(intent=record.intent, entry_point="button", parameters=dict(record.params))
-        await self._show(who, action, message_id, started)
+        try:
+            await self._show(who, action, message_id, started)
+        finally:
+            try:
+                await ack
+            except Exception as exc:  # noqa: BLE001 — un acuse fallido no invalida la vista ya entregada
+                log.warning("acuse de callback fallido: %s", type(exc).__name__)
 
     async def _show(self, who: Principal, action: UiAction, message_id: int | None, started: float) -> None:
         ctx = await self.state.load(who.chat_id, who.user_id)
         revision = ctx.revision
         result_set = await self._result_set(who, action, ctx)
+        render_started = self.clock()
         view = await asyncio.to_thread(self.app.handle, action, ctx, result_set, user_hash=who.user_hash)
+        render_ms = int((self.clock() - render_started) * 1000)
         latest = await self.state.load(who.chat_id, who.user_id)
         if latest.revision != revision:
             # Otra interacción cambió la sesión mientras se armaba esta vista: no se pisa (UI-F28).
@@ -197,11 +207,14 @@ class UiRuntime:
         await self._store_result_set(who, view)
         keyboard = await self._keyboard(view, who, ctx)
         html = split_message(view.blocks or [view.title], self.message_limit)[0]
+        telegram_started = self.clock()
         edited = message_id is not None and await self.transport.edit(who.chat_id, message_id, html, keyboard)
         ctx.anchor_message_id = message_id if edited else await self.transport.send(who.chat_id, html, keyboard)
+        telegram_ms = int((self.clock() - telegram_started) * 1000)
         await self._save(who, ctx)
         self._event("ui.view_rendered", who, entry="button", intent=action.intent.value, view=view.view_type,
-                    status=view.status, edited=bool(edited), ms=int((self.clock() - started) * 1000))
+                    status=view.status, edited=bool(edited), ms=int((self.clock() - started) * 1000),
+                    render_ms=render_ms, telegram_ms=telegram_ms)
 
     # -- apoyo ---------------------------------------------------------------------------------
 

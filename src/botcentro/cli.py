@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from collections.abc import Sequence
 from typing import Any
@@ -337,8 +338,17 @@ def run_bot() -> None:
                             app=app, intake=TelegramWebhook(settings, client), rpc=client,
                             bot_id=bot_id, pseudonym_key=pseudonym_key, worker_id=f"bot-{socket.gethostname()}",
                             message_limit=int(os.environ.get("BOTCENTRO_TELEGRAM_MESSAGE_LIMIT", "4096")))
+        # Calentamiento antes de aceptar mensajes: el modelo de embeddings carga perezosamente (~2,5 s en la
+        # primera pregunta) y la primera consulta abre conexiones a Qdrant, Redis y PostgreSQL.
+        started = time.perf_counter()
+        try:
+            await asyncio.to_thread(engine.answer, "proyectos sobre salud")
+            await redis.ping()
+        except Exception as exc:  # noqa: BLE001 — el calentamiento nunca impide arrancar
+            logging.getLogger("botcentro.ui").warning("calentamiento incompleto: %s", type(exc).__name__)
         me = await bot.get_me()
-        print(json.dumps({"bot": me.username, "bot_id": bot_id, "adapter": "aiogram"}), flush=True)
+        print(json.dumps({"bot": me.username, "bot_id": bot_id, "adapter": "aiogram",
+                          "calentamiento_ms": int((time.perf_counter() - started) * 1000)}), flush=True)
         try:
             await run_polling(bot, runtime, digest=DigestWorker(client, transport, redis, prefix=state.prefix))
         finally:
