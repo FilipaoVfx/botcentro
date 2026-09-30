@@ -59,6 +59,30 @@ def account_client(who: str) -> InsForgeClient:
     return InsForgeClient(_required("BOTCENTRO_INSFORGE_URL"), _required(f"{prefix}_EMAIL"), _required(f"{prefix}_PASSWORD"))
 
 
+def muestra_secop(per_territory: int, seed: int) -> None:
+    """Muestra de verificación de SECOP II antes de publicarlo (§24.6). Escribe en var/ (fuera del repo)."""
+    from datetime import date
+
+    from psycopg.rows import dict_row
+
+    import psycopg
+    from botcentro.investigations.muestra import SAMPLE_SQL, SampleItem, choose, compare, stored_view, write_report
+    from botcentro.investigations.socrata import DOMAINS, SocrataClient
+
+    with psycopg.connect(_required("BOTCENTRO_DATABASE_ADMIN_URL"), row_factory=dict_row) as conn:
+        rows = conn.execute(SAMPLE_SQL, {"code": "SRC-15"}).fetchall()
+    items = [SampleItem(reason, r["native_id"], r["territory"] or "sin territorio", stored_view(r))
+             for reason, r in choose(rows, per_territory=per_territory, seed=seed)]
+    key = _required("BOTCENTRO_IDENTITY_KEY").encode()
+    with SafeFetcher(UrlGuard(UrlPolicy.for_domains(DOMAINS))) as fetcher:
+        compare(items, SocrataClient(fetcher), key)
+    md, csv_path = write_report(items, Path("var"), today=date.today())
+    same = sum(1 for i in items if i.source and not i.diffs)
+    print(json.dumps({"muestra": len(items), "coinciden": same, "con_diferencias": sum(1 for i in items if i.diffs),
+                      "sin_consulta": sum(1 for i in items if i.fetch_error), "markdown": str(md), "csv": str(csv_path)},
+                     ensure_ascii=False))
+
+
 def db_bootstrap() -> None:
     from botcentro.db.migrate import bootstrap
 
@@ -391,12 +415,17 @@ def main(argv: list[str] | None = None) -> None:
     g.add_argument("--limit", type=int, default=200)
     g.add_argument("--out", default="var/pilot-gacetas.jsonl")
     sub.add_parser("bot", help="ejecuta el bot de Telegram (sondeo largo, respuestas sin IA)")
+    ms = sub.add_parser("muestra-secop", help="muestra de verificación de SECOP II contra datos.gov.co (en var/)")
+    ms.add_argument("--por-municipio", type=int, default=7)
+    ms.add_argument("--semilla", type=int, default=20260930)
     sub.add_parser("db-bootstrap", help="prepara roles, auth y extensiones en el PostgreSQL autoalojado")
     mg = sub.add_parser("migrate", help="aplica las migraciones pendientes en el PostgreSQL autoalojado")
     mg.add_argument("--record-only", action="store_true", help="solo registra (base restaurada con ese esquema)")
     args = parser.parse_args(argv)
     if args.command == "verify-account":
         verify_account(args.who, args.code)
+    elif args.command == "muestra-secop":
+        muestra_secop(args.por_municipio, args.semilla)
     elif args.command == "db-bootstrap":
         db_bootstrap()
     elif args.command == "migrate":
