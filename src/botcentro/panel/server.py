@@ -67,13 +67,21 @@ def create_panel_app(store: SessionStore, *, dist: Path = DIST, secure_cookie: b
 
 
 def _from_env() -> FastAPI:
-    base = os.environ.get("BOTCENTRO_INSFORGE_URL")
-    if not base:
-        raise RuntimeError("falta BOTCENTRO_INSFORGE_URL")
     secure = os.environ.get("BOTCENTRO_PANEL_INSECURE_COOKIE") != "1"
     from botcentro.panel.live_stats import LiveStats
 
-    return create_panel_app(SessionStore(InsForgeAuth(base)), secure_cookie=secure, enrich=LiveStats.from_env().enrich_view)
+    if os.environ.get("BOTCENTRO_DATABASE_URL"):  # PostgreSQL autoalojado (DEC-21): código por Telegram
+        from botcentro.db.pgclient import conninfo_from_env, shared_pool
+        from botcentro.panel.local_auth import LocalAuth, parse_operators, telegram_sender
+
+        auth = LocalAuth(shared_pool(conninfo_from_env()), parse_operators(os.environ.get("BOTCENTRO_PANEL_OPERATORS", "")),
+                         telegram_sender(os.environ["BOTCENTRO_TELEGRAM_BOT_TOKEN"]))
+    else:
+        base = os.environ.get("BOTCENTRO_INSFORGE_URL")
+        if not base:
+            raise RuntimeError("falta BOTCENTRO_DATABASE_URL o BOTCENTRO_INSFORGE_URL")
+        auth = InsForgeAuth(base)
+    return create_panel_app(SessionStore(auth), secure_cookie=secure, enrich=LiveStats.from_env().enrich_view)  # type: ignore[arg-type]
 
 
-app = _from_env() if os.environ.get("BOTCENTRO_INSFORGE_URL") else None
+app = _from_env() if os.environ.get("BOTCENTRO_DATABASE_URL") or os.environ.get("BOTCENTRO_INSFORGE_URL") else None

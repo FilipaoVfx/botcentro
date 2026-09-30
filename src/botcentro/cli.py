@@ -50,8 +50,27 @@ def _required(name: str) -> str:
 
 
 def account_client(who: str) -> InsForgeClient:
+    """Cuenta de servicio. Con BOTCENTRO_DATABASE_URL usa el PostgreSQL autoalojado (DEC-21)."""
     prefix = ACCOUNTS[who]
+    if os.environ.get("BOTCENTRO_DATABASE_URL"):
+        from botcentro.db.pgclient import service_client
+
+        return service_client(_required(f"{prefix}_EMAIL"))  # type: ignore[return-value]
     return InsForgeClient(_required("BOTCENTRO_INSFORGE_URL"), _required(f"{prefix}_EMAIL"), _required(f"{prefix}_PASSWORD"))
+
+
+def db_bootstrap() -> None:
+    from botcentro.db.migrate import bootstrap
+
+    bootstrap(_required("BOTCENTRO_DATABASE_ADMIN_URL"), _required("BOTCENTRO_PG_APP_PASSWORD"))
+    print("plataforma lista")
+
+
+def db_migrate(record_only: bool) -> None:
+    from botcentro.db.migrate import migrate
+
+    n = migrate(_required("BOTCENTRO_DATABASE_ADMIN_URL"), record_only=record_only)
+    print(f"{n} migraciones {'registradas' if record_only else 'aplicadas'}")
 
 
 def verify_account(who: str, code: str) -> None:
@@ -372,9 +391,16 @@ def main(argv: list[str] | None = None) -> None:
     g.add_argument("--limit", type=int, default=200)
     g.add_argument("--out", default="var/pilot-gacetas.jsonl")
     sub.add_parser("bot", help="ejecuta el bot de Telegram (sondeo largo, respuestas sin IA)")
+    sub.add_parser("db-bootstrap", help="prepara roles, auth y extensiones en el PostgreSQL autoalojado")
+    mg = sub.add_parser("migrate", help="aplica las migraciones pendientes en el PostgreSQL autoalojado")
+    mg.add_argument("--record-only", action="store_true", help="solo registra (base restaurada con ese esquema)")
     args = parser.parse_args(argv)
     if args.command == "verify-account":
         verify_account(args.who, args.code)
+    elif args.command == "db-bootstrap":
+        db_bootstrap()
+    elif args.command == "migrate":
+        db_migrate(args.record_only)
     elif args.command == "normalize":
         normalize(args.source)
     elif args.command == "bot":

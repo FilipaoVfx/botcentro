@@ -1,0 +1,8 @@
+[Unit]
+Description=botcentro: respaldo diario de PostgreSQL (pg_dump, conserva 14)
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/botcentro
+ExecStart=/root/botcentro/ops/postgres.sh backup

@@ -1,0 +1,12 @@
+# Instalar: sudo cp ops/botcentro-respaldo.* /etc/systemd/system/ && sudo systemctl daemon-reload &&
+# sudo systemctl enable --now botcentro-respaldo.timer
+[Unit]
+Description=botcentro: respaldo diario de PostgreSQL a las 03:30 (Bogotá)
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 America/Bogota
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

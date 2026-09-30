@@ -112,6 +112,12 @@ class Db:
 
     def __init__(self, conninfo: str) -> None:
         self.conninfo = conninfo
+        self._pool: Any = None
+
+    def close(self) -> None:
+        if self._pool is not None:
+            self._pool.close()
+            self._pool = None
 
     def admin(self) -> psycopg.Connection[dict[str, Any]]:
         return psycopg.connect(self.conninfo, row_factory=dict_row, autocommit=True)
@@ -128,8 +134,16 @@ class Db:
             self.execute("insert into public.app_roles (user_id, role) values (%s, %s)", (user_id, role))
         return user_id
 
-    def rpc(self, user_id: UUID | None) -> PsycopgRpc:
-        return PsycopgRpc(self.conninfo, user_id)
+    def rpc(self, user_id: UUID | None) -> Any:
+        """Cliente de producción (PgClient, DEC-21): las pruebas ejercitan el mismo código que los servicios."""
+        from psycopg_pool import ConnectionPool
+
+        from botcentro.db.pgclient import PgClient
+
+        if self._pool is None:
+            self._pool = ConnectionPool(self.conninfo, min_size=1, max_size=4, open=True,
+                                        kwargs={"row_factory": dict_row})
+        return PgClient(self._pool, user_id)
 
     def as_user(self, user_id: UUID | None, query: str, params: Any = None) -> list[dict[str, Any]]:
         """Consulta directa como authenticated (o anon si user_id es None), como vía REST."""

@@ -49,7 +49,7 @@ def template_db() -> str:
     template = _base_conninfo(TEMPLATE)
     assert template is not None
     with psycopg.connect(template, autocommit=True) as conn:
-        conn.execute((ROOT / "tests/integration/insforge_shim.sql").read_text())
+        conn.execute((ROOT / "ops/sql/plataforma.sql").read_text())  # misma plataforma que producción (DEC-21)
     for migration in sorted((ROOT / "migrations").glob("*.sql")):
         with psycopg.connect(template) as conn:  # una transacción por migración, como InsForge
             conn.execute("set role project_admin")
@@ -66,8 +66,10 @@ def db(template_db: str) -> Iterator[Db]:
         conn.execute(f"create database {name} template {template_db}")
     conninfo = _base_conninfo(name)
     assert conninfo is not None
+    database = Db(conninfo)
     try:
-        yield Db(conninfo)
+        yield database
     finally:
+        database.close()
         with psycopg.connect(admin, autocommit=True) as conn:
             conn.execute(f"drop database if exists {name} with (force)")

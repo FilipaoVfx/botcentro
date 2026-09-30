@@ -80,7 +80,7 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
         {step === "email" ? (
           <form onSubmit={sendCode} noValidate>
             <h1>Entrar</h1>
-            <p className="form-note">Te enviaremos un código de 6 dígitos a tu correo. No se usan contraseñas.</p>
+            <p className="form-note">Escribe tu correo de operador: te enviaremos un código de 6 dígitos por Telegram, al chat del bot. No se usan contraseñas.</p>
             <div className="field">
               <label htmlFor="email">Correo</label>
               <input
@@ -104,7 +104,7 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
           <form onSubmit={verify} noValidate>
             <h1>Código</h1>
             <p className="form-note">
-              Revisa <strong>{email}</strong>. El código vence en 5 minutos y admite tres intentos.
+              Revisa tu chat de Telegram con el bot (cuenta de <strong>{email}</strong>). El código vence en 10 minutos y admite cinco intentos.
             </p>
             <div className="field">
               <label htmlFor="code">Código de 6 dígitos</label>
