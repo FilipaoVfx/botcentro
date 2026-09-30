@@ -96,7 +96,7 @@ def test_person_documents_are_pseudonymised() -> None:
 
 def test_contract_parser_keeps_nit_and_sign() -> None:
     row = {"id_contrato": "CO1.SYN.1", "nit_entidad": "0891180009", "nombre_entidad": "ALCALDIA",
-           "tipodocproveedor": "NIT", "documento_proveedor": "0800123456", "proveedor_adjudicado": "P",
+           "tipodocproveedor": "NIT", "documento_proveedor": "0800123456", "proveedor_adjudicado": "P SAS",
            "valor_del_contrato": "-12.50", "estado_contrato": "En ejecución", "departamento": "Caquetá",
            "ciudad": "Florencia"}
     cand = parse_secop2_contract(row, KEY)
@@ -167,3 +167,18 @@ def test_consortium_uses_secop_supplier_code_never_name() -> None:
     assert group["id_public"] == "734685258"
     unknown = parse_secop2_contract({**base, "es_grupo": "No", "codigo_proveedor": "734685258"}, KEY).value["contractor"]
     assert unknown["kind"] == "desconocido" and "id_public" not in unknown and unknown["name"]
+
+
+def test_nit_of_natural_person_is_protected_and_unified() -> None:
+    """Privacidad (2026-09-30): el NIT de una persona natural no queda en claro y se une con su cédula."""
+    base = {"id_contrato": "X", "nit_entidad": "1", "nombre_entidad": "E", "valor_del_contrato": "1", "tipodocproveedor": "NIT"}
+    company = parse_secop2_contract({**base, "documento_proveedor": "900123456", "proveedor_adjudicado": "Acme S.A.S."}, KEY)
+    assert company.value["contractor"]["kind"] == "organizacion" and company.value["contractor"]["id_public"] == "900123456"
+    by_nit = parse_secop2_contract({**base, "documento_proveedor": "801234561", "proveedor_adjudicado": "Juan Pérez",
+                                    "identificaci_n_representante_legal": "80123456"}, KEY).value["contractor"]
+    by_cc = parse_secop2_contract({**base, "tipodocproveedor": "Cédula de Ciudadanía", "documento_proveedor": "80123456",
+                                   "proveedor_adjudicado": "Juan Pérez"}, KEY).value["contractor"]
+    assert by_nit["kind"] == "persona" and "id_public" not in by_nit and by_nit["id_hmac"] == by_cc["id_hmac"]
+    unknown = parse_secop2_contract({**base, "documento_proveedor": "12345678", "proveedor_adjudicado": "Nombre Sin Marca",
+                                     "nombre_representante_legal": "Sin Descripcion"}, KEY).value["contractor"]
+    assert unknown["kind"] == "sin_clasificar" and "id_public" not in unknown and "12345678" not in str(unknown)

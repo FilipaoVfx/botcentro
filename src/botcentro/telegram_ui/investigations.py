@@ -546,7 +546,11 @@ class InvestigationViews:
                  "Un contrato no acredita irregularidad.</i>", ""]
         rows: list[list[Button]] = []
         for n, c in enumerate(chunk, start=1):
-            contractor = c.get("contractor") or "no informado"
+            # En listas solo se nombran empresas, consorcios y entidades; las personas naturales (o contratistas
+            # sin identidad) se nombran únicamente en la ficha del contrato (decisión 2026-09-30).
+            kind = c.get("contractor_type")
+            contractor = ((c.get("contractor") or "no informado") if kind in ("organizacion_privada", "entidad_publica", "partido")
+                          else "persona natural" if kind == "persona" else "nombre en la ficha")
             lines.append(f"{n}. {bold(_money(c.get('value_current')))} · {escape(c.get('status_original') or '')} · "
                          f"{escape(fmt_date(c['signed_on']) if c.get('signed_on') else 'sin fecha de firma')}")
             lines.append(f"   {escape(_clip(c.get('entity'), 60))} → {escape(_clip(contractor, 60))}")

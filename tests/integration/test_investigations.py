@@ -115,7 +115,7 @@ def contract_row(rid: str, native: str, status: str, value: str, signed: str | N
             "id_contrato": native, "estado_contrato": status, "descripcion_del_proceso": "SUMINISTRO SINTETICO",
             "tipo_de_contrato": "Suministros", "modalidad_de_contratacion": "Contratación directa",
             **({"fecha_de_firma": signed} if signed else {}),
-            "tipodocproveedor": doc_type, "documento_proveedor": doc, "proveedor_adjudicado": "PROVEEDOR SINTETICO",
+            "tipodocproveedor": doc_type, "documento_proveedor": doc, "proveedor_adjudicado": "PROVEEDOR SINTETICO S.A.S.",
             "valor_del_contrato": value, "valor_pagado": "0", "urlproceso": {"url": f"https://community.secop.gov.co/{native}"},
             "ultima_actualizacion": "2026-09-01T00:00:00.000"}
 

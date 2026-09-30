@@ -8,6 +8,7 @@ nunca guardan documentos de personas: solo HMAC y valor enmascarado (SEG-02, DAT
 from __future__ import annotations
 
 import hashlib
+import re
 import unicodedata
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -58,15 +59,53 @@ def _party(key: bytes, issuer: str, id_type: str | None, raw_id: object, name: s
     return party
 
 
+_COMPANY_MARKERS = re.compile(
+    r"\b(S ?A ?S|SAS|LTDA|S ?A|E ?S ?P|SOCIEDAD|FUNDACION|ASOCIACION|CORPORACION|CONSORCIO|UNION TEMPORAL|COOPERATIVA|"
+    r"EMPRESA|IPS|EPS|CLINICA|HOSPITAL|UNIVERSIDAD|INSTITUTO|CAJA|BANCO|COMPANIA|CIA|GRUPO|INVERSIONES|COMERCIALIZADORA|"
+    r"CONSTRUCTORA|DISTRIBUIDORA|SERVICIOS|SOLUCIONES|INGENIERIA|JAC|JUNTA|ESE|E ?S ?E)\b")
+
+
+def _plain(text: object) -> str:
+    """Mayúsculas sin tildes ni puntuación: «Acme S.A.S.» → «ACME S A S»."""
+    return " ".join(re.sub(r"[^A-Z0-9 ]", " ", fold(str(text or ""))).split())
+
+
 def _contractor(key: bytes, row: Mapping[str, Any]) -> dict[str, Any]:
-    """Contratista de SECOP II. Consorcios y uniones temporales (`es_grupo = Si`) se publican sin NIT
-    («No Definido»); su identidad es el código de proveedor de SECOP, estable y no personal. Sin
-    documento ni código no hay identidad: el nombre se conserva solo como texto (DAT-05)."""
+    """Contratista de SECOP II, con prioridad a la privacidad (auditoría 2026-09-30):
+
+    * documento de persona (cédula, pasaporte...) ⇒ persona, solo HMAC y enmascarado;
+    * NIT de persona natural (el NIT es la cédula del representante más el dígito de verificación, o el
+      nombre coincide con el del representante, sin marca de sociedad) ⇒ persona con la identidad de su
+      cédula: se une con sus contratos firmados con cédula y el NIT no queda en claro;
+    * NIT con marca de sociedad (SAS, LTDA, FUNDACIÓN...) ⇒ organización con NIT público;
+    * NIT sin marca ni coincidencia ⇒ «sin clasificar»: puede ser una persona, así que el NIT se guarda
+      protegido (HMAC y enmascarado) y el nombre solo se muestra en la ficha del contrato;
+    * consorcios y uniones temporales sin NIT (`es_grupo = Si`) ⇒ organización por código de proveedor SECOP.
+    Sin documento ni código no hay identidad: el nombre se conserva solo como texto (DAT-05)."""
     party = _party(key, "SECOP", row.get("tipodocproveedor"), row.get("documento_proveedor"), row.get("proveedor_adjudicado"))
     code = identifier(row.get("codigo_proveedor"))
     if party["kind"] == "desconocido" and code and str(row.get("es_grupo") or "").strip().lower() == "si":
         party.update(kind="organizacion", issuer="SECOP", id_type="codigo_proveedor", id_public=code,
                      id_masked=mask(code, visible=4), group=True)
+        return party
+    if party["kind"] != "organizacion":
+        return party
+    nit = re.sub(r"\D", "", party.get("id_public") or "")
+    name, rep = _plain(row.get("proveedor_adjudicado")), _plain(row.get("nombre_representante_legal"))
+    rep_id = re.sub(r"\D", "", str(row.get("identificaci_n_representante_legal") or ""))
+    if _COMPANY_MARKERS.search(name):
+        return party
+    same_person = bool(name) and name == rep
+    nit_is_rep_id = len(rep_id) >= 5 and nit.startswith(rep_id) and len(nit) - len(rep_id) <= 1
+    party.pop("id_public", None)
+    if nit_is_rep_id or same_person:
+        document = rep_id if nit_is_rep_id else nit
+        party.update(kind="persona", id_type="Cédula de Ciudadanía" if nit_is_rep_id else "NIT",
+                     id_hmac=identity_hmac(key, "SECOP", "Cédula de Ciudadanía" if nit_is_rep_id else "NIT", document),
+                     id_masked=mask(document), natural_person_nit=True)
+    else:
+        party.update(kind="sin_clasificar", id_type="NIT", id_hmac=identity_hmac(key, "SECOP", "NIT", nit),
+                     id_masked=mask(nit))
     return party
 
 
@@ -282,7 +321,8 @@ SPECS: dict[str, DatasetSpec] = {
         optional=("descripcion_del_proceso", "fecha_de_inicio_del_contrato", "fecha_de_fin_del_contrato", "valor_pagado",
                   "valor_facturado", "dias_adicionados", "modalidad_de_contratacion", "tipo_de_contrato",
                   "referencia_del_contrato", "proceso_de_compra", "ultima_actualizacion", "orden", "sector",
-                  "es_grupo", "codigo_proveedor", "objeto_del_contrato", "codigo_entidad"),
+                  "es_grupo", "codigo_proveedor", "objeto_del_contrato", "codigo_entidad",
+                  "nombre_representante_legal", "identificaci_n_representante_legal"),
         parser=parse_secop2_contract, location_fields=("departamento", "ciudad"), date_field="fecha_de_firma",
         include_null_dates=True, updated_field="ultima_actualizacion",
         capabilities={"discovery": "yes", "detail": "yes", "incremental": "yes", "history": "partial",

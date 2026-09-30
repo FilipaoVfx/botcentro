@@ -226,3 +226,21 @@ def test_worker_is_silent_at_night_and_marks_ambiguous_delivery() -> None:
                                      now=lambda: at(10)).tick())
     assert stats["unknown"] == 1
     assert [p["p_state"] for n, p in rpc.calls if n == "digest_mark"] == ["sending", "unknown_delivery"]
+
+
+def test_contract_list_names_companies_but_not_people() -> None:
+    """Decisión 2026-09-30: personas naturales solo en la ficha del contrato, no en listas."""
+    items = [{"id": "c1", "native_id": "CO1.1", "value_current": "100", "status_original": "Aprobado", "signed_on": "2026-09-01",
+              "entity": "MUNICIPIO", "contractor": "PERSONA SINTETICA", "contractor_type": "persona", "object": "x"},
+             {"id": "c2", "native_id": "CO1.2", "value_current": "200", "status_original": "Aprobado", "signed_on": "2026-09-02",
+              "entity": "MUNICIPIO", "contractor": "EMPRESA SINTETICA SAS", "contractor_type": "organizacion_privada", "object": "y"},
+             {"id": "c3", "native_id": "CO1.3", "value_current": "300", "status_original": "Aprobado", "signed_on": "2026-09-03",
+              "entity": "MUNICIPIO", "contractor": "SIN DOCUMENTO", "contractor_type": None, "object": "z"}]
+    rpc = FakeRpc(public_contracts={"known_total": 3, "items": items},
+                  public_contract={"native_id": "CO1.1", "entity": {"name": "MUNICIPIO"},
+                                   "contractor": {"name": "PERSONA SINTETICA", "identified": True, "type": "persona"}})
+    views = InvestigationViews(rpc, bot_id=1)
+    text = views.contracts({}, "de prueba").blocks[0]
+    assert "EMPRESA SINTETICA SAS" in text and "PERSONA SINTETICA" not in text and "SIN DOCUMENTO" not in text
+    assert text.count("persona natural") == 1 and text.count("nombre en la ficha") == 1
+    assert "PERSONA SINTETICA" in views.contract("c1").blocks[0]
