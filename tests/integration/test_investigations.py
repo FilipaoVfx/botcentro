@@ -554,3 +554,23 @@ def test_failed_page_is_not_success(world) -> None:
     finally:
         fake.fetch = original
     assert result.status != "succeeded"
+
+
+def test_consortium_contractor_is_identified_by_supplier_code(world) -> None:
+    """Consorcio sin NIT: identidad por código de proveedor SECOP; sin código, solo el nombre como texto."""
+    db, ingest, fake = world["db"], world["users"]["ingest_service"], world["fake"]
+    ut = {**contract_row("c-9", "CO1.SYN.9", "En ejecución", "500", "2026-03-01T00:00:00.000", "NIT", "No Definido"),
+          "proveedor_adjudicado": "UNION TEMPORAL SINTETICA", "es_grupo": "Si", "codigo_proveedor": "734685258"}
+    anon = {**contract_row("c-8", "CO1.SYN.8", "En ejecución", "700", "2026-03-02T00:00:00.000", "No Definido", "No Definido"),
+            "proveedor_adjudicado": "CONSORCIO SIN CODIGO", "es_grupo": "Si"}
+    fake.rows["jbjy-vk9h"] = [ut, anon]
+    run_source(db, ingest, fake, "secop2_contracts",
+               {"territories": [{"departamento": "Caquetá", "municipio": "Florencia"}], "from": "2026-01-01"}, world["tmp"])
+    normalize(db, ingest, "contracts")
+    rows = {r["native_id"]: r for r in db.execute(
+        "select c.native_id, c.contractor_name_source, a.display_name, i.issuer, i.id_type, i.value_public "
+        "from public.contracts c left join public.actors a on a.id = c.contractor_actor_id "
+        "left join public.actor_identifiers i on i.actor_id = a.id where c.native_id in ('CO1.SYN.9', 'CO1.SYN.8')")}
+    assert (rows["CO1.SYN.9"]["issuer"], rows["CO1.SYN.9"]["id_type"], rows["CO1.SYN.9"]["value_public"]) == \
+        ("SECOP", "codigo_proveedor", "734685258")
+    assert rows["CO1.SYN.8"]["display_name"] is None and rows["CO1.SYN.8"]["contractor_name_source"] == "CONSORCIO SIN CODIGO"

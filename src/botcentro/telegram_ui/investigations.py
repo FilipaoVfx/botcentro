@@ -528,6 +528,12 @@ class InvestigationViews:
             item = f"{c.get('native_id')} · {money} · {c.get('status_original') or ''}"
             lines.append("• " + (link(item, c["official_url"]) if (c.get("official_url") or "").startswith("https://")
                                  else escape(item)))
+            contractor = c.get("contractor") or "no informado"
+            if c.get("contractor") and c.get("contractor_identified") is False:
+                contractor += " (sin documento en la fuente)"
+            signed = f"firmado el {fmt_date(c['signed_on'])}" if c.get("signed_on") else "sin fecha de firma"
+            lines.append(f"   Entidad: {escape(c.get('entity') or 'no informada')} · Contratista: {escape(contractor)}"
+                         f" · {escape(signed)}")
             lines.append(f"   <i>{escape(_clip(c.get('object'), 140))}</i>")
         if not items:
             lines.append("No hay contratos publicados para este criterio. Las cargas de SECOP del piloto están en "

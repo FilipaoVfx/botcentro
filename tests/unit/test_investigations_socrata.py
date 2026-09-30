@@ -155,3 +155,15 @@ def test_tls_verification_is_always_on() -> None:
     transport = GuardedTransport(UrlGuard(UrlPolicy.for_domains(["www.datos.gov.co"])))
     context = transport._pool._ssl_context  # noqa: SLF001
     assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
+
+
+def test_consortium_uses_secop_supplier_code_never_name() -> None:
+    """Auditoría 2026-09-30: consorcios con documento «No Definido» se identifican por código de proveedor."""
+    base = {"id_contrato": "CO1.PCCNTR.9", "nit_entidad": "800095728", "nombre_entidad": "MUNICIPIO",
+            "tipodocproveedor": "NIT", "documento_proveedor": "No Definido",
+            "proveedor_adjudicado": "UNIÓN TEMPORAL SINTÉTICA 2026", "valor_del_contrato": "1"}
+    group = parse_secop2_contract({**base, "es_grupo": "Si", "codigo_proveedor": "734685258"}, KEY).value["contractor"]
+    assert group["kind"] == "organizacion" and group["issuer"] == "SECOP" and group["id_type"] == "codigo_proveedor"
+    assert group["id_public"] == "734685258"
+    unknown = parse_secop2_contract({**base, "es_grupo": "No", "codigo_proveedor": "734685258"}, KEY).value["contractor"]
+    assert unknown["kind"] == "desconocido" and "id_public" not in unknown and unknown["name"]

@@ -19,7 +19,7 @@ from botcentro.investigations.socrata import Condition
 from botcentro.investigations.values import (identifier, identity_hmac, is_person_document, mask, money,
                                              source_date)
 
-MAPPING_VERSION = "mapeo-2026-09-29"
+MAPPING_VERSION = "mapeo-2026-09-30"
 Parser = Callable[[Mapping[str, Any], bytes], NormalizedCandidate]
 
 
@@ -55,6 +55,18 @@ def _party(key: bytes, issuer: str, id_type: str | None, raw_id: object, name: s
                      id_masked=mask(value))
     else:
         party.update(kind="organizacion", id_public=value, id_masked=mask(value, visible=4))
+    return party
+
+
+def _contractor(key: bytes, row: Mapping[str, Any]) -> dict[str, Any]:
+    """Contratista de SECOP II. Consorcios y uniones temporales (`es_grupo = Si`) se publican sin NIT
+    («No Definido»); su identidad es el código de proveedor de SECOP, estable y no personal. Sin
+    documento ni código no hay identidad: el nombre se conserva solo como texto (DAT-05)."""
+    party = _party(key, "SECOP", row.get("tipodocproveedor"), row.get("documento_proveedor"), row.get("proveedor_adjudicado"))
+    code = identifier(row.get("codigo_proveedor"))
+    if party["kind"] == "desconocido" and code and str(row.get("es_grupo") or "").strip().lower() == "si":
+        party.update(kind="organizacion", issuer="SECOP", id_type="codigo_proveedor", id_public=code,
+                     id_masked=mask(code, visible=4), group=True)
     return party
 
 
@@ -118,8 +130,7 @@ def parse_secop2_contract(row: Mapping[str, Any], key: bytes) -> NormalizedCandi
         "entity": {"name": _clip(row.get("nombre_entidad"), 300), "nit": identifier(row.get("nit_entidad")),
                    "departamento": row.get("departamento"), "municipio": row.get("ciudad"),
                    "orden": row.get("orden"), "sector": row.get("sector")},
-        "contractor": _party(key, "SECOP", row.get("tipodocproveedor"), row.get("documento_proveedor"),
-                             row.get("proveedor_adjudicado")),
+        "contractor": _contractor(key, row),
         "status": row.get("estado_contrato"), "signed_on": _iso(row.get("fecha_de_firma")),
         "starts_on": _iso(row.get("fecha_de_inicio_del_contrato")), "ends_on": _iso(row.get("fecha_de_fin_del_contrato")),
         "value_initial": _money_text(row.get("valor_del_contrato")), "value_paid": _money_text(row.get("valor_pagado")),
@@ -235,7 +246,8 @@ SPECS: dict[str, DatasetSpec] = {
                   "fecha_de_firma"),
         optional=("descripcion_del_proceso", "fecha_de_inicio_del_contrato", "fecha_de_fin_del_contrato", "valor_pagado",
                   "valor_facturado", "dias_adicionados", "modalidad_de_contratacion", "tipo_de_contrato",
-                  "referencia_del_contrato", "proceso_de_compra", "ultima_actualizacion", "orden", "sector"),
+                  "referencia_del_contrato", "proceso_de_compra", "ultima_actualizacion", "orden", "sector",
+                  "es_grupo", "codigo_proveedor"),
         parser=parse_secop2_contract, location_fields=("departamento", "ciudad"), date_field="fecha_de_firma",
         include_null_dates=True, updated_field="ultima_actualizacion",
         capabilities={"discovery": "yes", "detail": "yes", "incremental": "yes", "history": "partial",
