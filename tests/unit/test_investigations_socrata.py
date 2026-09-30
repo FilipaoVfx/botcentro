@@ -182,3 +182,17 @@ def test_nit_of_natural_person_is_protected_and_unified() -> None:
     unknown = parse_secop2_contract({**base, "documento_proveedor": "12345678", "proveedor_adjudicado": "Nombre Sin Marca",
                                      "nombre_representante_legal": "Sin Descripcion"}, KEY).value["contractor"]
     assert unknown["kind"] == "sin_clasificar" and "id_public" not in unknown and "12345678" not in str(unknown)
+
+
+def test_secop1_uses_the_same_privacy_rule() -> None:
+    """SECOP I: NIT de persona natural protegido y unido a su cédula; sociedad con NIT público."""
+    from botcentro.investigations.datasets import parse_secop1
+
+    base = {"uid": "1", "nombre_entidad": "E", "nit_de_la_entidad": "1", "cuantia_contrato": "10",
+            "tipo_identifi_del_contratista": "NIT"}
+    person = parse_secop1({**base, "identificacion_del_contratista": "801234561", "nom_razon_social_contratista": "Juan Pérez",
+                           "identific_representante_legal": "80123456"}, KEY).value["contractor"]
+    company = parse_secop1({**base, "identificacion_del_contratista": "900123456",
+                            "nom_razon_social_contratista": "Obras del Sur Ltda."}, KEY).value["contractor"]
+    assert person["kind"] == "persona" and "id_public" not in person and "801234561" not in str(person)
+    assert company["kind"] == "organizacion" and company["id_public"] == "900123456"

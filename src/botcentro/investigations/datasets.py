@@ -70,7 +70,15 @@ def _plain(text: object) -> str:
     return " ".join(re.sub(r"[^A-Z0-9 ]", " ", fold(str(text or ""))).split())
 
 
-def _contractor(key: bytes, row: Mapping[str, Any]) -> dict[str, Any]:
+_SECOP2_FIELDS = {"doc_type": "tipodocproveedor", "doc": "documento_proveedor", "name": "proveedor_adjudicado",
+                  "rep_name": "nombre_representante_legal", "rep_id": "identificaci_n_representante_legal",
+                  "group": "es_grupo", "code": "codigo_proveedor"}
+_SECOP1_FIELDS = {"doc_type": "tipo_identifi_del_contratista", "doc": "identificacion_del_contratista",
+                  "name": "nom_razon_social_contratista", "rep_name": "nombre_del_represen_legal",
+                  "rep_id": "identific_representante_legal", "group": None, "code": None}
+
+
+def _contractor(key: bytes, row: Mapping[str, Any], fields: Mapping[str, str | None] = _SECOP2_FIELDS) -> dict[str, Any]:
     """Contratista de SECOP II, con prioridad a la privacidad (auditoría 2026-09-30):
 
     * documento de persona (cédula, pasaporte...) ⇒ persona, solo HMAC y enmascarado;
@@ -82,17 +90,18 @@ def _contractor(key: bytes, row: Mapping[str, Any]) -> dict[str, Any]:
       protegido (HMAC y enmascarado) y el nombre solo se muestra en la ficha del contrato;
     * consorcios y uniones temporales sin NIT (`es_grupo = Si`) ⇒ organización por código de proveedor SECOP.
     Sin documento ni código no hay identidad: el nombre se conserva solo como texto (DAT-05)."""
-    party = _party(key, "SECOP", row.get("tipodocproveedor"), row.get("documento_proveedor"), row.get("proveedor_adjudicado"))
-    code = identifier(row.get("codigo_proveedor"))
-    if party["kind"] == "desconocido" and code and str(row.get("es_grupo") or "").strip().lower() == "si":
+    get = lambda k: row.get(fields[k]) if fields.get(k) else None  # noqa: E731
+    party = _party(key, "SECOP", get("doc_type"), get("doc"), get("name"))
+    code = identifier(get("code"))
+    if party["kind"] == "desconocido" and code and str(get("group") or "").strip().lower() == "si":
         party.update(kind="organizacion", issuer="SECOP", id_type="codigo_proveedor", id_public=code,
                      id_masked=mask(code, visible=4), group=True)
         return party
     if party["kind"] != "organizacion":
         return party
     nit = re.sub(r"\D", "", party.get("id_public") or "")
-    name, rep = _plain(row.get("proveedor_adjudicado")), _plain(row.get("nombre_representante_legal"))
-    rep_id = re.sub(r"\D", "", str(row.get("identificaci_n_representante_legal") or ""))
+    name, rep = _plain(get("name")), _plain(get("rep_name"))
+    rep_id = re.sub(r"\D", "", str(get("rep_id") or ""))
     if _COMPANY_MARKERS.search(name):
         return party
     same_person = bool(name) and name == rep
@@ -218,16 +227,17 @@ def parse_secop1(row: Mapping[str, Any], key: bytes) -> NormalizedCandidate:
         "native_id": native, "dataset": "f789-7hwg",
         "entity": {"name": _clip(row.get("nombre_entidad"), 300), "nit": identifier(row.get("nit_de_la_entidad")),
                    "departamento": row.get("departamento_entidad"), "municipio": row.get("municipio_entidad")},
-        "contractor": _party(key, "SECOP", row.get("tipo_identifi_del_contratista"),
-                             row.get("identificacion_del_contratista"), row.get("nom_razon_social_contratista")),
+        "contractor": _contractor(key, row, _SECOP1_FIELDS),
         "status": row.get("estado_del_proceso"), "signed_on": _iso(row.get("fecha_de_firma_del_contrato")),
         "starts_on": _iso(row.get("fecha_ini_ejec_contrato")), "ends_on": _iso(row.get("fecha_fin_ejec_contrato")),
         "value_initial": _money_text(row.get("cuantia_contrato")),
         "value_additions": _money_text(row.get("valor_total_de_adiciones")),
         "value_current": _money_text(row.get("valor_contrato_con_adiciones")),
         "modality": row.get("modalidad_de_contratacion"), "contract_type": row.get("tipo_de_contrato"),
-        "object": _clip(row.get("detalle_del_objeto_a_contratar"), 1200), "reference": row.get("numero_de_contrato"),
+        "object": _clip(row.get("detalle_del_objeto_a_contratar"), 4000), "reference": row.get("numero_de_contrato"),
         "process_id": row.get("numero_de_proceso"), "updated_on": _iso(row.get("ultima_actualizacion")),
+        "url": (row.get("ruta_proceso_en_secop_i") or {}).get("url") if isinstance(row.get("ruta_proceso_en_secop_i"), Mapping)
+               else row.get("ruta_proceso_en_secop_i"),
         "currency": "COP",
     }
     return NormalizedCandidate("contract", f"secop1:contrato:{native}", "contract_snapshot", value,
@@ -345,7 +355,8 @@ SPECS: dict[str, DatasetSpec] = {
                   "fecha_de_firma_del_contrato", "fecha_ini_ejec_contrato", "fecha_fin_ejec_contrato",
                   "valor_total_de_adiciones", "valor_contrato_con_adiciones", "modalidad_de_contratacion",
                   "tipo_de_contrato", "detalle_del_objeto_a_contratar", "numero_de_contrato", "numero_de_proceso",
-                  "ultima_actualizacion"),
+                  "ultima_actualizacion", "nombre_del_represen_legal", "identific_representante_legal",
+                  "ruta_proceso_en_secop_i"),
         parser=parse_secop1, location_fields=("departamento_entidad", "municipio_entidad"),
         date_field="fecha_de_firma_del_contrato", include_null_dates=True, updated_field="ultima_actualizacion",
         capabilities={"discovery": "yes", "detail": "yes", "incremental": "yes", "history": "yes",

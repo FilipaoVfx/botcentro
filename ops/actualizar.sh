@@ -18,6 +18,10 @@ step index-fichas --batch 50
 PILOTO='{"territories":[{"departamento":"Caquetá","municipio":"Florencia"},{"departamento":"Valle del Cauca","municipio":"Buenaventura"},{"departamento":"Arauca","municipio":"Arauca"}]}'
 step ingest SRC-15 --from "$from" --to "$today" --max-pages 50 --filters "$PILOTO"
 step normalize SRC-15
+step ingest SRC-17 --from "$from" --to "$today" --max-pages 50 --filters "$PILOTO"
+step normalize SRC-17
+step ingest SRC-19 --from "$from" --to "$today" --max-pages 50
+step normalize SRC-19
 codes=$("$PY" -m botcentro.db.entity_codes) && step ingest SRC-25 --from 2000-01-01 --to "$today" --max-pages 50 --filters "{\"entity_codes\": $codes}"
 step normalize SRC-25
 exit $status

@@ -57,6 +57,10 @@ class SocrataConnector:
         self._last_rows: int | None = None
         self._awaiting_parse = False  # se entregó una página que no llegó a interpretarse (falló la descarga)
         self.schema = None
+        # Límites por ejecución: se cuentan en memoria. El cursor guarda totales acumulados solo como
+        # información; si los límites se leyeran del cursor, una ejecución reanudada nacería agotada.
+        self._run_rows = 0
+        self._run_requests = 0
 
     # -- esquema -------------------------------------------------------------------------------
 
@@ -93,14 +97,18 @@ class SocrataConnector:
         after = self._last_after if self._last_after is not None else position.get("after")
         rows = int(position.get("rows", 0)) + (self._last_rows or 0)
         requests = int(position.get("requests", 0)) + (1 if self._last_rows is not None else 0)
+        if self._last_rows is not None:
+            self._run_rows += self._last_rows
+            self._run_requests += 1
         finished = self._last_rows is not None and self._last_rows < self.page_size
         position.update(after=after, rows=rows, requests=requests)
         next_cursor = cursor.advance(**position)
         if finished:
             return DiscoverPage([], next_cursor, has_more=False)
         elapsed_min = (self.clock() - self._started) / 60
-        if rows >= self.max_rows or requests >= self.max_requests or elapsed_min >= self.max_minutes:
-            reason = ("filas" if rows >= self.max_rows else "solicitudes" if requests >= self.max_requests else "minutos")
+        if self._run_rows >= self.max_rows or self._run_requests >= self.max_requests or elapsed_min >= self.max_minutes:
+            reason = ("filas" if self._run_rows >= self.max_rows
+                      else "solicitudes" if self._run_requests >= self.max_requests else "minutos")
             return DiscoverPage([], next_cursor, has_more=False,
                                 limit_reached=f"límite de {reason} por ejecución; continúa desde el cursor")
         query = self._query(cursor.scope, position["cutoff"], after)

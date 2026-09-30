@@ -67,7 +67,8 @@ class FakeSocrata:
         return fetched(json.dumps(rows[:limit]).encode())
 
 
-def run_source(db: Db, ingest_user, fake: FakeSocrata, adapter: str, scope: dict, tmp_path, *, reparse=False, **limits):
+def run_source(db: Db, ingest_user, fake: FakeSocrata, adapter: str, scope: dict, tmp_path, *, reparse=False, previous=None,
+               **limits):
     spec = SPECS[adapter]
     source = db.execute("select id from public.sources where code = %s", (spec.code,))[0]["id"]
     connector = SocrataConnector(fake, spec, identity_key=KEY, pause_seconds=0, **limits)  # type: ignore[arg-type]
@@ -75,7 +76,7 @@ def run_source(db: Db, ingest_user, fake: FakeSocrata, adapter: str, scope: dict
     runner = IngestionRunner(source_id=source, connector=connector, store=IngestStore(db.rpc(ingest_user)),
                              objects=LocalObjectStore(tmp_path), profile=UsageProfile(*[Permission.ALLOWED] * 6,
                              reviewed_at=datetime.now(timezone.utc), reviewer="r"), reparse=reparse)
-    return runner.run(mode="backfill", scope=scope)
+    return runner.run(mode="backfill", scope=scope, previous_cursor=previous)
 
 
 def normalize(db: Db, ingest_user, step: str) -> None:
@@ -613,3 +614,35 @@ def test_full_object_entity_profile_and_state_versions(world) -> None:
     assert "OBJETO COMPLETO" in view.blocks[0] and "Vision sintetica" in view.blocks[0]
     db.execute("update public.sources set shadow_mode = true where code in ('SRC-15', 'SRC-25')")
     assert rpc(world, "query_service").call("public_contract", {"p_contract_id": str(row["id"])}) is None  # sombra: oculto
+
+
+
+def test_resumed_run_continues_after_limit(world) -> None:
+    """Regresión 2026-09-30: una ejecución reanudada no hereda el límite agotado de la anterior (ING-04)."""
+    db, ingest, fake = world["db"], world["users"]["ingest_service"], world["fake"]
+    fake.rows["gdxc-w37w"] = DIVIPOLA
+    source = db.execute("select id from public.sources where code = 'SRC-20'")[0]["id"]
+    first = run_source(db, ingest, fake, "divipola", {"resume": 1}, world["tmp"], reparse=True, max_rows=2, page_size=1)
+    assert first.status == "partial"
+    cursor = db.execute("select cursor_after from public.ingestion_runs where id = %s", (first.run_id,))[0]["cursor_after"]
+    fake.requests.clear()
+    second = run_source(db, ingest, fake, "divipola", {"resume": 1}, world["tmp"], reparse=True, previous=cursor,
+                        max_rows=2, page_size=1)  # mismo límite que la primera: antes nacía agotada
+    pages = [u for u in fake.requests if "/resource/" in u]
+    assert len(pages) >= 2 and "%3Aid+%3E" in pages[0]  # reanudó por `:id > cursor` en vez de detenerse sin leer
+    assert second.status == "partial"
+
+
+def test_relatoria_keeps_every_topic_of_a_document(world) -> None:
+    """La Relatoría publica una fila por tema: un documento, todos sus temas (antes quedaba solo el último)."""
+    db, ingest, fake = world["db"], world["users"]["ingest_service"], world["fake"]
+    url = {"url": "https://www.procuraduria.gov.co/sim/relatoria/.webdocumento?docId=1"}
+    row = {"tipo_documento": "CONCEPTO (MISIONAL)", "n_mero_documento": "073-2025", "dependencia": "DELEGADA SINTETICA",
+           "url_documento": url, "fecha_documento": "2025-06-03T00:00:00.000"}
+    fake.rows["rhun-uf37"] = [{**row, ":id": "r-1", "tema": "PRINCIPIO PRO ACTIONE", "subtema": "Aplica"},
+                              {**row, ":id": "r-2", "tema": "REPARACION DIRECTA", "subtema": "Caducó"}]
+    run_source(db, ingest, fake, "relatoria_pgn", {"from": "2025-01-01"}, world["tmp"])
+    normalize(db, ingest, "documents")
+    docs = db.execute("select topics from public.official_documents where number = '073-2025'")
+    assert len(docs) == 1
+    assert {t["tema"] for t in docs[0]["topics"]} == {"PRINCIPIO PRO ACTIONE", "REPARACION DIRECTA"}

@@ -593,13 +593,15 @@ class InvestigationViews:
                  f"{bold('Modalidad:')} {escape(c.get('modality') or 'no informada')} · {escape(c.get('contract_type') or '')}",
                  "", bold("Objeto del contrato"), escape(_clip(c.get("object"), 2200))]
         if len(c.get("object") or "") >= 500:
-            lines.append("<i>Datos abiertos publica hasta 500 caracteres del objeto; el texto completo está en el portal "
-                         "de SECOP (enlace abajo).</i>")
+            lines.append("<i>Datos abiertos puede recortar el objeto; el texto completo está en el portal de SECOP "
+                         "(enlace abajo).</i>")
         evidence: list[dict[str, str]] = []
+        secop = "SECOP I" if c.get("source") == "SRC-17" else "SECOP II"
         if (c.get("official_url") or "").startswith("https://"):
-            lines += ["", "• " + link("Proceso en SECOP II (portal oficial)", c["official_url"])]
-            evidence.append({"label": f"SECOP II · {c['native_id']}", "url": c["official_url"]})
-        opendata = f"https://www.datos.gov.co/resource/jbjy-vk9h.json?id_contrato={c['native_id']}"
+            lines += ["", "• " + link(f"Proceso en {secop} (portal oficial)", c["official_url"])]
+            evidence.append({"label": f"{secop} · {c['native_id']}", "url": c["official_url"]})
+        opendata = (f"https://www.datos.gov.co/resource/f789-7hwg.json?uid={c['native_id']}" if c.get("source") == "SRC-17"
+                    else f"https://www.datos.gov.co/resource/jbjy-vk9h.json?id_contrato={c['native_id']}")
         lines.append("• " + link("Registro en datos abiertos", opendata))
         profile = c.get("entity_profile") or {}
         if profile:
@@ -634,8 +636,9 @@ class InvestigationViews:
         lines = [bold("🧭 Cobertura de investigaciones"),
                  "Solo se muestra lo revisado de estas fuentes; no es un censo nacional de investigaciones.", ""]
         for s in sources:
-            state = "en validación (no publica)" if s.get("shadow") else {"approved": "publicada", "pilot": "piloto",
-                                                                          "candidate": "candidata"}.get(s.get("approval"), s.get("approval") or "")
+            state = ("candidata, aún sin carga" if s.get("approval") == "candidate"
+                     else "en validación (no publica)" if s.get("shadow")
+                     else {"approved": "publicada", "pilot": "piloto"}.get(s.get("approval"), s.get("approval") or ""))
             last = f" · última lectura {fmt_date(s['last_success'])}" if s.get("last_success") else ""
             lines.append(f"• {bold(escape(s.get('institution') or s['code']))}: {escape(_clip(s['name'], 70))} "
                          f"<i>({escape(state)}{last})</i>")
