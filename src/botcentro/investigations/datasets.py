@@ -90,6 +90,7 @@ class DatasetSpec:
     include_null_dates: bool = False
     updated_field: str | None = None
     capabilities: Mapping[str, str] = field(default_factory=dict)
+    entity_code_field: str | None = None  # alcance por códigos de entidad SECOP (scope["entity_codes"])
 
     @property
     def fields(self) -> frozenset[str]:
@@ -104,6 +105,8 @@ class DatasetSpec:
             dept, muni = self.location_fields
             conditions.append(Condition(muni, "in", sorted({v for t in territories for v in name_variants(t["municipio"])})))
             conditions.append(Condition(dept, "in", sorted({v for t in territories for v in name_variants(t["departamento"])})))
+        if self.entity_code_field and scope.get("entity_codes"):
+            conditions.append(Condition(self.entity_code_field, "in", sorted({str(c) for c in scope["entity_codes"]})))
         if self.date_field and scope.get("from"):
             span = [Condition(self.date_field, ">=", scope["from"])]
             if scope.get("to"):
@@ -128,6 +131,7 @@ def parse_secop2_contract(row: Mapping[str, Any], key: bytes) -> NormalizedCandi
     value = {
         "native_id": native, "dataset": "jbjy-vk9h",
         "entity": {"name": _clip(row.get("nombre_entidad"), 300), "nit": identifier(row.get("nit_entidad")),
+                   "code": identifier(row.get("codigo_entidad")),
                    "departamento": row.get("departamento"), "municipio": row.get("ciudad"),
                    "orden": row.get("orden"), "sector": row.get("sector")},
         "contractor": _contractor(key, row),
@@ -136,7 +140,10 @@ def parse_secop2_contract(row: Mapping[str, Any], key: bytes) -> NormalizedCandi
         "value_initial": _money_text(row.get("valor_del_contrato")), "value_paid": _money_text(row.get("valor_pagado")),
         "value_invoiced": _money_text(row.get("valor_facturado")), "days_added": identifier(row.get("dias_adicionados")),
         "modality": row.get("modalidad_de_contratacion"), "contract_type": row.get("tipo_de_contrato"),
-        "object": _clip(row.get("descripcion_del_proceso"), 1200), "reference": row.get("referencia_del_contrato"),
+        # `descripcion_del_proceso` llega cortada a 300 caracteres en la fuente; el concepto completo es
+        # `objeto_del_contrato` (auditoría 2026-09-30).
+        "object": _clip(row.get("objeto_del_contrato") or row.get("descripcion_del_proceso"), 4000),
+        "reference": row.get("referencia_del_contrato"),
         "process_id": row.get("proceso_de_compra"), "url": (row.get("urlproceso") or {}).get("url"),
         "updated_on": _iso(row.get("ultima_actualizacion")), "currency": "COP",
     }
@@ -233,12 +240,40 @@ def parse_divipola(row: Mapping[str, Any], key: bytes) -> NormalizedCandidate:
     return NormalizedCandidate("territory", f"divipola:{code}", "territory", value, record_pointer=code)
 
 
+def parse_paa_header(row: Mapping[str, Any], key: bytes) -> NormalizedCandidate:
+    """Encabezado del Plan Anual de Adquisiciones: misión, visión (perspectiva estratégica) y presupuesto
+    de la entidad, por año. Los datos de contacto (nombre, teléfono y correo de funcionarios) no se
+    guardan: no hacen falta para el producto (minimización de datos personales)."""
+    native = identifier(row.get("identificador_unico"))
+    code = identifier(row.get("codigo_entidad"))
+    year = identifier(row.get("anno"))
+    if not native or not code or not year or not year.isdigit():
+        raise ValueError("encabezado de PAA sin identificador, entidad o año")
+    value = {
+        "native_id": native, "dataset": "b6m4-qgqv", "entity_code": code, "entity_name": _clip(row.get("nombre_entidad"), 300),
+        "year": int(year), "mission_vision": _clip(row.get("mision_vision"), 6000),
+        "strategic_perspective": _clip(row.get("perspectiva_estrategica"), 6000),
+        "general_budget": _money_text(row.get("valor_presupuesto_general")), "plan_version": identifier(row.get("version")),
+        "published_on": _iso(str(row.get("fecha_de_publicacion") or "")[:10] or None),
+        "modified_on": _iso(str(row.get("fecha_de_ultima_modificacion") or "")[:10] or None),
+        "state": row.get("estado"), "departamento": row.get("departamento_paa"), "municipio": row.get("municipio_paa"),
+    }
+    return NormalizedCandidate("entity_plan", f"secop2:paa:{native}", "entity_plan", value, record_pointer=native)
+
+
 def _iso(value: object) -> str | None:
     d = source_date(value)
     return d.isoformat() if d else None
 
 
 SPECS: dict[str, DatasetSpec] = {
+    "secop2_paa": DatasetSpec(
+        "SRC-25", "b6m4-qgqv", "secop2_paa", "SECOP II · Plan Anual de Adquisiciones (encabezado)", "Colombia Compra Eficiente",
+        critical=("identificador_unico", "anno", "codigo_entidad", "nombre_entidad", "mision_vision"),
+        optional=("perspectiva_estrategica", "valor_presupuesto_general", "fecha_de_publicacion",
+                  "fecha_de_ultima_modificacion", "version", "estado", "departamento_paa", "municipio_paa"),
+        parser=parse_paa_header, entity_code_field="codigo_entidad",
+        capabilities={"discovery": "yes", "detail": "yes", "identifiers": "yes", "history": "yes"}),
     "secop2_contracts": DatasetSpec(
         "SRC-15", "jbjy-vk9h", "secop2_contracts", "SECOP II · Contratos electrónicos", "Colombia Compra Eficiente",
         critical=("id_contrato", "nombre_entidad", "nit_entidad", "departamento", "ciudad", "estado_contrato",
@@ -247,7 +282,7 @@ SPECS: dict[str, DatasetSpec] = {
         optional=("descripcion_del_proceso", "fecha_de_inicio_del_contrato", "fecha_de_fin_del_contrato", "valor_pagado",
                   "valor_facturado", "dias_adicionados", "modalidad_de_contratacion", "tipo_de_contrato",
                   "referencia_del_contrato", "proceso_de_compra", "ultima_actualizacion", "orden", "sector",
-                  "es_grupo", "codigo_proveedor"),
+                  "es_grupo", "codigo_proveedor", "objeto_del_contrato", "codigo_entidad"),
         parser=parse_secop2_contract, location_fields=("departamento", "ciudad"), date_field="fecha_de_firma",
         include_null_dates=True, updated_field="ultima_actualizacion",
         capabilities={"discovery": "yes", "detail": "yes", "incremental": "yes", "history": "partial",

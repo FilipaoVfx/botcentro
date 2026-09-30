@@ -1,0 +1,96 @@
+{
+ "id": "b6m4-qgqv",
+ "name": "SECOP II - PAA - Encabezado",
+ "rowsUpdatedAt": 1790667287,
+ "license": {
+  "name": "Creative Commons Attribution | Share Alike 4.0 International",
+  "logoUrl": "images/licenses/cc30bysa.png",
+  "termsLink": "http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+ },
+ "columns": [
+  {
+   "fieldName": "identificador_unico",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "id_plan_anual_de_adquisiciones",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "anno",
+   "dataTypeName": "number"
+  },
+  {
+   "fieldName": "codigo_entidad",
+   "dataTypeName": "number"
+  },
+  {
+   "fieldName": "nombre_entidad",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "mision_vision",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "perspectiva_estrategica",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "nombre_contacto",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "telefono_contacto",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "correo_contacto",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "valor_presupuesto_general",
+   "dataTypeName": "number"
+  },
+  {
+   "fieldName": "presupuesto_menor_cuantia",
+   "dataTypeName": "number"
+  },
+  {
+   "fieldName": "presupuesto_minima_cuantia",
+   "dataTypeName": "number"
+  },
+  {
+   "fieldName": "fecha_de_publicacion",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "fecha_de_creacion",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "fecha_de_ultima_modificacion",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "version",
+   "dataTypeName": "number"
+  },
+  {
+   "fieldName": "identificador_requerimiento_compra",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "estado",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "departamento_paa",
+   "dataTypeName": "text"
+  },
+  {
+   "fieldName": "municipio_paa",
+   "dataTypeName": "text"
+  }
+ ]
+}

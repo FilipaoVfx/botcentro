@@ -27,7 +27,11 @@ with specs(code, name, institution, adapter, base_url, domains, objects, capabil
    'allowed', 'CC BY-SA 4.0. Índice documental, no censo de expedientes.'),
   ('SRC-20', 'DIVIPOLA · Códigos de municipios (gdxc-w37w)', 'DANE', 'divipola',
    'https://www.datos.gov.co/resource/gdxc-w37w.json', '{www.datos.gov.co}'::text[], '{territory}'::text[],
-   '{"discovery":"yes","identifiers":"yes"}'::jsonb, 'allowed', 'CC BY-SA 4.0. Identidad territorial oficial (DAT-03).')
+   '{"discovery":"yes","identifiers":"yes"}'::jsonb, 'allowed', 'CC BY-SA 4.0. Identidad territorial oficial (DAT-03).'),
+  ('SRC-25', 'SECOP II · Plan Anual de Adquisiciones, encabezado (b6m4-qgqv)', 'Colombia Compra Eficiente', 'secop2_paa',
+   'https://www.datos.gov.co/resource/b6m4-qgqv.json', '{www.datos.gov.co}'::text[], '{entity_plan}'::text[],
+   '{"discovery":"yes","detail":"yes","identifiers":"yes","history":"yes"}'::jsonb,
+   'allowed', 'CC BY-SA 4.0. Misión, visión y presupuesto de cada entidad por año, tal como los publica la entidad (la fuente omite letras con tilde). No se guardan los datos de contacto de funcionarios.')
 ), upserted as (
   insert into public.sources (code, name, authority, phase, base_url, allowed_domains, supported_objects, notes, adapter,
                               adapter_version, owner, poll_interval, institution, access_method, capabilities,
@@ -54,7 +58,7 @@ with specs(code, name, institution, adapter, base_url, domains, objects, capabil
 ), coverage as (
   insert into public.coverage_scopes (source_id, object_type, from_date, status, limitations)
   select u.id, s.objects[1], case when u.code in ('SRC-15', 'SRC-16', 'SRC-17') then date '2026-01-01' end, 'planned',
-         case when u.code in ('SRC-15', 'SRC-16', 'SRC-17', 'SRC-18')
+         case when u.code in ('SRC-15', 'SRC-16', 'SRC-17', 'SRC-18', 'SRC-25')
               then 'Piloto: Florencia (18001), Buenaventura (76109) y Arauca (81001), selección propuesta por disponibilidad documental'
               else 'Conjunto completo' end
     from upserted u join specs s on s.code = u.code
@@ -67,7 +71,8 @@ select 1;
 update public.sources s set policy_id = p.id, state = 'active',
        state_reason = 'Descubrimiento verificado 2026-09-29; activa en modo sombra (MIG-02)'
   from public.source_policies p
- where p.source_id = s.id and p.version = 1 and s.code between 'SRC-15' and 'SRC-20' and s.state = 'candidate';
+ where p.source_id = s.id and p.version = 1 and (s.code between 'SRC-15' and 'SRC-20' or s.code = 'SRC-25')
+   and s.state = 'candidate';
 
 insert into public.sources (code, name, authority, phase, base_url, allowed_domains, supported_objects, notes,
                             institution, access_method, capabilities, shadow_mode, approval_state)

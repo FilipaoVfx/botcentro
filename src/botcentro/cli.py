@@ -203,7 +203,7 @@ BATCHED_STEPS = {"vote_observations", "current_votes", "attendance"}
 
 CAMARA_STEPS = ("projects", "status", "authors")
 INVESTIGATION_STEPS = {"SRC-20": "territories", "SRC-15": "contracts", "SRC-17": "contracts", "SRC-18": "siri",
-                       "SRC-19": "documents"}
+                       "SRC-19": "documents", "SRC-25": "entity_plans"}
 
 
 def _run_steps(client: InsForgeClient, fn: str, steps: Sequence[str], batched: set[str], batch: int) -> None:

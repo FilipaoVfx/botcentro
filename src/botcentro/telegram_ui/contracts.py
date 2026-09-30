@@ -66,6 +66,8 @@ class Intent(StrEnum):
     UNSUBSCRIBE = "subscriptions.delete"
     UNSUBSCRIBE_ALL = "subscriptions.delete_all"
     COVERAGE = "coverage.show"
+    CONTRACTS = "contracts.list"
+    CONTRACT_OPEN = "contract.open"
 
 
 class _Model(BaseModel):

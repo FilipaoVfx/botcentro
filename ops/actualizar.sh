@@ -14,4 +14,10 @@ step normalize SRC-01
 step ingest SRC-06 --from "$from" --to "$today"
 step normalize SRC-06
 step index-fichas --batch 50
+# Investigaciones: contratos SECOP II de los municipios piloto y planes de adquisiciones de sus entidades.
+PILOTO='{"territories":[{"departamento":"Caquetá","municipio":"Florencia"},{"departamento":"Valle del Cauca","municipio":"Buenaventura"},{"departamento":"Arauca","municipio":"Arauca"}]}'
+step ingest SRC-15 --from "$from" --to "$today" --max-pages 50 --filters "$PILOTO"
+step normalize SRC-15
+codes=$("$PY" -m botcentro.db.entity_codes) && step ingest SRC-25 --from 2000-01-01 --to "$today" --max-pages 50 --filters "{\"entity_codes\": $codes}"
+step normalize SRC-25
 exit $status

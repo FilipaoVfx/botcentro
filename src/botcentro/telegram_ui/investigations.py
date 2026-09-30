@@ -27,7 +27,7 @@ FLAG_TTL = 60.0
 CASE_INTENTS = frozenset({
     Intent.CASES, Intent.CASE_OPEN, Intent.CASE_TIMELINE, Intent.CASE_PROCEEDINGS, Intent.CASE_ACTORS,
     Intent.CASE_CONTRACTS, Intent.PROCEEDINGS, Intent.PROCEEDING_OPEN, Intent.ACTOR_OPEN, Intent.ACTORS_SEARCH,
-    Intent.TERRITORIES, Intent.TERRITORY_RESOLVE, Intent.TERRITORY_OPEN,
+    Intent.TERRITORIES, Intent.TERRITORY_RESOLVE, Intent.TERRITORY_OPEN, Intent.CONTRACTS, Intent.CONTRACT_OPEN,
 })
 SUBSCRIPTION_INTENTS = frozenset({
     Intent.SUBSCRIPTIONS, Intent.SUBSCRIBE, Intent.SUBSCRIBE_CONFIRM, Intent.UNSUBSCRIBE, Intent.UNSUBSCRIBE_ALL,
@@ -60,6 +60,12 @@ BACK = Button(label="⬅️ Volver", intent=Intent.BACK)
 def _clip(text: str | None, limit: int) -> str:
     text = " ".join((text or "").split())
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def _money(value: Any) -> str:
+    if value in (None, ""):
+        return "valor no informado"
+    return "$" + f"{float(value):,.0f}".replace(",", ".")
 
 
 def _branch_line(b: dict[str, Any]) -> str:
@@ -157,6 +163,11 @@ class InvestigationViews:
             return self.case_actors(str(params["case_id"])), True
         if intent is Intent.CASE_CONTRACTS:
             return self.contracts({"case_id": str(params["case_id"])}, "del caso"), True
+        if intent is Intent.CONTRACTS:
+            filters = {k: str(params[k]) for k in ("territory_id", "actor_id") if params.get(k)}
+            return self.contracts(filters, str(params.get("label") or ""), page=int(params.get("page", 1))), True
+        if intent is Intent.CONTRACT_OPEN:
+            return self.contract(str(params["contract_id"])), True
         if intent is Intent.PROCEEDINGS:
             return self.proceedings(params), True
         if intent is Intent.PROCEEDING_OPEN:
@@ -451,7 +462,10 @@ class InvestigationViews:
         if cases:
             lines += ["", bold("Casos relacionados")]
             lines += [f"• {escape(c['title'])}: <i>{escape(_relation(c.get('relation') or ''))}</i>" for c in cases[:8]]
-        if not (positions or parts or cases):
+        profile = a.get("profile") or {}
+        if profile:
+            lines += ["", *self._profile_lines(profile, a["name"], limit=1200)]
+        if not (positions or parts or cases or profile):
             lines += ["", "No hay relaciones publicadas para este actor en nuestra cobertura."]
         lines += ["", PRESUMPTION]
         rows = [[Button(label=_clip(c["title"], 30), intent=Intent.CASE_OPEN, params={"case_id": c["case_id"]})]
@@ -509,6 +523,9 @@ class InvestigationViews:
                 for c in cases[:4]]
         rows += [[Button(label=f"🏛 {_clip(e['name'], 28)}", intent=Intent.ACTOR_OPEN, params={"actor_id": e["actor_id"]})]
                  for e in (t.get("entities") or [])[:3]]
+        if contracts.get("count"):
+            rows.append([Button(label="📑 Contratos aquí", intent=Intent.CONTRACTS,
+                                params={"territory_id": territory_id, "label": f"de {t['name'].title()}"})])
         rows.append([Button(label="⚖️ Expedientes aquí", intent=Intent.PROCEEDINGS, params={"territory_id": territory_id})])
         if self.flags().get("FEATURE_SUBSCRIPTIONS"):
             rows.append([Button(label="🔔 Seguir", intent=Intent.SUBSCRIBE,
@@ -518,28 +535,95 @@ class InvestigationViews:
 
     # -- contratos y cobertura -----------------------------------------------------------------
 
-    def contracts(self, filters: dict[str, Any], label: str) -> ViewModel:
-        data = self.rpc.call("public_contracts", {"p_filters": filters, "p_limit": 10}) or {}
+    def contracts(self, filters: dict[str, Any], label: str, *, page: int = 1) -> ViewModel:
+        data = self.rpc.call("public_contracts", {"p_filters": filters, "p_limit": 200}) or {}
         items = data.get("items") or []
-        lines = [bold(f"📑 Contratos {escape(label)}"), "<i>Un contrato no acredita irregularidad.</i>", ""]
-        for c in items:
-            value = c.get("value_current")
-            money = f"${float(value):,.0f}".replace(",", ".") if value is not None else "valor no informado"
-            item = f"{c.get('native_id')} · {money} · {c.get('status_original') or ''}"
-            lines.append("• " + (link(item, c["official_url"]) if (c.get("official_url") or "").startswith("https://")
-                                 else escape(item)))
+        total = int(data.get("known_total") or len(items))
+        pages = max(1, -(-len(items) // PAGE_SIZE))
+        page = max(1, min(page, pages))
+        chunk = items[(page - 1) * PAGE_SIZE: page * PAGE_SIZE]
+        lines = [bold(f"📑 Contratos {escape(label)}".strip()), "<i>Orden: fecha de firma, más recientes primero. "
+                 "Un contrato no acredita irregularidad.</i>", ""]
+        rows: list[list[Button]] = []
+        for n, c in enumerate(chunk, start=1):
             contractor = c.get("contractor") or "no informado"
-            if c.get("contractor") and c.get("contractor_identified") is False:
-                contractor += " (sin documento en la fuente)"
-            signed = f"firmado el {fmt_date(c['signed_on'])}" if c.get("signed_on") else "sin fecha de firma"
-            lines.append(f"   Entidad: {escape(c.get('entity') or 'no informada')} · Contratista: {escape(contractor)}"
-                         f" · {escape(signed)}")
-            lines.append(f"   <i>{escape(_clip(c.get('object'), 140))}</i>")
+            lines.append(f"{n}. {bold(_money(c.get('value_current')))} · {escape(c.get('status_original') or '')} · "
+                         f"{escape(fmt_date(c['signed_on']) if c.get('signed_on') else 'sin fecha de firma')}")
+            lines.append(f"   {escape(_clip(c.get('entity'), 60))} → {escape(_clip(contractor, 60))}")
+            lines.append(f"   <i>{escape(_clip(c.get('object'), 120))}</i>")
+            rows.append([Button(label=f"{n} · {c.get('native_id')}", intent=Intent.CONTRACT_OPEN, params={"contract_id": c["id"]})])
         if not items:
-            lines.append("No hay contratos publicados para este criterio. Las cargas de SECOP del piloto están en "
-                         "validación y aún no se muestran.")
+            lines.append("No hay contratos publicados para este criterio. Las fuentes de contratación en validación "
+                         "aún no se muestran.")
+        else:
+            more = f" (se muestran los {len(items)} más recientes)" if total > len(items) else ""
+            lines += ["", f"Página {page} de {pages} · {total} contrato(s){more}"]
+        nav = []
+        if page > 1:
+            nav.append(Button(label="⬅️ Anterior", intent=Intent.CONTRACTS, params={**filters, "label": label, "page": page - 1}))
+        if page < pages:
+            nav.append(Button(label="Siguiente ➡️", intent=Intent.CONTRACTS, params={**filters, "label": label, "page": page + 1}))
+        rows += [nav] if nav else []
+        rows.append([BACK, HOME])
         return ViewModel(view_type="contracts", title="Contratos", status="ready" if items else "empty",
-                         blocks=["\n".join(lines)], rows=[[BACK, HOME]])
+                         blocks=["\n".join(lines)], rows=rows)
+
+    def contract(self, contract_id: str) -> ViewModel:
+        c = self.rpc.call("public_contract", {"p_contract_id": contract_id})
+        if not c:
+            return self._gone("Contrato")
+        entity, contractor = c.get("entity") or {}, c.get("contractor") or {}
+        territory = c.get("territory") or {}
+        place = f"{territory.get('name', '').title()}, {(territory.get('department') or '').title()}" if territory else ""
+        who = contractor.get("name") or "no informado"
+        if contractor.get("name") and not contractor.get("identified"):
+            who += " (sin documento en la fuente)"
+        lines = [bold(f"📑 Contrato {escape(c['native_id'])}"), f"<i>{escape(place)} · {escape(c.get('source_name') or '')}</i>", "",
+                 f"{bold('Entidad:')} {escape(entity.get('name') or 'no informada')}"
+                 + (f" (NIT {escape(entity['nit'])})" if entity.get("nit") else ""),
+                 f"{bold('Contratista:')} {escape(who)}",
+                 f"{bold('Valor del contrato:')} {_money(c.get('value_initial'))}"
+                 + (f" · vigente {_money(c.get('value_current'))}" if c.get("value_current") not in (None, c.get("value_initial")) else ""),
+                 f"{bold('Estado:')} {escape(c.get('status') or 'no informado')} · "
+                 f"{escape('firmado el ' + fmt_date(c['signed_on']) if c.get('signed_on') else 'sin fecha de firma')}",
+                 f"{bold('Modalidad:')} {escape(c.get('modality') or 'no informada')} · {escape(c.get('contract_type') or '')}",
+                 "", bold("Objeto del contrato"), escape(_clip(c.get("object"), 2200))]
+        if len(c.get("object") or "") >= 500:
+            lines.append("<i>Datos abiertos publica hasta 500 caracteres del objeto; el texto completo está en el portal "
+                         "de SECOP (enlace abajo).</i>")
+        evidence: list[dict[str, str]] = []
+        if (c.get("official_url") or "").startswith("https://"):
+            lines += ["", "• " + link("Proceso en SECOP II (portal oficial)", c["official_url"])]
+            evidence.append({"label": f"SECOP II · {c['native_id']}", "url": c["official_url"]})
+        opendata = f"https://www.datos.gov.co/resource/jbjy-vk9h.json?id_contrato={c['native_id']}"
+        lines.append("• " + link("Registro en datos abiertos", opendata))
+        profile = c.get("entity_profile") or {}
+        if profile:
+            lines += ["", *self._profile_lines(profile, entity.get("name") or "la entidad", limit=700)]
+        lines += ["", "<i>Un contrato no acredita irregularidad.</i>"]
+        rows: list[list[Button]] = []
+        if entity.get("actor_id"):
+            rows.append([Button(label=f"🏛 {_clip(entity.get('name'), 30)}", intent=Intent.ACTOR_OPEN,
+                                params={"actor_id": entity["actor_id"]})])
+        if contractor.get("actor_id"):
+            rows.append([Button(label=f"👤 {_clip(contractor.get('name'), 30)}", intent=Intent.ACTOR_OPEN,
+                                params={"actor_id": contractor["actor_id"]})])
+        rows.append([BACK, HOME])
+        return ViewModel(view_type="contract", title=c["native_id"], blocks=["\n".join(lines)], rows=rows, evidence=evidence)
+
+    def _profile_lines(self, profile: dict[str, Any], name: str, *, limit: int) -> list[str]:
+        lines = [bold(f"Misión y visión de {escape(_clip(name, 60))}"),
+                 f"<i>Según su Plan Anual de Adquisiciones {profile.get('year')} (SECOP II), tal como lo publica la "
+                 "entidad; la fuente omite las letras con tilde.</i>"]
+        if profile.get("mission_vision"):
+            lines.append(f"{bold('Misión y visión:')} {escape(_clip(profile['mission_vision'], limit))}")
+        if profile.get("strategic_perspective") and profile.get("strategic_perspective") != profile.get("mission_vision"):
+            lines.append(f"{bold('Perspectiva estratégica:')} {escape(_clip(profile['strategic_perspective'], limit))}")
+        if profile.get("general_budget"):
+            lines.append(f"{bold('Presupuesto general declarado:')} {_money(profile['general_budget'])}")
+        if (profile.get("url") or "").startswith("https://"):
+            lines.append("• " + link("Plan Anual de Adquisiciones en datos abiertos", profile["url"]))
+        return lines
 
     def coverage(self) -> ViewModel:
         sources = self.rpc.call("public_coverage", {}) or []

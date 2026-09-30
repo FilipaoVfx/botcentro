@@ -574,3 +574,42 @@ def test_consortium_contractor_is_identified_by_supplier_code(world) -> None:
     assert (rows["CO1.SYN.9"]["issuer"], rows["CO1.SYN.9"]["id_type"], rows["CO1.SYN.9"]["value_public"]) == \
         ("SECOP", "codigo_proveedor", "734685258")
     assert rows["CO1.SYN.8"]["display_name"] is None and rows["CO1.SYN.8"]["contractor_name_source"] == "CONSORCIO SIN CODIGO"
+
+
+def test_full_object_entity_profile_and_state_versions(world) -> None:
+    """Auditoría 2026-09-30: objeto completo sin versión nueva, misión/visión por código de entidad y ficha pública."""
+    from botcentro.telegram_ui.investigations import InvestigationViews
+
+    db, ingest, fake = world["db"], world["users"]["ingest_service"], world["fake"]
+    scope = {"territories": [{"departamento": "Caquetá", "municipio": "Florencia"}], "from": "2026-01-01"}
+    base = {**contract_row("c-7", "CO1.SYN.7", "En ejecución", "900", "2026-04-01T00:00:00.000"), "codigo_entidad": "704035211",
+            "descripcion_del_proceso": "TEXTO CORTADO A TRESCIENTOS"}
+    fake.rows["jbjy-vk9h"] = [base]
+    run_source(db, ingest, fake, "secop2_contracts", scope, world["tmp"])
+    normalize(db, ingest, "contracts")
+    full = "OBJETO COMPLETO DEL CONTRATO " * 20
+    fake.rows["jbjy-vk9h"] = [{**base, "objeto_del_contrato": full}]
+    run_source(db, ingest, fake, "secop2_contracts", scope, world["tmp"])
+    normalize(db, ingest, "contracts")
+    row = one(world, "select c.id, c.object, (select count(*) from public.contract_versions v where v.contract_id = c.id) n "
+                     "from public.contracts c where c.native_id = 'CO1.SYN.7'")
+    assert row["n"] == 1 and row["object"].startswith("OBJETO COMPLETO")  # texto nuevo, misma versión de estado
+
+    fake.rows["b6m4-qgqv"] = [
+        {":id": "p-1", "identificador_unico": "CO1.APP.1", "anno": "2025", "codigo_entidad": "704035211",
+         "nombre_entidad": "ALCALDIA SINTETICA", "mision_vision": "Mision vieja", "version": "3",
+         "nombre_contacto": "FUNCIONARIO SINTETICO", "telefono_contacto": "3000000000", "correo_contacto": "x@y.co"},
+        {":id": "p-2", "identificador_unico": "CO1.APP.2", "anno": "2026", "codigo_entidad": "704035211",
+         "nombre_entidad": "ALCALDIA SINTETICA", "mision_vision": "Mision vigente sintetica",
+         "perspectiva_estrategica": "Vision sintetica", "valor_presupuesto_general": "1000", "version": "5"}]
+    run_source(db, ingest, fake, "secop2_paa", {"entity_codes": ["704035211"]}, world["tmp"])
+    normalize(db, ingest, "entity_plans")
+    dump = json.dumps(db.execute("select value_json from public.observations where predicate = 'entity_plan'"))
+    assert "FUNCIONARIO SINTETICO" not in dump and "3000000000" not in dump  # sin datos de contacto
+    db.execute("update public.sources set shadow_mode = false where code in ('SRC-15', 'SRC-25')")
+    detail = rpc(world, "query_service").call("public_contract", {"p_contract_id": str(row["id"])})
+    assert detail["entity_profile"]["year"] == 2026 and detail["entity_profile"]["mission_vision"] == "Mision vigente sintetica"
+    view = InvestigationViews(rpc(world, "query_service"), bot_id=BOT_ID).contract(str(row["id"]))
+    assert "OBJETO COMPLETO" in view.blocks[0] and "Vision sintetica" in view.blocks[0]
+    db.execute("update public.sources set shadow_mode = true where code in ('SRC-15', 'SRC-25')")
+    assert rpc(world, "query_service").call("public_contract", {"p_contract_id": str(row["id"])}) is None  # sombra: oculto
