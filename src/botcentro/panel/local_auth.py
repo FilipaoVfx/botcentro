@@ -70,7 +70,7 @@ class LocalAuth:
 
     def _user(self, email: str) -> dict[str, Any] | None:
         with self.pool.connection() as conn:
-            return conn.execute("select id, email from auth.users where lower(email) = %s", (email,)).fetchone()
+            return conn.execute("select id, email from public.panel_operator(%s)", (email,)).fetchone()
 
     def send_code(self, email: str) -> None:
         email = email.strip().lower()

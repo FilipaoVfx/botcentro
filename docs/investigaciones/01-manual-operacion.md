@@ -65,18 +65,13 @@ InsForge gestiona los respaldos del plan. Para una prueba de restauración (T-56
    - que `public_case` devuelve la misma revisión publicada;
    - que `outbox_events` conserva sus `dedupe_key`.
 
-## 8. Incidente 2026-09-29: afirmaciones SIRI duplicadas
+## 8. Incidente 2026-09-29: afirmaciones SIRI duplicadas (resuelto)
 
-La primera versión del paso `siri` reprocesaba observaciones que compartían número SIRI y creó unas 318 mil afirmaciones `pending_review`, nunca publicadas, que llevaron la base a unos 877 MB. La migración `20260929212337_investigaciones-normalizacion-idempotente.sql` corrige el paso con marcas explícitas de observaciones normalizadas.
+La primera versión del paso `siri` reprocesaba observaciones que compartían número SIRI y creó unas 318 mil afirmaciones `pending_review`, nunca publicadas. En InsForge la limpieza quedó bloqueada más de 3 horas: la migración siguió corriendo en el servidor tras un 504 y no se podía cancelar.
 
-**Pendiente de autorización del responsable:** borrar por lotes las filas derivadas de SRC-18. Son afirmaciones con `origin = 'system_ingest'` y `value->>'source' = 'SRC-18'`, junto con sus actuaciones, participaciones, evidencias, revisiones y los expedientes `system = 'SIRI'`. Orden de borrado:
+**Resolución, 2026-09-30, tras el cambio a PostgreSQL autoalojado (DEC-21):**
+1. Se importó el respaldo completo de InsForge.
+2. Se borraron por autorización del responsable las filas derivadas de SRC-18 en 37 s, gracias a los índices en `claim_id` y `claims.superseded_by`. El borrado quedó registrado en `audit_log` (`cleanup.siri_duplicates`).
+3. Se volvió a normalizar con el paso corregido, que es idempotente: quedaron 445 expedientes, 445 afirmaciones pendientes y 767 actuaciones (una por sanción distinta).
 
-1. Primero las tablas dependientes, cada una en una llamada.
-2. Luego los expedientes `system = 'SIRI'`.
-3. Al final las afirmaciones.
-
-Después de borrar:
-
-1. Aplicar la migración.
-2. Ejecutar `normalize SRC-18`, que crea unos 445 registros.
-3. Recuperar espacio con `VACUUM`.
+Base resultante: 355 MB.

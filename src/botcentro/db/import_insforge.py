@@ -50,16 +50,21 @@ def import_all(target: str, source: str, *, log: Callable[[str], None] = print) 
             log(f"sin datos de origen (tablas nuevas): {', '.join(f'{s}.{t}' for s, t in missing)}")
         with dst.transaction():
             dst.execute("set local session_replication_role = replica")
+            # Todo el destino se vacía primero y de una vez: un TRUNCATE ... CASCADE por tabla vaciaría
+            # tablas hijas ya copiadas (p. ej. `sources` arrastra a `observations`).
+            dst.execute(sql.SQL("truncate {} cascade").format(
+                sql.SQL(", ").join(sql.Identifier(sch, tbl) for sch, tbl in common)))
             for schema, table in common:
                 cols = [c for c in dst_tables[(schema, table)] if c in set(src_tables[(schema, table)])]
                 ident = sql.Identifier(schema, table)
                 col_list = sql.SQL(", ").join(map(sql.Identifier, cols))
-                dst.execute(sql.SQL("truncate {} cascade").format(ident))
-                copied = 0
                 with src.cursor().copy(sql.SQL("copy (select {} from {}) to stdout (format binary)").format(col_list, ident)) as out, \
                         dst.cursor().copy(sql.SQL("copy {} ({}) from stdin (format binary)").format(ident, col_list)) as inp:
                     for chunk in out:
                         inp.write(chunk)
+            # Conteos al final, sobre todas las tablas: detecta cualquier pérdida posterior a la copia.
+            for schema, table in common:
+                ident = sql.Identifier(schema, table)
                 copied = dst.execute(sql.SQL("select count(*) from {}").format(ident)).fetchone()[0]
                 expected = src.execute(sql.SQL("select count(*) from {}").format(ident)).fetchone()[0]
                 report[f"{schema}.{table}"] = (expected, copied)

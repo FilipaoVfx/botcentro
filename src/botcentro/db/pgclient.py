@@ -12,6 +12,7 @@ servidor, igual que antes la API key de InsForge.
 
 from __future__ import annotations
 
+import atexit
 import json
 import os
 import threading
@@ -51,6 +52,16 @@ def shared_pool(conninfo: str, *, max_size: int = 8) -> ConnectionPool:
                                   kwargs={"row_factory": dict_row, "application_name": "botcentro"})
             _POOLS[conninfo] = pool
         return pool
+
+
+@atexit.register
+def close_pools() -> None:
+    """Cierra los pools antes del apagado del intérprete (sus hilos no pueden unirse después)."""
+    with _POOLS_LOCK:
+        pools = list(_POOLS.values())
+        _POOLS.clear()
+    for pool in pools:
+        pool.close()
 
 
 def _adapt(value: Any, pg_type: str) -> Any:

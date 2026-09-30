@@ -8,7 +8,7 @@ Plataforma que convierte información legislativa dispersa de Colombia (Senado, 
 
 Implementada la **fase H1 — Fundaciones** (SRS §18, pasos 2–3) más el núcleo de dominio y el canal de Telegram:
 
-- **Esquema completo** del modelo lógico (SRS §6) en InsForge: 71 tablas con RLS, capturas y evidencia append-only, observaciones idempotentes, cola durable, presupuesto con reserva atómica y auditoría.
+- **Esquema completo** del modelo lógico (SRS §6) en PostgreSQL (antes InsForge; DEC-21): 71 tablas con RLS, capturas y evidencia append-only, observaciones idempotentes, cola durable, presupuesto con reserva atómica y auditoría.
 - **RPC** de ingesta, cola, presupuesto, recepción de Telegram, administración auditada, retención y búsqueda léxica y vectorial.
 - **Servicios Python**:
   - fetcher con protección SSRF;
@@ -28,13 +28,13 @@ El detalle por requisito está en [`docs/trazabilidad.md`](docs/trazabilidad.md)
 
 ```mermaid
 flowchart LR
-    TG[Telegram] -->|webhook + secreto| API[API FastAPI<br/>insforge compute]
-    API -->|RPC telegram_accept_update| DB[(InsForge PostgreSQL<br/>RLS + RPC)]
-    W[Workers Python<br/>insforge compute] -->|jobs_claim / ingest_*| DB
+    TG[Telegram] -->|sondeo largo| BOT[Bot aiogram<br/>servidor propio]
+    BOT -->|PgClient: rol authenticated + claims| DB[(PostgreSQL 16 autoalojado<br/>RLS + funciones SQL)]
+    W[CLI e ingesta diaria] -->|PgClient| DB
     W -->|SafeFetcher anti-SSRF| SRC[Fuentes oficiales]
-    W --> OBJ[Originales<br/>almacén por hash]
-    API -. cuentas de servicio .-> AUTH[InsForge Auth]
-    W -. cuentas de servicio .-> AUTH
+    BOT --> Q[(Qdrant local)]
+    BOT --> R[(Redis local)]
+    PANEL[Panel FastAPI + React] -->|código por Telegram| DB
 ```
 
 Decisiones y motivos: [`docs/adr/0001-arquitectura-insforge.md`](docs/adr/0001-arquitectura-insforge.md). Resumen:
@@ -43,7 +43,7 @@ Decisiones y motivos: [`docs/adr/0001-arquitectura-insforge.md`](docs/adr/0001-a
 - Las escrituras sensibles son RPC `SECURITY DEFINER` que verifican el rol.
 
 ```
-migrations/              SQL aplicado en InsForge (npx -y @insforge/cli db migrations ...)
+migrations/              SQL aplicado con `python -m botcentro.cli migrate`
 seeds/                   catálogo inicial (corporaciones y SRC-01…SRC-14 como candidatas)
 src/botcentro/
   domain/                fechas de Bogotá, identificadores de proyectos, votos, nombres, hashing
@@ -57,7 +57,7 @@ src/botcentro/
   query/                 intención y validación de afirmaciones
   insforge/              cliente REST/RPC con sesión de servicio
 tests/unit/              núcleo puro, fetcher, Telegram y cliente HTTP
-tests/integration/       SQL real contra un PostgreSQL que replica InsForge
+tests/integration/       SQL real contra PostgreSQL con la plataforma de producción
 ```
 
 ## Desarrollo
@@ -67,7 +67,7 @@ python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest tests/unit                      # sin dependencias externas
 ```
 
-Las pruebas de integración ejecutan las migraciones y las RPC contra un PostgreSQL ≥ 15 con pgvector. Usan `tests/integration/insforge_shim.sql`, que reproduce roles, `auth.uid()` y los privilegios por defecto de InsForge. Hace falta un superusuario:
+Las pruebas de integración ejecutan las migraciones y las funciones contra un PostgreSQL ≥ 15 con pgvector. Usan la misma plataforma que producción (`ops/sql/plataforma.sql`: roles, `auth.uid()` y privilegios por defecto) y el cliente de producción (`PgClient`). Hace falta un superusuario:
 
 ```bash
 docker run -d --name pg -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 pgvector/pgvector:pg15
@@ -79,16 +79,14 @@ La CI (`.github/workflows/ci.yml`) ejecuta ambas suites.
 ### Migraciones
 
 ```bash
-npx -y @insforge/cli db migrations new <nombre-en-minusculas-con-guiones>
-# editar migrations/<version>_<nombre>.sql y probar localmente con pytest
-npx -y @insforge/cli db migrations up --all
+# crear migrations/<AAAAMMDDhhmmss>_<nombre>.sql y probar localmente con pytest
+.venv/bin/python -m botcentro.cli migrate
 ```
 
-Restricciones de InsForge:
-- Todo en `public`.
-- Sin `BEGIN`/`COMMIT`.
-- Sin cambios de configuración de sesión: `set_config` y `SET LOCAL` se rechazan.
-- Las migraciones aplicadas son historia: no se editan.
+Reglas:
+- Cada archivo corre en su propia transacción como `project_admin`: sin `BEGIN`/`COMMIT`.
+- Las migraciones aplicadas son historia: no se editan. El ejecutor detiene el proceso si un archivo aplicado cambió (suma SHA-256).
+- Nada de borrados masivos dentro de una migración: se hacen por operación, con índices en las claves foráneas.
 
 ## Bot de Telegram
 
@@ -98,7 +96,7 @@ Adaptador **aiogram 3** con menús, edición de mensajes y contexto breve en **R
 ops/redis.sh up            # 127.0.0.1:6379, contraseña en BOTCENTRO_REDIS_URL (.env), AOF, 256 MB
 ```
 
-Respuestas sin IA (DEC-16): plantillas deterministas sobre las lecturas `bot_*` de InsForge y los pasajes de Qdrant, siempre con su fuente.
+Respuestas sin IA (DEC-16): plantillas deterministas sobre las lecturas `bot_*` de PostgreSQL y los pasajes de Qdrant, siempre con su fuente.
 
 Qué entiende:
 - número de proyecto: ficha, estado, autores y votaciones;
@@ -137,13 +135,13 @@ journalctl -u botcentro-actualizar -f
 
 ## Índice vectorial (Qdrant autoalojado)
 
-Los vectores de documentos (fichas de Cámara y gacetas) viven en Qdrant, dentro del servidor del bot (DEC-15). InsForge conserva los documentos, los chunks citables y los enlaces a proyectos.
+Los vectores de documentos (fichas de Cámara y gacetas) viven en Qdrant, dentro del servidor del bot (DEC-15). PostgreSQL conserva los documentos, los chunks citables y los enlaces a proyectos.
 
 ```bash
 ops/qdrant.sh up          # contenedor en 127.0.0.1:6333 con API key (.env), datos en /var/lib/botcentro/qdrant
 ops/qdrant.sh status
 ops/qdrant.sh snapshot    # copiar el snapshot fuera del servidor: es la única copia de respaldo
-.venv/bin/python -m botcentro.cli sync-qdrant        # republica los chunks registrados en InsForge
+.venv/bin/python -m botcentro.cli sync-qdrant        # republica los chunks registrados en PostgreSQL
 .venv/bin/python -m botcentro.cli load-gacetas --since 2022-07-20 --skip-kinds ""   # reanudable
 ```
 
@@ -154,7 +152,7 @@ Si se pierde el volumen, el índice se reconstruye:
 ## Puesta en marcha (pendiente de aprobación)
 
 1. **Catálogo inicial:** `npx -y @insforge/cli db query "$(grep -v '^--' seeds/catalogo_inicial.sql)"`.
-2. **Cuentas de servicio:** crear en InsForge Auth los usuarios de `ingest_service` y `query_service` y asignarles su rol. Un administrador del proyecto puede usar `admin_grant_role`; para el primer arranque vale `insert into public.app_roles (user_id, role) values ('<uuid>', 'query_service');` vía `db query`.
+2. **Cuentas de servicio:** crear en `auth.users` los usuarios de `ingest_service` y `query_service` y asignarles su rol en `app_roles` (con `ops/postgres.sh psql`). Los servicios se identifican por `BOTCENTRO_INGEST_EMAIL` y `BOTCENTRO_QUERY_EMAIL`.
 3. **Secretos:** `npx -y @insforge/cli secrets add ...` con los valores de `.env.example`.
 4. **Descubrimiento (H0) por fuente:** completar la ficha, registrar el perfil de uso (`admin_add_source_policy`) y la cobertura, y activar (`admin_set_source_state`).
 5. **Despliegue** de la API y los workers con `insforge compute`, y registro del webhook de Telegram con `secret_token`.
@@ -163,7 +161,7 @@ Si se pierde el volumen, el índice se reconstruye:
 
 Panel web de solo lectura (hito P-H2 de [`prd-panel-web.md`](prd-panel-web.md) y [`srs-panel-web.md`](srs-panel-web.md)). Es un tablero de salidas: cada etapa, fuente, ejecución y cola es una fila con su estado, su cifra medida y la hora en que se observó.
 
-- **Acceso:** código de 6 dígitos por email (InsForge Auth). El primer administrador se registra en `pending_role_grants` y reclama su rol al entrar con el email verificado.
+- **Acceso:** código de 6 dígitos por Telegram al chat del operador (`BOTCENTRO_PANEL_OPERATORS`). Solo entran cuentas con rol operativo.
 - **Lectura:** todas las lecturas usan el JWT del operador (RPC `ops_*` SECURITY INVOKER), así que RLS decide qué ve. Una sección sin permiso muestra «sin acceso», no ceros.
 - **Estados honestos:** se distingue «sin datos», «no instrumentado» (workers, intentos, alertas, incidentes, logs), «vencido» y «desconectado».
 - **Actualización:** resumen en vivo por SSE, con respaldo de consulta periódica. «Congelar tablero» detiene solo la animación.
@@ -195,6 +193,15 @@ Documentación:
 - [Trazabilidad T-01..T-60](docs/investigaciones/02-trazabilidad-pruebas.md)
 - [Licencias, cobertura y costos](docs/investigaciones/03-licencias-cobertura-costos.md)
 
+## Base de datos
+
+PostgreSQL 16 + pgvector autoalojado en este servidor (DEC-21; antes InsForge). Detalles en [docs/plataforma-postgres.md](docs/plataforma-postgres.md):
+
+- `ops/postgres.sh up|status|psql|backup` para operar el contenedor;
+- `python -m botcentro.cli migrate` para aplicar migraciones;
+- respaldo diario con `botcentro-respaldo.timer`;
+- acceso al panel con código por Telegram.
+
 ## Seguridad
 
 - Invariantes verificadas en el proyecto remoto:
@@ -202,7 +209,7 @@ Documentación:
   - `anon` sin privilegios;
   - `authenticated` limitado a las RPC y helpers de política;
   - `write_audit` no ejecutable.
-- El advisor de InsForge no reporta avisos. Marca como `dangerous-function` las RPC `SECURITY DEFINER` invocables por `authenticated`; es intencional (ver ADR 0001) y su supresión está pendiente de decisión.
+- Las funciones `SECURITY DEFINER` invocables por `authenticated` son intencionales (ver ADR 0001): cada una verifica el rol de aplicación del llamante. La aplicación conecta como `botcentro_app`, sin privilegios propios.
 - Webhook de Telegram:
   - autenticado con secreto y comparación en tiempo constante;
   - usuarios seudonimizados con HMAC;

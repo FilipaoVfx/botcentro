@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        # Misma versión mayor que el proyecto InsForge (PostgreSQL 15) con pgvector.
-        image: pgvector/pgvector:pg15
+        # Misma versión mayor que producción (PostgreSQL 16 autoalojado, DEC-21) con pgvector.
+        image: pgvector/pgvector:0.8.1-pg16
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:

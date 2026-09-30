@@ -19,7 +19,9 @@ pytestmark = pytest.mark.db
 
 @pytest.fixture()
 def pool(db: Db):
-    p = ConnectionPool(db.conninfo, min_size=1, max_size=2, open=True, kwargs={"row_factory": dict_row})
+    """Como en producción: el rol de aplicación sin privilegios propios (no el superusuario)."""
+    app = re.sub(r"user=\S+", "user=botcentro_app", db.conninfo)
+    p = ConnectionPool(app, min_size=1, max_size=2, open=True, kwargs={"row_factory": dict_row})
     yield p
     p.close()
 
@@ -98,6 +100,14 @@ def test_import_copies_common_columns_and_matches_counts(db: Db) -> None:
     from tests.integration.conftest import TEMPLATE
 
     user = db.create_user("ingest_service", email="svc@import.local")
+    src_id = db.execute("insert into public.sources (code, name, authority, phase, base_url, allowed_domains, supported_objects) "
+                        "values ('SRC-99', 'prueba', 'primary', 'mvp', 'https://x.gov.co', '{x.gov.co}', '{project}') "
+                        "returning id")[0]["id"]
+    with db.admin() as conn:  # hija de sources sin montar su captura: basta para la regresión del TRUNCATE
+        conn.execute("set session_replication_role = replica")
+        conn.execute("insert into public.observations (observation_key, source_id, first_snapshot_id, authority, subject_type, "
+                     "subject_ref, predicate, value_json, first_observed_at, last_observed_at, parser_version) values "
+                     "(repeat('a', 64), %s, gen_random_uuid(), 'primary', 'project', 'p1', 'p', '{}', now(), now(), 'v1')", (src_id,))
     db.execute("alter table auth.users add column if not exists insforge_only text")  # columna solo del origen
     target_name = f"botcentro_import_{_uuid.uuid4().hex[:8]}"
     host = db.conninfo  # "host=... port=... user=... dbname=..."
@@ -108,6 +118,10 @@ def test_import_copies_common_columns_and_matches_counts(db: Db) -> None:
     try:
         report = import_all(target, db.conninfo, log=lambda _m: None)
         assert report["auth.users"][0] == report["auth.users"][1] >= 1
+        # Regresión: las tablas hijas (observations → sources) no se vacían al importar la madre después.
+        with _pg.connect(target) as conn:
+            final = conn.execute("select (select count(*) from public.sources), (select count(*) from public.observations)").fetchone()
+        assert final == (report["public.sources"][0], report["public.observations"][0]) and final[1] >= 1
         with _pg.connect(target) as conn:
             role = conn.execute("select role from public.app_roles where user_id = %s", (user,)).fetchone()
             assert role == ("ingest_service",)

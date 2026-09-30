@@ -61,7 +61,7 @@ Estado al 2026-09-29. **Automatizada** significa que la prueba corre en la suite
 | T-53 Lease perdido | Existente | `tests/integration/test_jobs_and_budget.py::test_enqueue_is_idempotent_and_claim_leases` |
 | T-54 Error TLS | Automatizada | U-soc: `test_tls_verification_is_always_on` |
 | T-55 Comando repetido | Automatizada | I: `test_admin_command_idempotency`; `tests/unit/test_panel_bff.py::test_editorial_action_is_idempotent` |
-| T-56 Restauración | Manual | Procedimiento en el manual §7; sin ejecución automatizada |
+| T-56 Restauración | Manual, ejecutada | 2026-09-30: `ops/postgres.sh backup` y `pg_restore` en una base aparte, con conteos coincidentes (proyectos, migraciones, SIRI). Procedimiento en `docs/plataforma-postgres.md` |
 | T-57 Rollback de banderas | Automatizada | U-ui: `test_flags_off_hide_menu_and_explain` (el menú desaparece y el núcleo sigue) |
 | T-58 Conteos con denominador | Automatizada | I: `test_publish_case_and_read_branches_timeline_and_actors` |
 | T-59 «¿Es corrupto?» | Automatizada | U-ui: `test_sensitive_question_is_not_answered_with_a_label` |

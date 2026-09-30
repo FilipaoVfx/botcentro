@@ -40,7 +40,7 @@ Las dependencias nuevas del módulo son ninguna. Se usan las ya presentes:
 |---|---|
 | APIs de pago / LLM | 0 (presupuesto 0; `ENABLE_COMMERCIAL_PROVIDERS` apagada) |
 | Socrata (datos.gov.co) | 0; sin token de aplicación, con pausa de 1 s entre solicitudes y reintentos acotados |
-| Base de datos | Plan gratuito de InsForge. El incidente de duplicados SIRI llevó la base a 877 MB: sobre el cupo. Ver el manual §8 |
+| Base de datos | PostgreSQL autoalojado en el servidor del bot (DEC-21): 355 MB tras la limpieza, sin cupo de plan. Costo 0 |
 | Cómputo | Servidor actual del bot; el resumen diario es una tarea más del proceso del bot |
 
-**Estimación de espacio para completar el piloto:** SECOP II de los tres municipios desde 2026 son unas 13 mil filas; con historial de versiones, del orden de 20–40 MB. Esto solo cabe tras la limpieza del incidente.
+**Estimación de espacio para completar el piloto:** SECOP II de los tres municipios desde 2026 son unas 13 mil filas; con historial de versiones, del orden de 20–40 MB. Cabe sin problema en el disco local (66 GB libres).
