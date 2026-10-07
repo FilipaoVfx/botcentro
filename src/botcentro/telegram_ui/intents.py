@@ -36,6 +36,8 @@ _ALIASES: dict[str, Intent] = {
     "entidades": Intent.TERRITORIES, "mis seguimientos": Intent.SUBSCRIPTIONS, "seguimientos": Intent.SUBSCRIPTIONS,
     "/seguimientos": Intent.SUBSCRIPTIONS, "seguir": Intent.SUBSCRIBE, "dejar de seguir": Intent.UNSUBSCRIBE,
     "cobertura": Intent.COVERAGE, "ayuda y cobertura": Intent.COVERAGE,
+    "actas": Intent.ACTA_SEARCH_PROMPT, "/actas": Intent.ACTA_SEARCH_PROMPT, "buscar en actas": Intent.ACTA_SEARCH_PROMPT,
+    "buscar en las actas": Intent.ACTA_SEARCH_PROMPT,
 }
 _NAV_WORDS = sorted({k for k in _ALIASES if " " not in k and not k.startswith("/")})
 _CONTEXTUAL = [
@@ -57,6 +59,10 @@ _TERRITORY_RE = re.compile(r"^(?:investigaciones |casos |contratos )?(?:de |en )
 _CASES_SEARCH_RE = re.compile(r"^(?:grandes casos|casos|investigaciones) (?:de |sobre |del |en )?(?P<q>[a-z][a-z .'-]{2,60})$")
 _DAY_RE = re.compile(r"^(?P<corp>senado|camara)(?: (?:el |del |de )?(?P<when>.+))?$")
 _AGENDA_RE = re.compile(r"^agenda(?: (?:de |del |para |el )?(?P<when>.+))?$")
+# «actas reforma pensional», «buscar en actas "Paloma Valencia"», «en las actas JEP»: sobre el texto original
+# (se conservan comillas y tildes de la consulta).
+_ACTA_SEARCH_RE = re.compile(r"^(?:/actas|actas|(?:buscar?|busca)\s+(?:en\s+)?(?:las\s+)?actas|en\s+las\s+actas)\s*:?\s+(?P<q>.{2,200})$",
+                             re.IGNORECASE)
 _DISCUSSION_SEARCH_RE = re.compile(r"^(?:discusiones|debates) (?:de |sobre |del )?(?P<q>.{3,60})$")
 
 
@@ -90,6 +96,9 @@ def parse_text(text: str) -> UiAction:
             params = {"corporation": _corporation(command) or "senado"}
         return UiAction(intent=intent, entry_point="command" if command.startswith("/") else "text",
                         parameters=params, parameter_origins={k: "explicit" for k in params})
+    if m := _ACTA_SEARCH_RE.match(raw.strip()):
+        return UiAction(intent=Intent.ACTA_SEARCH, entry_point="text", parameters={"query": m["q"].strip(), "text": raw},
+                        parameter_origins={"query": "explicit"})
     if m := _TERRITORY_RE.match(folded):
         return UiAction(intent=Intent.TERRITORY_RESOLVE, entry_point="text", parameters={"name": m["name"].strip(), "text": raw},
                         parameter_origins={"name": "explicit"})

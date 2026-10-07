@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+import uuid
 import time
 from pathlib import Path
 from collections.abc import Sequence
@@ -135,9 +136,39 @@ def index_actas(manifest: str, backfill: int, pause: float) -> None:
             rows.append({**a, "document_key": rec["document_key"], "gaceta_url": rec["url"],
                          "published_on": f"{y}-{int(m):02d}-{int(d):02d}" if y else None})
     total = sum(client.call("ingest_session_actas", {"p_rows": rows[i:i + 500]}) for i in range(0, len(rows), 500))
+    passages = sync_acta_passages(client)
     print(json.dumps({"actas_publicadas": total, "gacetas_con_actas": sum(1 for r in seen.values() if r.get("actas")),
                       "pendientes_de_recuperar": sum(1 for r in seen.values()
-                                                     if "actas" not in r and "acta" in (r.get("segment_kinds") or []))}))
+                                                     if "actas" not in r and "acta" in (r.get("segment_kinds") or [])),
+                      "fragmentos_copiados": passages}))
+
+
+def sync_acta_passages(client: Any, *, docs_per_round: int = 100) -> int:
+    """Copia a Postgres el texto de los fragmentos de actas (Qdrant) de las gacetas con actas publicadas,
+    para la búsqueda de texto completo. Idempotente: solo gacetas que aún no tienen fragmentos."""
+    store = qdrant_store()
+    copied = 0
+    while True:
+        pending = client.call("ingest_actas_without_passages", {"p_limit": docs_per_round}) or []
+        if not pending:
+            return copied
+        for key in pending:
+            flt = {"must": [{"key": "document_key", "match": {"value": key}},
+                            {"key": "segment_kind", "match": {"value": "acta"}}]}
+            rows, offset = [], None
+            while True:
+                points, offset = store.scroll(offset=offset, limit=256, flt=flt, with_vector=False,
+                                              with_payload=["text", "pdf_page_start", "pdf_page_end"])
+                rows += [{"id": p["id"], "document_key": key, "text": p["payload"]["text"],
+                          "pdf_page_start": p["payload"]["pdf_page_start"], "pdf_page_end": p["payload"]["pdf_page_end"]}
+                         for p in points]
+                if offset is None:
+                    break
+            if not rows:  # gaceta con acta sin fragmentos indexados: se marca con un registro vacío no buscable
+                rows = [{"id": str(uuid.uuid5(uuid.NAMESPACE_URL, f"sin-fragmentos:{key}")), "document_key": key,
+                         "text": "", "pdf_page_start": 0, "pdf_page_end": 0}]
+            for i in range(0, len(rows), 200):
+                copied += client.call("ingest_acta_passages", {"p_rows": rows[i:i + 200]})
 
 
 def db_bootstrap() -> None:

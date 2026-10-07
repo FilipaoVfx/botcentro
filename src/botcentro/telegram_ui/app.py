@@ -34,6 +34,7 @@ IMPLEMENTED = frozenset({
     Intent.SEARCH_PROMPT, Intent.PAGE, Intent.PROJECT_OPEN, Intent.PROJECT_PARTICIPANTS, Intent.ORDINAL,
     Intent.VOTINGS, Intent.DOCUMENTS, Intent.DAY_OVERVIEW, Intent.PROJECT_TIMELINE, Intent.DISCUSSIONS,
     Intent.VOTING_OPEN, Intent.VOTINGS_PERSON, Intent.VOTE_PERSON_PROMPT, Intent.EVIDENCE,
+    Intent.ACTA_SEARCH, Intent.ACTA_SEARCH_PROMPT,
 })
 _NO_EVIDENCE_VIEWS = {"home", "help", "sources", "evidence", "cancel", "filters", "search_prompt", "unavailable",
                       "clarify", "expired", "subscribe_prompt", "subscribed", "subscriptions", "confirm", "coverage",
@@ -67,6 +68,20 @@ def _session_groups(videos: list[dict[str, Any]], actas: list[dict[str, Any]]) -
                                     "body": a.get("body"), "body_key": a.get("body_key"), "kind": "sesion", "urls": []})
         g.setdefault("actas", []).append(a)
     return sorted(groups.values(), key=lambda g: (str(g.get("session_date")), g.get("body_key") == "plenaria"), reverse=True)
+
+
+_PAGE_HEADER = re.compile(r"P[áa]gina\s+\d+\s+\w+,?\s+\d{1,2}\s+de\s+\w+\s+de\s+\d{4}\s+G\s*aceta\s+del\s+con\s*greso\s+\d+",
+                          re.IGNORECASE)
+
+
+def _snippet(raw: str | None) -> str:
+    """Fragmento legible: sin saltos de página ni cabeceras de la gaceta, guiones de corte unidos; las
+    coincidencias (⟦ ⟧) en negrita después de escapar el texto."""
+    text = (raw or "").replace("\x0c", " ")
+    text = _PAGE_HEADER.sub(" ", text)
+    text = re.sub(r"(\w) ?-\s*\n\s*(\w)", r"\1\2", text)
+    text = " ".join(text.split())
+    return escape(text).replace("⟦", "<b>").replace("⟧", "</b>")
 
 
 def _acta_link(a: dict[str, Any]) -> str:
@@ -159,15 +174,19 @@ class UiApplication:
         # Captura de búsqueda: tras «🔎 Buscar», un texto breve sin números es el término buscado;
         # cualquier intención explícita distinta la suspende (§19.3).
         if ctx.pending_clarification and ctx.pending_clarification.get("expect") in ("search", "discussion",
-                                                                                     "vote_person", "territory"):
+                                                                                     "vote_person", "territory", "acta_search"):
             expect = ctx.pending_clarification["expect"]
+            scope = dict(ctx.pending_clarification.get("scope") or {})
             ctx.pending_clarification = None
             text = params.get("text", "")
-            if intent is Intent.QUESTION and text and len(text.split()) <= 6 and not any(c.isdigit() for c in text):
+            if expect == "acta_search" and intent is Intent.QUESTION and text:
+                intent, params = Intent.ACTA_SEARCH, {"query": text, "text": text, **scope}
+            elif intent is Intent.QUESTION and text and len(text.split()) <= 6 and not any(c.isdigit() for c in text):
                 intent, params = {"search": (Intent.PROJECTS_SEARCH, {"query": text, "text": text}),
                                   "discussion": (Intent.DISCUSSIONS, {"query": text, "text": text}),
                                   "vote_person": (Intent.VOTINGS_PERSON, {"name": text}),
-                                  "territory": (Intent.TERRITORY_RESOLVE, {"name": text, "text": text})}[expect]
+                                  "territory": (Intent.TERRITORY_RESOLVE, {"name": text, "text": text}),
+                                  "acta_search": (Intent.ACTA_SEARCH, {"query": text, "text": text, **scope})}[expect]
         if not self.is_available(intent) and intent in _ENGINE_FALLBACK and params.get("text"):
             intent, params = Intent.QUESTION, {"text": params["text"]}
         if not self.is_available(intent):
@@ -233,6 +252,17 @@ class UiApplication:
             view = self._voting_detail(str(params["voting_id"]), ctx)
         elif intent is Intent.EVIDENCE:
             return self._evidence(ctx)
+        elif intent is Intent.ACTA_SEARCH_PROMPT:
+            scope = {k: params[k] for k in ("document_key", "page_from", "acta_number", "acta_year", "label") if params.get(k)}
+            ctx.pending_clarification = {"expect": "acta_search", "scope": scope}
+            where = f"el {params['label']}" if params.get("label") else "las actas de las sesiones del Congreso"
+            view = ViewModel(view_type="search_prompt", title="Buscar en actas", blocks=[
+                f"{bold('🔎 Buscar en ' + escape(where))}\nEscribe qué buscas: un nombre entre comillas "
+                "(<code>\"Paloma Valencia\"</code>), un tema (<code>reforma pensional</code>) o una palabra "
+                "(<code>votación</code>)."], rows=[[Button(label="✖️ Cancelar", intent=Intent.CANCEL)]])
+            push = False
+        elif intent is Intent.ACTA_SEARCH:
+            view = self._acta_search(params)
         elif intent in (Intent.PROJECT_PARTICIPANTS, Intent.DOCUMENTS):
             project_id = params.get("project_id") or (ctx.active_project_id if params.get("contextual")
                                                       or action.entry_point == "text" else None)
@@ -322,6 +352,65 @@ class UiApplication:
         except Exception:  # noqa: BLE001
             return []
 
+    def _acta_search(self, params: dict[str, Any]) -> ViewModel:
+        query = str(params.get("query") or "").strip()
+        scoped = bool(params.get("document_key"))
+        try:
+            data = self.rpc.call("bot_acta_search", {"p_query": query, "p_document_key": params.get("document_key"),
+                                                     "p_page_from": params.get("page_from"), "p_page_to": None,
+                                                     "p_limit": 12 if scoped else 6}) or {}
+        except Exception:  # noqa: BLE001 — falla de la fuente: se dice, no se presenta como «sin resultados»
+            return ViewModel(view_type="unavailable", title="Búsqueda no disponible", status="unavailable",
+                             blocks=["No pude consultar las actas en este momento. Inténtalo de nuevo en unos minutos."],
+                             rows=[[HOME_BUTTON]])
+        items = data.get("items") or []
+        if scoped and params.get("acta_number"):  # solo la acta pedida, aunque la gaceta traiga otras
+            items = [i for i in items if (i.get("session") or {}).get("acta_number") == str(params["acta_number"])
+                     and str((i.get("session") or {}).get("acta_year")) == str(params.get("acta_year"))]
+        where = escape(params["label"]) if scoped and params.get("label") else "las actas del Congreso"
+        mode = {"frase": "frase exacta", "palabras": "todas las palabras"}.get(data.get("mode") or "", "")
+        lines = [bold(f"🔎 «{escape(query)}» en {where}")]
+        if items:
+            total = len(items) if scoped else data.get("known_total", len(items))
+            extra = "" if scoped else f" en {data.get('documents')} gacetas"
+            lines.append(f"<i>{total} fragmento(s){extra}" + (f" · {mode}" if mode else "") + "; los más pertinentes primero.</i>")
+        lines.append("")
+        rows: list[list[Button]] = []
+        # Una entrada por sesión (acta) con su mejor fragmento; dentro de una acta, cada fragmento por separado.
+        grouped: list[dict[str, Any]] = []
+        index: dict[tuple, dict[str, Any]] = {}
+        for it in items:
+            sess = it.get("session") or {}
+            key = (it["document_key"], sess.get("acta_number"), it["pdf_page"] if scoped else None)
+            if key in index:
+                index[key]["more"] += 1
+                continue
+            index[key] = {**it, "more": 0}
+            grouped.append(index[key])
+        for it in grouped[:6]:
+            sess = it.get("session") or {}
+            when = format_local_date(date.fromisoformat(str(sess["session_date"])[:10])) if sess.get("session_date") else ""
+            head = (f"{_video_label({**sess, 'kind': 'sesion'})} · {when}" if sess else f"Gaceta {it['document_key'].split(':')[3]}")
+            lines.append(f"• {bold(escape(head))} — p. {it['pdf_page']}")
+            lines.append(f"   «{_snippet(it.get('snippet'))}»")
+            if it["more"]:
+                lines.append(f"   <i>+{it['more']} fragmento(s) más en esta acta</i>")
+            if sess.get("url"):
+                lines.append(f"   {_acta_link({**sess, 'pdf_page': it['pdf_page']})}")
+            if not scoped and sess.get("session_date") and sess.get("corporation") in ("senado", "camara") and len(rows) < 3:
+                rows.append([Button(label=f"🏛 {_clip(head, 30)}", intent=Intent.DAY_OVERVIEW,
+                                    params={"corporation": sess["corporation"], "date": str(sess["session_date"])[:10]})])
+        if not items:
+            lines.append(f"No aparece «{escape(query)}» en el texto de {where}. Prueba con otra palabra, sin tildes o "
+                         "con menos términos." if data.get("mode") != "vacia" else "Escribe al menos una palabra.")
+        lines += ["", "<i>Texto de la Gaceta del Congreso extraído del PDF (puede tener errores de lectura). Cobertura: "
+                      "actas cargadas desde 2022, en ampliación; que algo no aparezca no prueba que no se dijo.</i>"]
+        rows.append([Button(label="🔎 Otra búsqueda", intent=Intent.ACTA_SEARCH_PROMPT,
+                            params={k: params[k] for k in ("document_key", "page_from", "acta_number", "acta_year", "label")
+                                    if params.get(k)}), HOME_BUTTON])
+        return ViewModel(view_type="acta_search", title=f"Actas · {query}", status="ready" if items else "empty",
+                         blocks=["\n".join(lines)], rows=rows)
+
     def _videos(self, corporation: str | None, start: date, end: date) -> list[dict[str, Any]]:
         """Videos oficiales de sesiones (SRC-26). Si la fuente no responde, la vista sigue sin ellos."""
         try:
@@ -334,7 +423,8 @@ class UiApplication:
         rows = [[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST),
                  Button(label="🏛 Senado hoy", intent=Intent.DAY_OVERVIEW, params={"corporation": "senado"})],
                 [Button(label="🗳 Votaciones", intent=Intent.VOTINGS), Button(label="🗓 Agenda", intent=Intent.AGENDA)],
-                [Button(label="💬 Debates", intent=Intent.DISCUSSIONS)],
+                [Button(label="💬 Debates", intent=Intent.DISCUSSIONS),
+                 Button(label="📄 Buscar en actas", intent=Intent.ACTA_SEARCH_PROMPT)],
                 *(self.investigations.home_rows() if self.investigations is not None else []),
                 [Button(label="🔗 Fuentes", intent=Intent.SOURCES), HELP_BUTTON]]
         return ViewModel(view_type="home", title="🏛 Tu explorador legislativo", blocks=render_sections([Section(
@@ -615,6 +705,7 @@ class UiApplication:
             if corp == "camara" and not data.get("votings_covered"):
                 lines.append("<i>Las votaciones de la Cámara aún no están en nuestras fuentes.</i>")
         # 1b. Sesiones con video oficial (SRC-26): confirma que hubo sesión y deja ver la fuente primaria.
+        rows_search: list[Button] = []
         sessions = _session_groups(self._videos(corp, day, day), self._actas(corp, day, day)) if not future else []
         videos = [g for g in sessions if g.get("urls")]
         if sessions:
@@ -627,6 +718,15 @@ class UiApplication:
                 lines.append("   " + " · ".join(links))
             lines.append("<i>El video lo publica el canal oficial; el acta, con la transcripción de la sesión, se "
                          "publica en la Gaceta del Congreso semanas después.</i>")
+            searchable = [(g, a) for g in sessions for a in g.get("actas", [])][:2]
+            if searchable:
+                rows_search = [Button(label=f"🔎 Buscar en acta {a['acta_number']}/{a['acta_year']}", intent=Intent.ACTA_SEARCH_PROMPT,
+                                      params={"document_key": a["document_key"], "page_from": a.get("pdf_page"),
+                                              "acta_number": a["acta_number"], "acta_year": a["acta_year"],
+                                              "label": f"acta {a['acta_number']}/{a['acta_year']} · {_video_label(g)}"})
+                               for g, a in searchable]
+            else:
+                rows_search = []
         # 2. Programado para ese día
         lines += ["", bold("Programado")]
         if not data.get("agenda_covered"):
@@ -663,6 +763,8 @@ class UiApplication:
         if videos:
             rows.insert(0, [Button(label=f"▶️ {_clip(_video_label(v), 30)}", intent=Intent.DAY_OVERVIEW, url=v["urls"][0][1])
                             for v in videos[:2]])
+        if sessions and rows_search:
+            rows.insert(0, rows_search)
         held_today = bool(data.get("votings") or sessions)
         empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs or sessions)
         # «Senado hoy»: el Senado no sesiona todos los días. Si se consulta hoy, o el día no tiene sesión

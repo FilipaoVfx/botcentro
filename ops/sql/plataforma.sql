@@ -21,6 +21,7 @@ $$;
 grant anon, authenticated to botcentro_app;
 
 create extension if not exists vector with schema public;
+create extension if not exists unaccent with schema public;  -- búsqueda en actas sin importar tildes
 
 alter schema public owner to project_admin;
 grant usage, create on schema public to project_admin;

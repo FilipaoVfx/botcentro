@@ -39,6 +39,8 @@ class Intent(StrEnum):
     DOCUMENTS = "documents.list"
     COMPARE = "versions.compare"
     EVIDENCE = "evidence.show"
+    ACTA_SEARCH = "actas.search"
+    ACTA_SEARCH_PROMPT = "actas.search_prompt"
     SOURCES = "sources.catalog"
     PAGE = "page.goto"
     ORDINAL = "selection.ordinal"

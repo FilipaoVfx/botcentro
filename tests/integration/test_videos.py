@@ -142,3 +142,38 @@ def test_video_and_acta_of_the_same_session_are_one_line(loaded) -> None:
     old = app.handle(UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button",
                               parameters={"corporation": "camara", "date": "2025-05-21"}), SessionContext()).blocks[0]
     assert "Acta 3/2025" in old and "▶️ video oficial" not in old
+
+
+def test_acta_search_phrase_scope_and_empty(loaded) -> None:
+    """Búsqueda en el texto de las actas: frase exacta primero, acotada a una acta, y «sin resultados» distinto de error."""
+    db = loaded["db"]
+    ingest = db.create_user("ingest_service")
+    rpc = db.rpc(ingest)
+    rpc.call("ingest_session_actas", {"p_rows": [
+        {"document_key": "gaceta:senado:2026:900", "gaceta_url": "https://svrpubindc.imprenta.gov.co/senado/x?num=900",
+         "number": "7", "year": 2026, "session_date": "2026-05-05", "corporation": "senado", "body": "Comisión Sexta",
+         "body_key": "comision_6", "pdf_page": 1, "published_on": "2026-06-01"},
+        {"document_key": "gaceta:senado:2026:900", "gaceta_url": "https://svrpubindc.imprenta.gov.co/senado/x?num=900",
+         "number": "8", "year": 2026, "session_date": "2026-05-12", "corporation": "senado", "body": "Comisión Sexta",
+         "body_key": "comision_6", "pdf_page": 20, "published_on": "2026-06-01"}]})
+    rpc.call("ingest_acta_passages", {"p_rows": [
+        {"id": "00000000-0000-4000-8000-000000000001", "document_key": "gaceta:senado:2026:900", "pdf_page_start": 5,
+         "pdf_page_end": 5, "text": "Intervino la senadora Paloma Valencia sobre la reforma pensional y la votación nominal."},
+        {"id": "00000000-0000-4000-8000-000000000002", "document_key": "gaceta:senado:2026:900", "pdf_page_start": 22,
+         "pdf_page_end": 22, "text": "La paloma de la paz y la Comunidad Valenciana fueron mencionadas en otra sesión."}]})
+    q = db.rpc(loaded["query"])
+    phrase = q.call("bot_acta_search", {"p_query": "Paloma Valencia"})
+    assert phrase["mode"] == "frase" and phrase["known_total"] == 1  # no mezcla «paloma» y «valenciana» sueltas
+    hit = phrase["items"][0]
+    assert hit["pdf_page"] == 5 and hit["session"]["acta_number"] == "7" and "⟦Paloma⟧" in hit["snippet"]
+    second = q.call("bot_acta_search", {"p_query": "paloma", "p_document_key": "gaceta:senado:2026:900", "p_page_from": 20})
+    assert [i["session"]["acta_number"] for i in second["items"]] == ["8"]  # la página fija el acta del fragmento
+    assert q.call("bot_acta_search", {"p_query": "votacion"})["known_total"] == 1  # sin tilde encuentra «votación»
+
+    app = _app(db, loaded["query"])
+    view = app.handle(UiAction(intent=Intent.ACTA_SEARCH, entry_point="text", parameters={"query": "xyzzy"}), SessionContext())
+    assert view.status == "empty" and "No aparece «xyzzy»" in view.blocks[0] and "no prueba que no se dijo" in view.blocks[0]
+    day = app.handle(UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button",
+                              parameters={"corporation": "senado", "date": "2026-05-05"}), SessionContext())
+    buttons = [b for row in day.rows for b in row if b.intent is Intent.ACTA_SEARCH_PROMPT]
+    assert buttons and buttons[0].params["acta_number"] == "7"
