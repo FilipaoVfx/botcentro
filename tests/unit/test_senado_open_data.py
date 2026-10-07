@@ -103,16 +103,22 @@ def test_unknown_vote_label_is_quarantined_and_missing_fields_flag_schema_change
     assert result.schema_changed and result.issues[0].severity is IssueSeverity.SCHEMA_CHANGE
 
 
-def test_future_dates_are_never_requested() -> None:
+def _by_name(page) -> dict:  # noqa: ANN001
+    return {item.record_type: item.hints for item in page.items}
+
+
+def test_votes_never_ask_future_dates_but_agenda_looks_ahead() -> None:
+    """Verificado 2026-10-06: votos y asistencias con fecha futura dan 400; la agenda acepta un final futuro."""
     connector = SenadoOpenDataConnector(NoFetch(), today=lambda: date(2026, 9, 28))  # type: ignore[arg-type]
     cursor, last = connector.discover(Cursor(connector.version, SCOPE)).next_cursor, None
     while True:
         page = connector.discover(cursor)
-        last = page.items[0].hints
+        last = _by_name(page)
         if not page.has_more:
             break
         cursor = page.next_cursor
-    assert last == {"from": "2026-09-22", "to": "2026-09-28"}
+    assert last["votes"] == last["assistances"] == {"from": "2026-09-22", "to": "2026-09-28"}
+    assert last["events"] == {"from": "2026-09-22", "to": "2026-10-19"}  # 21 días de agenda por delante
 
 
 def test_window_starting_today_is_moved_back_one_day() -> None:
@@ -123,7 +129,7 @@ def test_window_starting_today_is_moved_back_one_day() -> None:
     windows = []
     while True:
         page = connector.discover(cursor)
-        windows.append(page.items[0].hints)
+        windows.append(_by_name(page)["votes"])
         if not page.has_more:
             break
         cursor = page.next_cursor

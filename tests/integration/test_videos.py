@@ -100,3 +100,18 @@ def test_senate_day_includes_its_committee_and_unattributed_hearings(loaded) -> 
     assert ("sesion", "comision_7", "senado") in bodies and ("audiencia", None, None) in bodies
     assert all(v["corporation"] != "camara" for v in videos)  # la plenaria de la Cámara no aparece en el Senado
     assert date.fromisoformat(videos[0]["session_date"]) == date(2026, 10, 1)
+
+
+def test_today_view_says_last_and_next_session(loaded) -> None:
+    """La Cámara no sesiona todos los días: «hoy» dice cuál fue la última sesión (con su video y tema) y que
+    su agenda no está en nuestras fuentes, en vez de un día vacío sin contexto."""
+    engine = SimpleNamespace(rpc=loaded["db"].rpc(loaded["query"]), gacetas_published=lambda corp, day: [])
+    app = UiApplication(engine, today=lambda: date(2026, 10, 6))  # type: ignore[arg-type]
+    view = app.handle(UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button", parameters={"corporation": "camara"}),
+                      SessionContext())
+    text = view.blocks[0]
+    assert "📅 Sesiones" in text and "Última sesión con video oficial" in text
+    assert "jueves 1 de octubre de 2026" in text and "Sesión Especial de la Oposición" in text
+    assert "no publica su agenda en nuestras fuentes" in text
+    last = [b for row in view.rows for b in row if b.label == "📅 Última sesión"]
+    assert last and last[0].params == {"corporation": "camara", "date": "2026-10-01"}

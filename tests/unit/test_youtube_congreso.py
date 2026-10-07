@@ -69,3 +69,26 @@ def test_feed_with_dtd_is_rejected_without_parsing() -> None:
     result = parse_feed(b'<?xml version="1.0"?><!DOCTYPE f [<!ENTITY x SYSTEM "file:///etc/passwd">]><feed>&x;</feed>',
                         "c", "n", "congreso")
     assert result.issues[0].code == "XML_DTD" and not result.candidates
+
+
+def test_transient_error_is_retried_and_each_run_reads_the_feeds() -> None:
+    """Regresiones 2026-10-06: un 500 aislado se reintenta; una ejecución nunca se salta los feeds por un
+    cursor de la anterior (antes `done` en el cursor dejaba de leerlos tras una ejecución parcial)."""
+    from botcentro.connectors.base import Cursor
+    from botcentro.connectors.youtube_congreso import YoutubeCongresoConnector
+    from botcentro.errors import FailureKind, FetchError
+
+    calls = []
+
+    class Flaky:
+        def fetch(self, url, **kw):  # noqa: ANN001, ANN003, ANN201
+            calls.append(url)
+            if len(calls) == 1:
+                raise FetchError("HTTP_500", "error del servidor", kind=FailureKind.TRANSIENT)
+            return "ok"
+
+    connector = YoutubeCongresoConnector(Flaky(), sleep=lambda s: None)  # type: ignore[arg-type]
+    page = connector.discover(Cursor(connector.version, {}, {"done": True}))
+    assert len(page.items) == 2 and page.has_more
+    assert connector.fetch(page.items[0]) == "ok" and len(calls) == 2
+    assert connector.discover(page.next_cursor).items == []

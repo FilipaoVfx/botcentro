@@ -19,6 +19,11 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
+import time
+from collections.abc import Callable
+
+from botcentro.connectors.retry import Action, RetryPolicy, decide
+from botcentro.errors import FetchError
 from botcentro.connectors.base import (Cursor, DiscoveredItem, DiscoverPage, Issue, IssueSeverity, NormalizedCandidate,
                                        ParseResult, ValidationReport)
 from botcentro.connectors.video_titles import MONTHS, clean_description, fold, parse_title
@@ -32,6 +37,8 @@ XML = frozenset({"application/xml", "application/atom+xml", "text/xml"})
 NS = {"a": "http://www.w3.org/2005/Atom", "media": "http://search.yahoo.com/mrss/",
       "yt": "http://www.youtube.com/xml/schemas/2015"}
 _VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+# Un 5xx esporádico de YouTube no debe costar una lectura completa (2026-10-06: HTTP 500 aislado).
+RETRY = RetryPolicy(max_attempts=3, base_delay=2.0, max_delay=10.0)
 
 
 def _beyond_title(title: str, description: str) -> str:
@@ -112,22 +119,34 @@ class YoutubeCongresoConnector:
     version = "0.1.0"
     parser_version = "youtube-congreso-parser-1"
 
-    def __init__(self, fetcher: SafeFetcher) -> None:
+    def __init__(self, fetcher: SafeFetcher, *, sleep: Callable[[float], None] = time.sleep) -> None:
         self._fetcher = fetcher
+        self._sleep = sleep
+        self._listed = False  # por ejecución: cada ejecución lee los feeds aunque reanude un cursor anterior
 
     def validate_source(self, config: Mapping[str, Any]) -> ValidationReport:
         return ValidationReport(capabilities=["discovery", "metadata"], diagnostics=[])
 
     def discover(self, cursor: Cursor) -> DiscoverPage:
-        if cursor.position.get("done"):
+        if self._listed:
             return DiscoverPage([], cursor, has_more=False)
+        self._listed = True
         items = [DiscoveredItem("channel_feed", f"youtube-feed:{cid}", FEED.format(cid), external_id=cid,
                                 accept_mimes=XML, hints={"channel_id": cid, "name": name, "kind": kind})
                  for cid, name, kind in CHANNELS]
-        return DiscoverPage(items, cursor.advance(done=True), has_more=True)
+        return DiscoverPage(items, cursor, has_more=True)
 
     def fetch(self, item: DiscoveredItem, *, etag: str | None = None, last_modified: str | None = None) -> Fetched | NotModified:
-        return self._fetcher.fetch(item.url, etag=etag, last_modified=last_modified, accept_mimes=XML)
+        attempt = 1
+        while True:
+            try:
+                return self._fetcher.fetch(item.url, etag=etag, last_modified=last_modified, accept_mimes=XML)
+            except FetchError as exc:
+                decision = decide(exc.kind, attempt, RETRY, retry_after=getattr(exc, "retry_after", None))
+                if decision.action is not Action.RETRY:
+                    raise
+                self._sleep(decision.delay_seconds or 0)
+                attempt += 1
 
     def parse(self, item: DiscoveredItem, snapshot: Fetched) -> ParseResult:
         return parse_feed(snapshot.content, item.hints["channel_id"], item.hints["name"], item.hints["kind"])

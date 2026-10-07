@@ -1,5 +1,5 @@
 [Unit]
-Description=botcentro: videos oficiales de sesiones del Congreso (RSS de YouTube)
+Description=botcentro: sesiones del día (agenda y votos del Senado, videos oficiales del Congreso)
 After=network-online.target docker.service
 
 [Service]

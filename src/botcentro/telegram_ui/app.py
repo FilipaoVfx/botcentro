@@ -245,6 +245,56 @@ class UiApplication:
 
     # -- inicio y ayudas -----------------------------------------------------------------------
 
+    def _session_status_block(self, corp: str, corp_name: str, ref: date) -> tuple[list[str], list[Button]]:
+        """«Última sesión» y «Próxima sesión» con fuente y significado (bot_session_status)."""
+        try:
+            st = self.rpc.call("bot_session_status", {"p_corporation": corp, "p_today": ref.isoformat()}) or {}
+        except Exception:  # noqa: BLE001 — la vista del día no depende de este bloque
+            return [], []
+        lines, buttons = ["", bold("📅 Sesiones")], []
+        held: list[date] = []
+        if vs := st.get("last_vote_session"):
+            d = date.fromisoformat(str(vs["date"])[:10]); held.append(d)
+            lines.append(f"• Última plenaria con votaciones registradas: {format_local_date(d)} ({vs['votings']} votaciones)")
+        if vv := st.get("last_video_session"):
+            d = date.fromisoformat(str(vv["date"])[:10]); held.append(d)
+            what = "Audiencia pública" + (f" · {vv['body']}" if vv.get("body") else "") if vv.get("kind") == "audiencia" \
+                else (vv.get("body") or "Sesión")
+            topic = f" — {escape(_clip(vv['topic'], 110))}" if vv.get("topic") else ""
+            lines.append(f"• Última sesión con video oficial: {link(what, vv['url'])}, {format_local_date(d)}{topic}")
+        if not held:
+            lines.append(f"• No tengo sesiones celebradas de la {corp_name} registradas en las fuentes cubiertas.")
+        if nxt := st.get("next_agenda"):
+            d = date.fromisoformat(str(nxt["date"])[:10])
+            titles = "; ".join(_clip(t, 70) for t in (nxt.get("titles") or [])[:3])
+            lines.append(f"• Próxima en la agenda publicada: {format_local_date(d)}" + (f" — {escape(titles)}" if titles else ""))
+            lines.append("<i>Programada: publicar la agenda no confirma que la sesión se celebre.</i>")
+            buttons.append(Button(label="📅 Próxima sesión", intent=Intent.DAY_OVERVIEW,
+                                  params={"corporation": corp, "date": d.isoformat()}))
+        elif st.get("agenda_covered"):
+            checked = st.get("agenda_checked_at")
+            when = ""
+            if checked:
+                at = datetime.fromisoformat(str(checked)).astimezone(BOGOTA)
+                when = f" (última consulta: {format_local_date(at.date())}, {at:%H:%M})"
+            lines.append(f"• Próxima: el {corp_name} no ha publicado agenda para las próximas tres semanas{when}.")
+            pattern = (st.get("weekday_pattern") or {})
+            by_day, total = pattern.get("by_weekday") or {}, pattern.get("days") or 0
+            if total:
+                names = {"1": "lunes", "2": "martes", "3": "miércoles", "4": "jueves", "5": "viernes", "6": "sábado", "7": "domingo"}
+                top = sorted(by_day.items(), key=lambda kv: -kv[1])[:2]
+                lines.append(f"<i>En el último año las plenarias con votación fueron sobre todo "
+                             f"{' y '.join(f'{names[k]} ({v})' for k, v in top)}, de {total} días con sesión; "
+                             "es un patrón, no una programación.</i>")
+        else:
+            lines.append(f"• Próxima: la {corp_name} no publica su agenda en nuestras fuentes.")
+        if held:
+            last = max(held)
+            if last != ref:
+                buttons.insert(0, Button(label="📅 Última sesión", intent=Intent.DAY_OVERVIEW,
+                                         params={"corporation": corp, "date": last.isoformat()}))
+        return lines, buttons
+
     def _videos(self, corporation: str | None, start: date, end: date) -> list[dict[str, Any]]:
         """Videos oficiales de sesiones (SRC-26). Si la fuente no responde, la vista sigue sin ellos."""
         try:
@@ -517,6 +567,7 @@ class UiApplication:
         lines = [bold(f"🏛 {corp_name} · {format_local_date(day)}")]
         if mode == "relative" and params.get("expression", "hoy") in ("hoy", "ayer", "manana"):
             lines.append(f"<i>«{escape(str(params.get('expression', 'hoy')))}» en hora de Colombia.</i>")
+        status_lines, status_buttons = [], []
         # 1. Confirmado ese día
         lines += ["", bold("Confirmado")]
         if future:
@@ -580,7 +631,17 @@ class UiApplication:
         if videos:
             rows.insert(0, [Button(label=f"▶️ {_clip(_video_label(v), 30)}", intent=Intent.DAY_OVERVIEW, url=v["urls"][0][1])
                             for v in videos[:2]])
+        held_today = bool(data.get("votings") or videos)
         empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs or videos)
+        # «Senado hoy»: el Senado no sesiona todos los días. Si se consulta hoy, o el día no tiene sesión
+        # registrada, se dice cuál fue la última y cuál es la próxima publicada (datos reales con su fuente).
+        if day == self.today() or not held_today:
+            status_lines, status_buttons = self._session_status_block(corp, corp_name, min(day, self.today()))
+            if status_lines:
+                at = 2 if len(lines) > 1 and "hora de Colombia" in lines[1] else 1  # tras el título y su nota de «hoy»
+                lines[at:at] = status_lines
+            if status_buttons:
+                rows.insert(0, status_buttons)
         return ViewModel(view_type="day", title=f"{corp_name} · {day.isoformat()}", status="empty" if empty else "ready",
                          blocks=["\n".join(lines)], rows=rows)
 

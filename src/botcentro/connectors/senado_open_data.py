@@ -46,6 +46,7 @@ API = "https://app.senado.gov.co/backend/api/public/v1"
 ALLOWED_DOMAINS = ("app.senado.gov.co",)
 CATALOGS = ("senators", "commissions")
 DATED = ("events", "votes", "assistances")
+AGENDA_AHEAD_DAYS = 21
 JSON_ONLY = frozenset({"application/json"})
 REF = "senado-od"
 EMPTY_RANGE_RE = re.compile(r"No existen .* en el rango de fechas", re.IGNORECASE)
@@ -88,7 +89,10 @@ class SenadoOpenDataConnector:
     def discover(self, cursor: Cursor) -> DiscoverPage:
         """Una página = catálogos (primera) o una ventana de fechas con sus tres conjuntos."""
         scope = cursor.scope
-        # La API rechaza (HTTP 400) rangos con fechas futuras: el alcance se recorta a hoy en Bogotá.
+        # Votos y asistencias: la API rechaza (HTTP 400) cualquier fecha futura, así que el alcance se recorta a
+        # hoy en Bogotá. La agenda (`events`) sí acepta un final futuro si el inicio es anterior a hoy
+        # (verificado 2026-10-06): la última ventana pide además AGENDA_AHEAD_DAYS hacia adelante, que es lo
+        # que permite mostrar la próxima sesión programada.
         start = date.fromisoformat(scope["from"])
         end = min(date.fromisoformat(scope["to"]), self._today())
         window = timedelta(days=int(scope.get("window_days", 7)))
@@ -105,16 +109,17 @@ class SenadoOpenDataConnector:
         # La API exige start_at anterior a hoy (400 «debe ser una fecha anterior a …»): una ventana que
         # empieza hoy se adelanta un día; el solape se deduplica por clave de observación.
         request_start = min(window_start, self._today() - timedelta(days=1))
-        items = [
-            DiscoveredItem(
+        ahead = window_end >= self._today()
+        items = []
+        for name in DATED:
+            item_end = window_end + timedelta(days=AGENDA_AHEAD_DAYS) if (name == "events" and ahead) else window_end
+            items.append(DiscoveredItem(
                 record_type=name,
-                logical_key=f"{name}:{request_start.isoformat()}:{window_end.isoformat()}",
-                url=f"{API}/{name}?format=json&start_at={request_start.isoformat()}&end_at={window_end.isoformat()}",
+                logical_key=f"{name}:{request_start.isoformat()}:{item_end.isoformat()}",
+                url=f"{API}/{name}?format=json&start_at={request_start.isoformat()}&end_at={item_end.isoformat()}",
                 accept_mimes=JSON_ONLY,
-                hints={"from": request_start.isoformat(), "to": window_end.isoformat()},
-            )
-            for name in DATED
-        ]
+                hints={"from": request_start.isoformat(), "to": item_end.isoformat()},
+            ))
         return DiscoverPage(items, cursor.advance(page=page + 1), has_more=window_end < end)
 
     # -- §7.1 fetch ----------------------------------------------------------------------------
