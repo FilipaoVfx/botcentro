@@ -55,6 +55,25 @@ CORPORATIONS = {"all": "Ambas", "senado": "Senado", "camara": "Cámara"}
 TYPES = {"all": "Todos", "proyecto_ley": "Ley", "proyecto_acto_legislativo": "Acto legislativo"}
 
 
+def _video_groups(videos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Una entrada por sesión (fecha, corporación, cuerpo): la misma sesión puede estar en dos canales."""
+    groups: dict[tuple, dict[str, Any]] = {}
+    for v in videos:
+        key = (v.get("session_date"), v.get("corporation"), v.get("body_key") or v.get("title"))
+        g = groups.setdefault(key, {**v, "urls": []})
+        g["urls"].append((v.get("channel"), v["url"]))
+        g["topic"] = g.get("topic") or v.get("topic")
+    return list(groups.values())
+
+
+def _video_label(v: dict[str, Any]) -> str:
+    where = {"senado": "Senado", "camara": "Cámara", "congreso": "Congreso"}.get(v.get("corporation") or "", "Congreso")
+    what = "Audiencia pública" if v.get("kind") == "audiencia" else (v.get("body") or "Sesión")
+    if v.get("kind") == "audiencia" and v.get("body"):
+        what += f" · {v['body']}"
+    return f"{what} ({where})"
+
+
 def _clip(text: str | None, limit: int) -> str:
     text = " ".join((text or "").split())
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
@@ -225,6 +244,14 @@ class UiApplication:
         return self._track_evidence(view, ctx)
 
     # -- inicio y ayudas -----------------------------------------------------------------------
+
+    def _videos(self, corporation: str | None, start: date, end: date) -> list[dict[str, Any]]:
+        """Videos oficiales de sesiones (SRC-26). Si la fuente no responde, la vista sigue sin ellos."""
+        try:
+            return self.rpc.call("bot_session_videos", {"p_corporation": corporation, "p_from": start.isoformat(),
+                                                        "p_to": end.isoformat()}) or []
+        except Exception:  # noqa: BLE001 — un enriquecimiento nunca rompe la vista principal
+            return []
 
     def _home(self, ctx: SessionContext) -> ViewModel:
         rows = [[Button(label="📚 Proyectos", intent=Intent.PROJECTS_LIST),
@@ -509,6 +536,14 @@ class UiApplication:
             lines += facts or [f"No encontré registros para esta fecha en las fuentes cubiertas."]
             if corp == "camara" and not data.get("votings_covered"):
                 lines.append("<i>Las votaciones de la Cámara aún no están en nuestras fuentes.</i>")
+        # 1b. Sesiones con video oficial (SRC-26): confirma que hubo sesión y deja ver la fuente primaria.
+        videos = _video_groups(self._videos(corp, day, day)) if not future else []
+        if videos:
+            lines += ["", bold("▶️ Sesiones en video oficial")]
+            for v in videos[:6]:
+                topic = f" — {escape(_clip(v['topic'], 140))}" if v.get("topic") else ""
+                lines.append(f"• {link(_video_label(v), v['urls'][0][1])}{topic}")
+            lines.append("<i>Video publicado por el canal oficial; el título identifica la sesión.</i>")
         # 2. Programado para ese día
         lines += ["", bold("Programado")]
         if not data.get("agenda_covered"):
@@ -542,7 +577,10 @@ class UiApplication:
                  Button(label="🗓 Agenda", intent=Intent.AGENDA,
                         params={"from": day.isoformat(), "to": (day + timedelta(days=6)).isoformat()})],
                 [Button(label="🔄 Actualizar", intent=Intent.REFRESH), HOME_BUTTON]]
-        empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs)
+        if videos:
+            rows.insert(0, [Button(label=f"▶️ {_clip(_video_label(v), 30)}", intent=Intent.DAY_OVERVIEW, url=v["urls"][0][1])
+                            for v in videos[:2]])
+        empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs or videos)
         return ViewModel(view_type="day", title=f"{corp_name} · {day.isoformat()}", status="empty" if empty else "ready",
                          blocks=["\n".join(lines)], rows=rows)
 
@@ -601,6 +639,13 @@ class UiApplication:
                                "source": "SRC-03", "url": d.get("url")})
         events.sort(key=lambda e: str(e["date"]), reverse=True)
         corp = {"senado": "Senado", "camara": "Cámara"}
+        voted = [e for e in events if e.get("kind") == "votacion" and e.get("date")]
+        plenary_video: dict[tuple[str, str], str] = {}
+        if voted:
+            dates = [date.fromisoformat(str(e["date"])[:10]) for e in voted]
+            for v in self._videos(None, min(dates), max(dates)):
+                if v.get("body_key") == "plenaria" and v.get("kind") == "sesion":
+                    plenary_video.setdefault((str(v["session_date"])[:10], v.get("corporation")), v["url"])
         lines = [bold(f"🗓 Trámite · {label}"), "<i>Hechos fechados en las fuentes, del más reciente al más antiguo. "
                                               "Los del mismo día no tienen orden horario.</i>", ""]
         for e in events[:25]:
@@ -608,7 +653,10 @@ class UiApplication:
             detail = escape(e["detail"])
             if e.get("url", "").startswith("https://") if e.get("url") else False:
                 detail = link(e["detail"], e["url"])
-            lines.append(f"• {fmt_date(e['date'])}{where} — {detail} <i>({e['source']})</i>")
+            video = (plenary_video.get((str(e["date"])[:10], e.get("corporation")))
+                     if e.get("kind") == "votacion" else None)
+            watch = f" · {link('▶️ video de la plenaria', video)}" if video else ""
+            lines.append(f"• {fmt_date(e['date'])}{where} — {detail} <i>({e['source']})</i>{watch}")
         if not events:
             lines.append("No tengo hechos fechados para este proyecto en las fuentes cargadas.")
         if status := data.get("status"):
@@ -788,6 +836,16 @@ class UiApplication:
                              "url": d["source_url"]})
         rows = [[Button(label="📌 Ficha", intent=Intent.PROJECT_OPEN, params={"project_id": p["project_id"]})
                  for p in projects[:2]], [Button(label="⬅️ Votaciones", intent=Intent.BACK), HOME_BUTTON]]
+        body_key = ("plenaria" if session.get("type") == "plenaria" else
+                    f"comision_{session['commission']}" if str(session.get("commission") or "").isdigit() else None)
+        if d.get("date") and body_key:
+            day = date.fromisoformat(str(d["date"])[:10])
+            match = [v for v in self._videos(session.get("corporation"), day, day)
+                     if v.get("body_key") == body_key and v.get("corporation") == session.get("corporation")]
+            if match:
+                lines += ["", f"▶️ {link('Video oficial de esta sesión', match[0]['url'])} ({escape(match[0]['channel'])})"]
+                rows.insert(0, [Button(label="▶️ Ver la sesión", intent=Intent.VOTING_OPEN, url=match[0]["url"])])
+                evidence.append({"label": f"Video oficial · {match[0]['title']}", "url": match[0]["url"]})
         rows = [r for r in rows if r]
         return ViewModel(view_type="voting", title=subject, blocks=["\n".join(lines)], rows=rows, evidence=evidence)
 

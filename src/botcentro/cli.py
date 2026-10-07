@@ -22,6 +22,7 @@ import httpx
 
 from botcentro.connectors.camara_proyectos import CamaraProyectosConnector
 from botcentro.connectors.senado_open_data import SenadoOpenDataConnector
+from botcentro.connectors.youtube_congreso import YoutubeCongresoConnector
 from botcentro.http.fetcher import SafeFetcher
 from botcentro.ingest.runner import IngestionRunner
 from botcentro.ingest.store import IngestStore
@@ -31,7 +32,8 @@ from botcentro.sources.policy import Permission, UsageProfile
 from botcentro.storage.objects import LocalObjectStore
 
 ACCOUNTS = {"ingest": "BOTCENTRO_INGEST", "query": "BOTCENTRO_QUERY"}
-CONNECTORS = {"senado_open_data": SenadoOpenDataConnector, "camara_proyectos": CamaraProyectosConnector}
+CONNECTORS = {"senado_open_data": SenadoOpenDataConnector, "camara_proyectos": CamaraProyectosConnector,
+              "youtube_congreso": YoutubeCongresoConnector}
 
 
 def load_env(path: str = ".env") -> None:
@@ -226,6 +228,9 @@ def normalize(code: str) -> None:
         _run_steps(client, "normalize_senado_od", NORMALIZE_STEPS, BATCHED_STEPS, 20000)
     elif code == "SRC-06":
         _run_steps(client, "normalize_camara_pl", CAMARA_STEPS, set(CAMARA_STEPS), 100)
+    elif code == "SRC-26":
+        _run_steps(client, "normalize_session_videos", ("session_videos",), {"session_videos"}, 200)
+        return
     elif code in INVESTIGATION_STEPS:
         _run_steps(client, "normalize_investigations", (INVESTIGATION_STEPS[code],), {INVESTIGATION_STEPS[code]}, 60)
         return

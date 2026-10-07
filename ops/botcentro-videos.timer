@@ -1,0 +1,12 @@
+# Instalar: sudo cp ops/botcentro-videos.* /etc/systemd/system/ && sudo systemctl daemon-reload &&
+# sudo systemctl enable --now botcentro-videos.timer
+[Unit]
+Description=botcentro: lectura de videos de sesiones a las 06:30, 10:30, 14:30, 18:30 y 22:30 (Bogotá)
+
+[Timer]
+OnCalendar=*-*-* 06,10,14,18,22:30:00 America/Bogota
+Persistent=true
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target
