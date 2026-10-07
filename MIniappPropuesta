@@ -1,0 +1,423 @@
+# Propuesta de implementación: Mini App de búsqueda en actas y visor documental
+
+Fecha: 6 de octubre de 2026. Estado: propuesta para implementación por agente de código.
+
+## 1. Objetivo y decisión propuesta
+
+Crear una Mini App de Telegram que permita explorar la búsqueda existente en actas y abrir la evidencia en la página correspondiente del PDF. El usuario conservará la consulta rápida por chat y podrá profundizar mediante una interfaz con filtros, resultados agrupados por sesión y lectura documental.
+
+El primer entregable debe completar este recorrido: consulta en el bot → explorar resultados → desplegar coincidencias de una sesión → abrir el documento en la página del fragmento → volver a los mismos resultados.
+
+Reutilizar el backend Python y el servicio de búsqueda actual. La Mini App será una nueva interfaz sobre esas capacidades. La mejora esperada es de navegación, comprensión y verificación; no se promete que cambiar la interfaz acelere las consultas existentes.
+
+Este documento integra las propuestas anteriores sobre PDF adjunto, páginas como imágenes, visor con PDF.js, lectura accesible, búsqueda, evidencia, procedencia, favoritos y evolución hacia un explorador documental. Las funciones se priorizan por fases para hacer implementable la primera versión.
+
+## 2. Contexto conocido y límites de la evidencia
+
+La captura aportada por el usuario reporta:
+
+- Búsqueda por comandos como `actas reforma pensional`, `buscar en actas "Paloma Valencia"` y `/actas`.
+- Acceso general desde el inicio y acceso restringido desde una sesión mediante «Buscar en acta N/AAAA».
+- Una entrada por sesión con cuerpo, corporación, fecha, fragmento, página y enlace a la gaceta.
+- Indicación de coincidencias adicionales dentro del acta.
+- Búsqueda de frases y tratamiento de tildes y variantes derivadas del OCR.
+- Atribución del fragmento a la sesión según páginas, incluso cuando una gaceta contiene varias actas.
+- Distinción entre error de búsqueda y ausencia de resultados; cobertura incompleta explícita.
+- PostgreSQL como soporte de búsqueda textual; aproximadamente 16 mil fragmentos y respuesta reportada de unos 80 ms.
+- Procesamiento y publicación progresiva de actas.
+
+Estos datos describen el estado reportado en una captura, no una auditoría independiente del repositorio, un benchmark reproducido ni una garantía de cobertura actual. El agente debe comprobar implementación, esquema, pruebas y métricas antes de modificar código. Los conteos y fechas de la captura nunca se incorporarán como valores fijos a la interfaz.
+
+## 3. Instrucciones de arranque para el agente
+
+1. Leer las instrucciones aplicables del repositorio y localizar bot, API, búsqueda de actas, almacenamiento documental, extracción OCR, despliegue y frontend existente.
+2. Documentar brevemente qué se reutiliza y qué falta. Adaptar nombres de módulos, rutas y tablas al proyecto; los contratos de este documento son propuestas.
+3. Comprobar la semántica real de frase exacta, normalización, agrupación, página y cobertura. Preservar el comportamiento validado del chat.
+4. Confirmar que el bot y la Mini App llamarán al mismo servicio de búsqueda. Evitar duplicar reglas o construir un segundo índice por comodidad del frontend.
+5. Identificar disponibilidad y permisos de distribución de los PDF, tamaño típico, páginas físicas, versiones y coordenadas existentes.
+6. Implementar por fases con cambios revisables, migraciones aditivas y activación controlada.
+7. Entregar instrucciones de ejecución, configuración, pruebas y limitaciones reales. No afirmar que la Mini App está desplegada o probada en Telegram sin haberlo comprobado.
+
+La creación de esta propuesta no configura BotFather, no publica una Mini App ni modifica el bot en producción.
+
+## 4. Alcance y prioridades
+
+| Fase | Entregables |
+|---|---|
+| P0: recorrido completo | Entradas desde el bot, autenticación, búsqueda compartida, filtros, resultados por sesión, coincidencias paginadas, visor PDF en página exacta, vista de texto disponible, procedencia, descarga, cobertura y errores claros. |
+| P1: lectura persistente | Favoritos personales, última página entre dispositivos, historial voluntario y borrable, enlaces compartibles a referencias públicas, resaltado geométrico si los datos lo permiten. |
+| P2: exploración avanzada | Comparación de versiones, índices enriquecidos, vínculos con proyectos/casos/videos y explicaciones con IA sustentadas en páginas. |
+
+P0 no requiere un modelo de IA, un índice vectorial nuevo, reconocimiento de personas ni una nueva plataforma de orquestación. n8n puede participar en trabajos de ingesta si ya existe, pero no debe intermediar cada consulta o cambio de página.
+
+El visor debe ser reutilizable para gacetas, actas, textos de proyectos, informes y providencias. La búsqueda global P0 se limita al corpus de actas existente; no se debe presentar como buscador de documentos que aún no están indexados.
+
+## 5. Experiencia y entradas
+
+### 5.1 Desde una consulta de chat
+
+El usuario escribe una consulta. El bot conserva una respuesta breve y ofrece «Explorar resultados». La Mini App abre con consulta, modo y filtros equivalentes a los del chat. El usuario no vuelve a escribirlos.
+
+### 5.2 Desde una sesión
+
+El botón «Buscar en esta acta» abre la Mini App con una sesión identificada mediante ID estable. Mostrar una etiqueta visible «Buscando en: [corporación, fecha y acta]», con opción explícita para ampliar a todas las actas. El número/año del acta es una etiqueta, no una clave global suficiente.
+
+### 5.3 Desde una cita o documento
+
+«Ver evidencia» abre versión documental, página física y fragmento. «Leer documento» abre la portada o la última posición del lector cuando no hay una cita explícita. Una cita explícita siempre prevalece sobre la posición guardada.
+
+### 5.4 Desde el menú
+
+El menú del bot puede ofrecer «Buscar en actas». Configurar el lanzamiento disponible para el contexto de chat; los botones `web_app` tienen restricciones según su tipo. Verificar su soporte en la Bot API utilizada. En grupos, canales o clientes no compatibles, ofrecer un enlace de lanzamiento admitido o acceso al chat privado, sin depender de un botón exclusivo de chats privados.
+
+### 5.5 Fuera de Telegram
+
+Un enlace público puede abrir un modo de lectura pública limitado si se decide habilitarlo. Las preferencias personales requieren autenticación válida. Si ese modo no se implementa, presentar una invitación clara para abrir en Telegram; nunca simular una identidad.
+
+## 6. Pantallas y navegación
+
+### A. Búsqueda
+
+Campo de consulta, acción de buscar, alcance, modo de coincidencia y filtros. Filtros iniciales: Senado/Cámara/ambas, corporación mediante identificador del catálogo y rango de fechas de sesión. Evitar mostrar comisiones incompatibles con la cámara elegida.
+
+Permitir orden por relevancia y por fecha cuando el servicio lo soporte. Mostrar el orden activo. No enviar consultas por cada pulsación en P0: buscar al confirmar. Si se añade búsqueda incremental, aplicar espera breve y cancelación de peticiones anteriores.
+
+### B. Resultados
+
+Una tarjeta por sesión: cámara, corporación, fecha, acta si está disponible, fragmento representativo, página y cantidad de fragmentos coincidentes. Mostrar por separado cantidad de sesiones y de fragmentos; distinguir totales exactos, aproximados o limitados. Paginación estable mediante «Cargar más» o controles equivalentes.
+
+«Ver fragmentos» despliega las coincidencias de esa sesión sin perder filtros. «Abrir acta» lleva al inicio mapeado de esa acta dentro del PDF, no necesariamente a la primera página de la gaceta. Si el mapeo no existe, informar la limitación.
+
+### C. Coincidencias de una sesión
+
+Lista paginada de fragmentos con texto, página y acción «Ver en documento». El conteo principal es de fragmentos; varias apariciones dentro de un mismo fragmento no deben inflar silenciosamente ese número. Si se muestran apariciones, identificarlas como otra medida.
+
+### D. Lector
+
+Vistas «Documento», «Texto» y «Contexto».
+
+- Documento: PDF, página actual/total, ajuste al ancho, zoom, anterior/siguiente, ir a página y descarga.
+- Texto: extracción paginada disponible, tamaño de letra ajustable y etiqueta de procedencia OCR o extracción digital. Si solo existen fragmentos parciales, mostrar «Texto disponible de esta página», no «Texto completo».
+- Contexto: cita de entrada, sesión relacionada, título, entidad publicadora, fechas y fuente oficial. Mostrar relaciones verificadas disponibles; no inventarlas.
+
+En móvil, controles compactos y panel de contexto desplegable. En escritorio se puede usar un panel lateral. Regresar restaura consulta, filtros, resultados cargados, tarjeta expandida y desplazamiento.
+
+Ejemplo ilustrativo, sin datos de producción:
+
+```text
+← Buscar en actas
+[ reforma pensional                  🔍 ]
+[Ambas cámaras ▾] [Corporación ▾] [Fechas ▾]
+Modo: Frase exacta
+15 sesiones · 31 fragmentos
+Cobertura disponible ⓘ
+
+SENADO · [Corporación] · [Fecha]
+«…fragmento con la coincidencia…»
+Página impresa 40 · Página PDF 42
+[Ver fragmentos] [Abrir acta]
+```
+
+Los números del ejemplo son ilustrativos. Todos los valores visibles deben provenir de la API.
+
+## 7. Requisitos funcionales verificables
+
+| ID | Requisito P0 salvo indicación |
+|---|---|
+| MA-01 | Reutilizar un servicio de búsqueda para chat y Mini App con iguales reglas y corpus. |
+| MA-02 | Abrir desde el bot preservando consulta, modo y alcance. |
+| MA-03 | Buscar globalmente o dentro de una sesión con alcance visible. |
+| MA-04 | Ofrecer filtros compatibles por cámara, corporación y fechas de sesión. |
+| MA-05 | Agrupar por sesión y presentar coincidencias adicionales bajo demanda. |
+| MA-06 | Mantener paginación y orden deterministas dentro de una versión del índice. |
+| MA-07 | Distinguir vacío válido, error, cobertura parcial y procesamiento pendiente. |
+| MA-08 | Abrir una evidencia en su versión y página física correctas. |
+| MA-09 | Diferenciar numeración PDF e impresa cuando ambas existan. |
+| MA-10 | Renderizar progresivamente y liberar recursos de páginas lejanas. |
+| MA-11 | Mostrar texto disponible con origen y límites de cobertura. |
+| MA-12 | Mostrar procedencia y ofrecer acceso al original disponible. |
+| MA-13 | Restaurar el estado de exploración al volver desde el lector. |
+| MA-14 | Adaptarse a móvil, tema, teclado y controles de navegación de Telegram. |
+| MA-15 | Validar identidad en backend para funciones autenticadas. |
+| MA-16 | Mantener el chat y acceso al archivo como alternativas ante fallos del visor. |
+| MA-17 | Registrar métricas operativas sin registrar credenciales ni consultas personales por defecto. |
+| MA-18 | Guardar favoritos y posición por usuario y versión documental, P1. |
+| MA-19 | Compartir referencias públicas sin incluir sesión o credenciales del autor, P1. |
+| MA-20 | Resaltar sobre el PDF únicamente con coordenadas o alineación verificada, P1; si ya existen datos fiables se puede adelantar. |
+
+## 8. Semántica de búsqueda y confianza
+
+«Frase exacta» debe tener un significado documentado. Si se ignoran tildes, mayúsculas, saltos o guiones de final de línea, mostrar una ayuda que lo explique. No introducir expansión semántica, raíces de palabras o coincidencias aproximadas bajo esa etiqueta sin distinguirlas.
+
+El agente verificará si las variantes reportadas en la captura corresponden a normalización, stemming o recuperación aproximada. Si hay varios comportamientos, la API devolverá el modo realmente aplicado. Un cambio de modo debe ser explícito y consistente con el chat.
+
+Preservar tanto el texto de presentación como el texto normalizado para búsqueda. Los rangos de resaltado se calcularán sobre el texto visible o mediante un mapa de alineación; los offsets del texto normalizado no se aplican directamente si cambió su longitud. No aceptar HTML de resaltado arbitrario desde un documento.
+
+El texto del acta puede registrar declaraciones de terceros: una coincidencia de búsqueda no demuestra la veracidad de una acusación. El visor muestra el documento y su contexto; no atribuye automáticamente responsabilidad penal, sanción ni estado procesal a una persona.
+
+Mensaje de vacío sugerido: «No encontramos coincidencias con estos filtros en las actas disponibles. La cobertura sigue creciendo». Mensaje de error: «No pudimos completar la búsqueda. Intenta nuevamente». Nunca convertir una excepción en lista vacía.
+
+## 9. Modelo documental y páginas
+
+Adaptar el modelo existente; no crear entidades duplicadas sin necesidad.
+
+| Entidad lógica | Campos mínimos |
+|---|---|
+| Documento | ID estable, tipo, título, publicador, URL oficial, disponibilidad. |
+| Versión documental | ID, documento, hash del archivo, referencia de almacenamiento, fecha de recuperación, tamaño, número de páginas. |
+| Sesión | ID, cámara, corporación, fecha, número/año de acta si existen. |
+| Relación sesión-documento | Sesión, versión, intervalo de páginas físicas y procedencia del mapeo. |
+| Fragmento | ID, sesión, versión, texto visible, texto de búsqueda, localización por página, origen de extracción y versión del extractor. |
+| Localización geométrica | Página, rectángulos normalizados o coordenadas PDF con convención explícita, rotación y método de alineación. |
+| Cobertura | Ámbito, versión del índice, último procesamiento, conteos publicados y pendientes cuando sean conocidos. |
+| Preferencia P1 | Usuario autenticado, versión, posición/favorito y fecha de actualización. |
+
+Convención propuesta: API y UI usan `pdf_page_number` desde 1; el frontend realiza la conversión que requiera la biblioteca. `printed_page_label` es una cadena opcional: puede contener romanos u otra numeración. No calcularla sumando un desplazamiento fijo para todo PDF sin verificarlo.
+
+Una gaceta puede contener varias actas y otros materiales. El límite de una sesión puede caer dentro de una página: si ocurre, la atribución necesita límites de fragmento o región, no solo el número de página. Si no puede resolverse, marcar atribución pendiente y no presentar la coincidencia como asignación confirmada.
+
+Una cita siempre referencia una versión concreta. Si la fuente sustituye el PDF, crear una nueva versión y conservar la cita anterior cuando el almacenamiento lo permita. No redirigirla silenciosamente a otra página de un archivo cambiado. Si la versión ya no está disponible, mostrar ese estado.
+
+Los fragmentos multipágina deben contener localizadores por parte; no fingir que el fragmento completo aparece en una sola página.
+
+## 10. Arquitectura propuesta
+
+```mermaid
+flowchart LR
+    B[Bot Telegram] -->|Contexto de apertura| M[Mini App]
+    M -->|HTTPS y sesión validada| A[API Python]
+    B --> S[Servicio de búsqueda compartido]
+    A --> S
+    S --> P[(PostgreSQL)]
+    A --> D[Servicio documental]
+    D --> O[(PDF y derivados)]
+    M -->|Archivo autorizado| V[PDF.js en el dispositivo]
+    J[Trabajos existentes de extracción y OCR] --> P
+    J --> O
+```
+
+Preferir el framework backend y frontend ya presentes. Si no existe frontend, crear una aplicación pequeña con TypeScript y PDF.js; elegir un framework solo si aporta al mantenimiento del equipo. Fijar versiones compatibles del motor y worker de PDF.js en el lockfile.
+
+La API debe devolver metadatos y resultados paginados. Los archivos se entregan por un endpoint controlado o URL autorizada de almacenamiento. Evitar que Python cargue el PDF completo en memoria para cada lectura.
+
+No aceptar una URL arbitraria del cliente para que el servidor descargue un PDF. Resolver IDs internos a fuentes registradas. Validar también redirecciones y destinos de red en los procesos de ingesta para evitar acceso a recursos internos.
+
+## 11. Contratos API propuestos
+
+Reutilizar rutas equivalentes si ya existen. El contrato final debe quedar documentado en el mecanismo habitual del repositorio.
+
+| Método y ruta conceptual | Uso |
+|---|---|
+| `POST /api/miniapp/session` | Validar `initData` y establecer sesión de aplicación. |
+| `GET /api/miniapp/launch/{token}` | Resolver contexto de apertura autorizado. |
+| `POST /api/actas/search` | Consulta, alcance, filtros, modo, orden y cursor. |
+| `POST /api/actas/sessions/{id}/matches` | Fragmentos de una sesión para la misma consulta y versión del índice. |
+| `GET /api/documents/{id}/versions/{version}` | Metadatos, capacidades y acceso al archivo. |
+| `GET /api/document-versions/{version}/pages/{page}/text` | Texto disponible y procedencia de esa página. |
+| `GET /api/fragments/{id}` | Cita, sesión, versión y localizadores. |
+| `GET /api/actas/coverage` | Cobertura y fecha de actualización. |
+| `PUT /api/me/reading-position` | Posición de lectura, P1. |
+| `PUT /api/me/bookmarks/{reference}` | Favorito idempotente, P1; incluir borrado equivalente. |
+
+Ejemplo ilustrativo de solicitud:
+
+```json
+{
+  "query": "reforma pensional",
+  "mode": "normalized_phrase",
+  "scope": {"type": "all_actas"},
+  "filters": {"chamber": null, "corporation_id": null, "date_from": null, "date_to": null},
+  "sort": "relevance",
+  "limit": 20,
+  "cursor": null
+}
+```
+
+Ejemplo ilustrativo de una entrada de respuesta:
+
+```json
+{
+  "index_version": "example-index-v1",
+  "applied_mode": "normalized_phrase",
+  "session_id": "example-session",
+  "matching_fragment_count": 3,
+  "representative_fragment": {
+    "id": "example-fragment",
+    "document_version_id": "example-version",
+    "text": "Se discutió la reforma pensional en la sesión.",
+    "pdf_page_number": 42,
+    "printed_page_label": "40",
+    "extraction_method": "ocr",
+    "geometry_available": false
+  }
+}
+```
+
+La respuesta completa incluye lista de sesiones, total de sesiones y fragmentos con tipo de conteo, cursor siguiente y metadatos de cobertura. No enviar miles de coincidencias en la primera respuesta.
+
+Valores iniciales propuestos: consulta hasta 300 caracteres, 20 sesiones por página, máximo 50; 10 fragmentos por expansión, máximo 50. Ajustar con datos reales. Fechas de sesión usan calendario de Colombia; instantes técnicos se almacenan con zona y se presentan en America/Bogota.
+
+El cursor vincula consulta, filtros, orden y versión del índice. Un cambio incompatible invalida el cursor con una respuesta específica para recargar; no mezclar páginas de índices distintos ni repetir resultados silenciosamente.
+
+Errores distinguibles: consulta inválida, sesión de autenticación vencida, recurso inexistente, versión no disponible, PDF en preparación, límite de peticiones y servicio temporalmente no disponible. Un recurso en preparación puede devolver estado pendiente y orientación de reintento; no activar OCR repetido por cada usuario.
+
+## 12. Integración Telegram y autenticación
+
+La Mini App se sirve mediante HTTPS. El bot aporta un contexto de apertura compacto que referencia consulta/sesión/fragmento. Preferir token opaco de vida limitada para consultas personales; la referencia documental pública compartible tendrá un tratamiento distinto y estable.
+
+Validar `Telegram.WebApp.initData` en el servidor según el algoritmo oficial para el mecanismo elegido. Comprobar firma y antigüedad de `auth_date`, y emitir una sesión de aplicación de duración limitada. No confiar en `initDataUnsafe`, un ID de usuario del formulario o un token de navegación como prueba de identidad. Mantener el token del bot exclusivamente en backend.
+
+El contexto de apertura privado se autoriza contra el usuario autenticado. Para referencias públicas compartidas, omitir consultas e información personal y volver a evaluar el acceso al documento. Un token de apertura no otorga por sí solo permiso sobre archivos privados.
+
+Definir almacenamiento de sesión compatible con los WebViews objetivo. Si se usan cookies, proteger mutaciones frente a CSRF; si se usan tokens, evitar persistir credenciales duraderas en almacenamiento accesible a scripts. Redactar `initData`, tokens y URLs firmadas en logs.
+
+Navegación interna mediante router y botón de regreso integrado. Funciones adicionales de Telegram se detectan por capacidad/versión y tienen alternativa. No asumir que `sendData` funciona para todo modo de lanzamiento: para la comunicación general del lector, usar la API propia autenticada.
+
+## 13. Visor PDF, texto y entrega de archivos
+
+PDF.js es la opción inicial recomendada. Probar primero con un PDF digital pequeño, una gaceta extensa y un escaneo real. Mantener dependencias actualizadas y revisar cambios del motor antes de fijar la versión final.
+
+Renderizar la página visible y un margen pequeño configurable; cancelar renderizados obsoletos, liberar canvas lejanos y limitar resolución en pantallas densas. Cargar miniaturas solo bajo demanda. Un archivo grande puede exigir descargar partes adicionales para su estructura: no prometer lectura instantánea ni consumo proporcional a una única página.
+
+Configurar y probar CORS, cabeceras necesarias, solicitudes HTTP Range y respuestas 206 donde el almacenamiento lo permita. Si no hay lectura parcial, informar el peso antes de una descarga grande y habilitar una alternativa. Renovar acceso cuando expire una URL firmada sin cambiar la versión documental.
+
+El escaneo sigue siendo imagen en el PDF aunque exista OCR en la base. Buscar y seleccionar texto en el visor requiere una capa de texto alineada; el OCR separado no aparece automáticamente en PDF.js. P0 puede mostrar resultados y texto en un panel independiente sin añadir una capa incorrecta sobre la página.
+
+Si hay geometría, especificar sistema de coordenadas, origen, tamaño de página y rotación. Probar zoom, rotación y recorte. Cuando no pueda localizarse exactamente, abrir la página y mostrar la cita como «Ubicación aproximada dentro de esta página», sin dibujar un resaltado inventado.
+
+Ofrecer búsqueda de texto en el PDF cuando exista capa textual, distinguiéndola de la búsqueda sobre fragmentos OCR indexados. Etiquetar el alcance. Un PDF de gaceta puede incluir material ajeno al acta seleccionada.
+
+Si el archivo está cifrado, corrupto, retirado o inaccesible, informar el estado y ofrecer fuente oficial o texto disponible cuando proceda. No pedir ni almacenar contraseñas documentales en P0. Los enlaces externos se tratan como contenido no confiable y se abren mediante una acción explícita del usuario.
+
+## 14. Alternativas desde el chat
+
+Conservar PDF adjunto o enlace de descarga. Para evidencias puntuales se puede ofrecer «Ver página en chat», con renderizado en imagen y botones anterior/siguiente. Es una alternativa, no un requisito para bloquear la salida del visor P0.
+
+Si se implementa, generar imágenes bajo demanda con límites y caché por hash de archivo, página, resolución y versión del renderizador. Reutilizar archivos ya enviados al bot cuando sea posible. No convertir toda una gaceta a imágenes por cada consulta.
+
+Un PDF adjunto se abre según el cliente/dispositivo. La Mini App ofrece una interfaz de lectura dentro de Telegram; no queda incrustada como un visor interactivo permanente en la burbuja del mensaje.
+
+## 15. Costos y rendimiento
+
+La integración básica de una Mini App alojada por el proyecto no implica un cobro de Telegram por cada apertura. El presupuesto del visor depende del alojamiento, almacenamiento, transferencia y procesamiento. No requiere Telegram Premium para la experiencia básica propuesta.
+
+No incorporar difusiones de pago, servicios comerciales de PDF, transcripción o IA como dependencias de P0. PDF.js tiene licencia Apache-2.0; conservar avisos aplicables. Free tier no equivale a capacidad ilimitada: inventariar las cuotas reales del proveedor elegido antes del despliegue.
+
+Reutilizar texto ya extraído; OCR pendiente se ejecuta como trabajo idempotente por versión y configuración, no en la petición de lectura. Caché de búsquedas por consulta normalizada, filtros, modo, orden, versión del índice y ámbito de acceso. No compartir respuestas privadas entre usuarios.
+
+Objetivos iniciales para validar en un entorno definido, no promesas de producción:
+
+- API de búsqueda P95 menor a 500 ms con 10 consultas concurrentes y corpus representativo; registrar por separado red y servidor.
+- Interfaz utilizable en menos de 3 segundos en dispositivo Android de gama media y conexión de prueba documentados, excluyendo descarga del PDF.
+- Primer render de PDF digital de 10 MB o menos en menos de 5 segundos en esa prueba; reportar caché fría/caliente y archivos fuera de perfil por separado.
+- Abrir evidencia desde una tarjeta en como máximo dos acciones.
+- La memoria del visor debe estabilizarse al recorrer un documento largo, en vez de crecer con cada página visitada.
+
+Los aproximadamente 80 ms de la captura son una observación reportada y no sustituyen estas mediciones. Ajustar metas justificadamente con evidencias antes de convertirlas en compromiso operativo.
+
+## 16. Accesibilidad y observabilidad
+
+Controles con etiquetas, foco visible, contraste legible y navegación por teclado; no depender únicamente del color del resaltado. La vista de texto facilita lectura y tamaño de letra, pero no garantiza por sí sola accesibilidad completa de tablas o escaneos. Mostrar limitaciones cuando existan.
+
+Probar tamaños móviles pequeños, teclado abierto, orientación horizontal y áreas seguras de Telegram. El tema oscuro aplica al entorno del lector; no invertir indiscriminadamente el PDF original porque puede alterar gráficos o sellos.
+
+Métricas: latencia de búsqueda, errores por tipo, aperturas de evidencia, fallos de archivo, tiempo al primer render, bytes servidos y fallos de autenticación agregados. No registrar consulta literal, texto de documentos o identidad personal por defecto. Si se habilita historial personal, debe ser voluntario y borrable.
+
+## 17. Casos límite y respuesta esperada
+
+| Caso | Comportamiento |
+|---|---|
+| Mismo número/año en varias corporaciones | Resolver por ID de sesión y mostrar corporación/fecha. |
+| Varias actas en una gaceta | Mantener delimitación y atribución por fragmento. |
+| Portadas y páginas romanas | Mostrar numeración física e impresa sin asumir offset constante. |
+| Fragmento entre dos páginas | Permitir abrir ambas localizaciones. |
+| OCR confunde nombre o cifra | Mostrar origen OCR y acceso al original; no corregir silenciosamente una cita. |
+| Consulta con comillas, apóstrofes o SQL | Tratar como datos mediante consultas parametrizadas y límites. |
+| Resultado llega después de cambiar consulta | Descartar respuesta obsoleta. |
+| Publicación de nuevas actas durante paginación | Mantener versión del índice o solicitar recarga explícita. |
+| PDF cambia bajo la misma URL | Nueva versión; referencias previas conservan su destino o muestran indisponibilidad. |
+| Enlace de apertura expira | Recuperar desde el bot o renovar sesión; no filtrar contexto privado. |
+| Archivo desaparece | Mostrar estado y texto disponible, con procedencia y límites. |
+| Teléfono con poca memoria | Menos páginas simultáneas y alternativa de descarga/texto. |
+| Coincidencia atribuida de forma ambigua | No presentarla como sesión confirmada. |
+| Usuario sin resultados por filtros | Mostrar filtros activos y acción para restablecerlos. |
+| Fallo en almacenamiento pero búsqueda disponible | Mantener resultados y explicar que el documento no pudo abrirse. |
+
+## 18. Criterios de aceptación y pruebas
+
+| ID | Validación necesaria |
+|---|---|
+| AT-01 | La consulta del chat abre la Mini App con iguales términos, modo y alcance. |
+| AT-02 | Buscar desde una sesión excluye fragmentos de otras actas en la misma gaceta. |
+| AT-03 | La frase de un nombre no combina palabras sueltas de fragmentos distintos. |
+| AT-04 | Tildes, guiones y saltos de línea siguen la semántica declarada; resaltado visible correcto. |
+| AT-05 | Una sesión con varias coincidencias muestra el conteo correcto y permite recorrerlas. |
+| AT-06 | Filtros y orden aplican de forma idéntica al resultado y a sus conteos. |
+| AT-07 | El lector abre la página física correcta cuando difiere de la impresa. |
+| AT-08 | Regresar conserva filtros, tarjeta expandida y desplazamiento. |
+| AT-09 | Documento sin geometría abre la página y muestra cita sin resaltado falso. |
+| AT-10 | OCR separado se presenta como tal, sin prometer selección nativa inexistente. |
+| AT-11 | Un fallo del servicio produce error y no «cero coincidencias». |
+| AT-12 | Cobertura parcial y texto incompleto se identifican en UI. |
+| AT-13 | Firma inválida, datos manipulados o autenticación vencida se rechazan. |
+| AT-14 | Un usuario no accede a contexto privado, favoritos o documentos de otro. |
+| AT-15 | El cliente no puede usar el backend como proxy de URLs arbitrarias. |
+| AT-16 | PDF extenso funciona sin renderizar simultáneamente todas las páginas. |
+| AT-17 | URL de archivo vencida se recupera o falla de forma comprensible. |
+| AT-18 | Cambio de versión no desplaza silenciosamente una cita. |
+| AT-19 | Android, iOS y Telegram Desktop completan el recorrido; documentar versiones probadas. |
+| AT-20 | Archivo corrupto, retirado o cifrado tiene salida comprensible. |
+| AT-21 | Consulta nueva no recibe resultados tardíos de la anterior. |
+| AT-22 | Paginación mantiene resultados estables o solicita actualización explícita. |
+| AT-23 | Desactivar la Mini App mantiene comandos y búsqueda del chat operativos. |
+| AT-24 | Las métricas de rendimiento se reportan con corpus, dispositivo, carga y caché definidos. |
+| AT-25 | Un límite entre actas dentro de una página no provoca atribución errónea. |
+| AT-26 | Documento con rotación y varias columnas conserva localización correcta cuando se habilitan resaltados. |
+
+Pruebas prioritarias: integración de búsqueda compartida, contratos de páginas y versiones, autenticación/autorización y recorrido end-to-end. Usar fixtures pequeños que representen errores reales de OCR y gacetas con varias actas. No sustituir validación en clientes Telegram por pruebas solo en navegador de escritorio.
+
+## 19. Secuencia de implementación y entregables
+
+### Paso 1. Inspección y prueba técnica
+
+Mapa del código existente, semántica de búsqueda documentada, prueba de PDF.js con tres tipos de archivo, verificación de páginas y entrega de archivo. Resolver bloqueos de acceso a PDF antes de construir toda la interfaz.
+
+### Paso 2. Recorrido mínimo integrado
+
+Lanzamiento autenticado desde el bot, consulta compartida y un resultado que abre su página. Probar en Telegram real. No necesita favoritos ni geometría de resaltado.
+
+### Paso 3. Completar P0
+
+Filtros, expansión de coincidencias, paginación, vista de texto, procedencia, estado de cobertura, errores y navegación de vuelta. Medir rendimiento y corregir problemas del recorrido.
+
+### Paso 4. Activación gradual
+
+Propuesta de flags: `MINIAPP_ACTAS_ENABLED`, `MINIAPP_PDF_VIEWER_ENABLED` y `MINIAPP_GEOMETRIC_HIGHLIGHTS_ENABLED`, inicialmente desactivadas hasta que corresponda. Reutilizar el sistema de flags existente si lo hay. Activar en entorno de prueba y luego para un grupo limitado.
+
+Rollback: ocultar accesos nuevos y desactivar flags; mantener APIs y migraciones aditivas mientras haya clientes abiertos. No revertir eliminando datos documentales. El bot conserva sus respuestas habituales.
+
+Entregables del agente: código, configuración de entorno sin secretos, migraciones necesarias, contratos de API, pruebas relevantes, capturas del recorrido con datos identificados, informe de rendimiento, guía de configuración de BotFather/HTTPS y procedimiento de activación/rollback. Declarar pruebas pendientes por falta de dispositivo o credenciales.
+
+## 20. Evolución posterior
+
+P1 añade favoritos, posición entre dispositivos, historial opcional y referencias compartibles. Compartir requiere acción del usuario y transmite una referencia pública, no credenciales ni consultas privadas. Verificar mecanismos de Telegram disponibles antes de elegir integración nativa o enlace.
+
+P2 puede comparar versiones por artículo, mostrar debates relacionados y ofrecer «Explícame este fragmento». Las respuestas con IA deben limitarse al material recuperado, citar versión y páginas, y abstenerse cuando no hay evidencia suficiente. La comparación de versiones debe separar cambios del documento de errores de OCR.
+
+Los vínculos hacia video deben apuntar a evidencia audiovisual comprobada y tiempos verificados. Esta propuesta no crea por sí sola el pipeline de transcripción del canal del Congreso.
+
+## 21. Fuentes técnicas y grado de certeza
+
+Consultadas el 6 de octubre de 2026. Son documentación técnica, no prueba de funcionamiento en este proyecto. Los requisitos, fases, contratos y metas de este documento son decisiones propuestas para la implementación.
+
+- [Telegram Mini Apps](https://core.telegram.org/bots/webapps): mecanismos de lanzamiento, interfaz e integración con el cliente.
+- [Validación de datos de Mini Apps](https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app): referencia obligatoria para validar la sesión en backend.
+- [Telegram Bot API](https://core.telegram.org/bots/api): comprobar restricciones del botón y operaciones de documentos utilizadas.
+- [Plataforma de bots](https://core.telegram.org/bots): gratuidad de la plataforma básica; infraestructura propia se presupuesta aparte.
+- [PDF.js](https://mozilla.github.io/pdf.js/) y [ejemplos](https://mozilla.github.io/pdf.js/examples/): motor de renderizado propuesto.
+- [FAQ oficial de PDF.js](https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions): consideraciones de integración, archivos y rendimiento.
+- [Licencia de PDF.js](https://github.com/mozilla/pdf.js/blob/master/LICENSE): Apache-2.0; verificar la versión finalmente incorporada.
+
+## 22. Instrucción resumida para iniciar el trabajo
+
+> Implementa P0 de esta propuesta sobre el repositorio existente. Primero verifica el servicio de búsqueda de actas, su semántica y la localización de páginas. Reutiliza Python y PostgreSQL, conecta el bot y la Mini App al mismo servicio y construye el recorrido búsqueda → sesión → fragmento → página PDF → volver. Usa PDF.js como opción inicial y valida temprano su funcionamiento con gacetas reales en Telegram. Conserva el contexto, la procedencia, la cobertura y las versiones de los documentos. Entrega cambios revisables, pruebas de los casos críticos, instrucciones de configuración y activación gradual. Documenta cualquier divergencia entre el estado reportado en la captura y el código real. Implementa las mejoras P1/P2 solo cuando sean solicitadas o se amplíe expresamente el alcance.
