@@ -45,3 +45,38 @@ def test_not_modified_is_a_successful_edit_and_old_callbacks_do_not_fail() -> No
     transport = AiogramTransport(FakeBot())  # type: ignore[arg-type]
     assert asyncio.run(transport.edit(5, 1, "igual", None)) is True
     asyncio.run(transport.answer_callback("viejo"))  # no lanza
+
+
+def test_callback_on_message_with_links_is_forwarded() -> None:
+    """Regresión 2026-10-06: un botón en un mensaje con enlaces (actas, videos) fallaba al serializar el update
+    porque aiogram completa `link_preview_options` con valores internos no serializables."""
+    import asyncio
+
+    from aiogram.types import Update
+
+    from botcentro.telegram_ui.aiogram_adapter import build_dispatcher
+
+    raw = {"update_id": 1, "callback_query": {"id": "1", "from": {"id": 7, "is_bot": False, "first_name": "A"},
+           "chat_instance": "x", "data": "v1:abc", "message": {
+               "message_id": 5, "date": 1, "chat": {"id": 7, "type": "private"},
+               "from": {"id": 9, "is_bot": True, "first_name": "B"}, "text": "Acta 3/2025",
+               "entities": [{"type": "text_link", "offset": 0, "length": 5, "url": "https://svrpubindc.imprenta.gov.co/x"}],
+               "link_preview_options": {"is_disabled": True}}}}
+    received = []
+
+    class Runtime:
+        async def on_update(self, update):  # noqa: ANN001, ANN201
+            received.append(update)
+
+    from aiogram import Bot
+
+    async def run() -> None:
+        bot = Bot("123456:TEST-token-no-network")  # solo se lee su id; el manejador no llama a la API
+        try:
+            await build_dispatcher(Runtime()).feed_raw_update(bot=bot, update=raw)  # type: ignore[arg-type]
+        finally:
+            await bot.session.close()
+
+    asyncio.run(run())
+    assert received and received[0]["callback_query"]["data"] == "v1:abc"
+    assert "Default" not in repr(received[0])

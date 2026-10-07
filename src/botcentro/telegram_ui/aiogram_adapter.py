@@ -24,7 +24,11 @@ from botcentro.telegram_ui.runtime import Keyboard, UiRuntime
 log = logging.getLogger("botcentro.ui.telegram")
 COMMANDS = [("start", "Inicio y menú"), ("help", "Qué puedo responder y ejemplos"),
             ("proyecto", "Ficha de un proyecto: /proyecto 178 de 2025 Senado"),
-            ("agenda", "Agenda publicada de esta semana"), ("fuentes", "De dónde salen los datos"),
+            ("senadohoy", "Senado hoy: sesiones, votaciones, actas y video"),
+            ("camarahoy", "Cámara hoy: sesiones, actas y video"),
+            ("actas", "Buscar en las actas de las sesiones: /actas reforma pensional"),
+            ("agenda", "Agenda publicada de esta semana"), ("votaciones", "Votaciones nominales del Senado"),
+            ("casos", "Grandes casos e investigaciones"), ("fuentes", "De dónde salen los datos"),
             ("privacidad", "Qué guardo de ti")]
 
 
@@ -85,7 +89,10 @@ def build_dispatcher(runtime: UiRuntime) -> Dispatcher:
     router = Router(name="botcentro")
 
     async def forward(event_update: Update) -> None:
-        raw = event_update.model_dump(mode="json", by_alias=True, exclude_none=True)
+        # Solo lo que envió Telegram (exclude_unset): en mensajes con enlaces, aiogram completa
+        # `link_preview_options` con valores internos (`Default`) que no se pueden serializar y tumbaban el
+        # botón (2026-10-06, mensajes de actas y videos).
+        raw = event_update.model_dump(mode="json", by_alias=True, exclude_none=True, exclude_unset=True)
         try:
             await runtime.on_update(raw)
         except TelegramForbiddenError:
