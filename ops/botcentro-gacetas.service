@@ -1,0 +1,21 @@
+# Instalar: sudo cp ops/botcentro-gacetas.service /etc/systemd/system/ && sudo systemctl daemon-reload &&
+# sudo systemctl enable --now botcentro-gacetas.service
+[Unit]
+Description=botcentro: carga de gacetas del Congreso (SRC-03) desde 2022-07-20 → texto, actas y Qdrant
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/botcentro
+EnvironmentFile=/root/botcentro/.env
+ExecStart=/root/botcentro/.venv/bin/python -m botcentro.cli load-gacetas --since 2022-07-20 --out var/gacetas-manifest-local.jsonl
+# Reanudable por manifiesto: un fallo (red, base) reintenta en 10 min en vez de morir en silencio (29/09).
+Restart=on-failure
+RestartSec=600
+Nice=15
+IOSchedulingClass=idle
+StandardOutput=append:/root/botcentro/var/load-gacetas.log
+StandardError=append:/root/botcentro/var/load-gacetas.log
+
+[Install]
+WantedBy=multi-user.target

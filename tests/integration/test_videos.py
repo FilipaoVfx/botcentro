@@ -81,7 +81,7 @@ def test_camara_day_shows_the_plenary_with_its_topic(loaded) -> None:
         UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button", parameters={"corporation": "camara", "date": "2026-09-22"}),
         SessionContext())
     text = view.blocks[0]
-    assert "Sesiones en video oficial" in text and "Plenaria (Cámara)" in text and "Moción de Censura MinDefensa" in text
+    assert "Sesiones de este día" in text and "Plenaria (Cámara)" in text and "Moción de Censura MinDefensa" in text
     assert "Comisiones económicas conjuntas (Congreso)" in text  # misma fecha, comisiones conjuntas
     assert view.status == "ready" and any(b.url for row in view.rows for b in row)
 
@@ -90,7 +90,7 @@ def test_day_without_session_video_shows_no_empty_section(loaded) -> None:
     view = _app(loaded["db"], loaded["query"]).handle(
         UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button", parameters={"corporation": "senado", "date": "2026-09-28"}),
         SessionContext())
-    assert "Sesiones en video oficial" not in view.blocks[0]
+    assert "Sesiones de este día" not in view.blocks[0]
 
 
 def test_senate_day_includes_its_committee_and_unattributed_hearings(loaded) -> None:
@@ -115,3 +115,30 @@ def test_today_view_says_last_and_next_session(loaded) -> None:
     assert "no publica su agenda en nuestras fuentes" in text
     last = [b for row in view.rows for b in row if b.label == "📅 Última sesión"]
     assert last and last[0].params == {"corporation": "camara", "date": "2026-10-01"}
+
+
+
+def test_video_and_acta_of_the_same_session_are_one_line(loaded) -> None:
+    """El video (SRC-26) y el acta en la Gaceta (SRC-03) de la misma sesión se muestran juntos; una fecha antigua
+    sin video muestra solo el acta. Un acta de otro cuerpo el mismo día no se mezcla."""
+    db = loaded["db"]
+    ingest = db.create_user("ingest_service")
+    rows = [{"document_key": "gaceta:camara:2026:1400", "gaceta_url": "https://svrpubindc.imprenta.gov.co/senado/x?num=1400",
+             "number": "41", "year": 2026, "session_date": "2026-09-22", "corporation": "camara", "body": "Plenaria",
+             "body_key": "plenaria", "pdf_page": 2, "published_on": "2026-10-20"},
+            {"document_key": "gaceta:camara:2026:1401", "gaceta_url": "https://svrpubindc.imprenta.gov.co/senado/x?num=1401",
+             "number": "9", "year": 2026, "session_date": "2026-09-22", "corporation": "camara", "body": "Comisión Tercera",
+             "body_key": "comision_3", "pdf_page": 1, "published_on": "2026-10-21"},
+            {"document_key": "gaceta:camara:2025:600", "gaceta_url": "https://svrpubindc.imprenta.gov.co/senado/x?num=600",
+             "number": "3", "year": 2025, "session_date": "2025-05-21", "corporation": "camara", "body": "Plenaria",
+             "body_key": "plenaria", "pdf_page": 1, "published_on": "2025-06-10"}]
+    assert db.rpc(ingest).call("ingest_session_actas", {"p_rows": rows}) == 3
+    app = _app(db, loaded["query"])
+    text = app.handle(UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button",
+                               parameters={"corporation": "camara", "date": "2026-09-22"}), SessionContext()).blocks[0]
+    plenary = text.split("Plenaria (Cámara)")[1].split("•")[0]
+    assert "▶️ video oficial" in plenary and "Acta 41/2026 · Gaceta 1400/2026, p. 2" in plenary
+    assert "Comisión Tercera (Cámara)" in text and "Acta 9/2026" in text.split("Comisión Tercera (Cámara)")[1]
+    old = app.handle(UiAction(intent=Intent.DAY_OVERVIEW, entry_point="button",
+                              parameters={"corporation": "camara", "date": "2025-05-21"}), SessionContext()).blocks[0]
+    assert "Acta 3/2025" in old and "▶️ video oficial" not in old

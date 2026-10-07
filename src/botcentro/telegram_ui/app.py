@@ -55,6 +55,25 @@ CORPORATIONS = {"all": "Ambas", "senado": "Senado", "camara": "Cámara"}
 TYPES = {"all": "Todos", "proyecto_ley": "Ley", "proyecto_acto_legislativo": "Acto legislativo"}
 
 
+def _session_groups(videos: list[dict[str, Any]], actas: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Una entrada por sesión (fecha, corporación, cuerpo) con su video oficial y/o su acta en la Gaceta.
+    Solo se unen si coinciden los tres datos; un acta sin cuerpo identificado queda aparte."""
+    groups: dict[tuple, dict[str, Any]] = {}
+    for g in _video_groups(videos):
+        groups[(str(g.get("session_date"))[:10], g.get("corporation"), g.get("body_key") or g.get("title"))] = g
+    for a in actas:
+        key = (str(a.get("session_date"))[:10], a.get("corporation"), a.get("body_key") or f"acta:{a['document_key']}")
+        g = groups.setdefault(key, {"session_date": a.get("session_date"), "corporation": a.get("corporation"),
+                                    "body": a.get("body"), "body_key": a.get("body_key"), "kind": "sesion", "urls": []})
+        g.setdefault("actas", []).append(a)
+    return sorted(groups.values(), key=lambda g: (str(g.get("session_date")), g.get("body_key") == "plenaria"), reverse=True)
+
+
+def _acta_link(a: dict[str, Any]) -> str:
+    page = f", p. {a['pdf_page']}" if a.get("pdf_page") else ""
+    return link(f"📄 Acta {a['acta_number']}/{a['acta_year']} · Gaceta {a['gaceta']}{page}", a["url"])
+
+
 def _video_groups(videos: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Una entrada por sesión (fecha, corporación, cuerpo): la misma sesión puede estar en dos canales."""
     groups: dict[tuple, dict[str, Any]] = {}
@@ -294,6 +313,14 @@ class UiApplication:
                 buttons.insert(0, Button(label="📅 Última sesión", intent=Intent.DAY_OVERVIEW,
                                          params={"corporation": corp, "date": last.isoformat()}))
         return lines, buttons
+
+    def _actas(self, corporation: str | None, start: date, end: date) -> list[dict[str, Any]]:
+        """Actas de sesiones en la Gaceta (SRC-03). Si la fuente no responde, la vista sigue sin ellas."""
+        try:
+            return self.rpc.call("bot_session_actas", {"p_corporation": corporation, "p_from": start.isoformat(),
+                                                       "p_to": end.isoformat()}) or []
+        except Exception:  # noqa: BLE001
+            return []
 
     def _videos(self, corporation: str | None, start: date, end: date) -> list[dict[str, Any]]:
         """Videos oficiales de sesiones (SRC-26). Si la fuente no responde, la vista sigue sin ellos."""
@@ -588,13 +615,18 @@ class UiApplication:
             if corp == "camara" and not data.get("votings_covered"):
                 lines.append("<i>Las votaciones de la Cámara aún no están en nuestras fuentes.</i>")
         # 1b. Sesiones con video oficial (SRC-26): confirma que hubo sesión y deja ver la fuente primaria.
-        videos = _video_groups(self._videos(corp, day, day)) if not future else []
-        if videos:
-            lines += ["", bold("▶️ Sesiones en video oficial")]
-            for v in videos[:6]:
-                topic = f" — {escape(_clip(v['topic'], 140))}" if v.get("topic") else ""
-                lines.append(f"• {link(_video_label(v), v['urls'][0][1])}{topic}")
-            lines.append("<i>Video publicado por el canal oficial; el título identifica la sesión.</i>")
+        sessions = _session_groups(self._videos(corp, day, day), self._actas(corp, day, day)) if not future else []
+        videos = [g for g in sessions if g.get("urls")]
+        if sessions:
+            lines += ["", bold("🎥 Sesiones de este día")]
+            for g in sessions[:6]:
+                topic = f" — {escape(_clip(g['topic'], 140))}" if g.get("topic") else ""
+                lines.append(f"• {bold(escape(_video_label(g)))}{topic}")
+                links = [link("▶️ video oficial", g["urls"][0][1])] if g.get("urls") else []
+                links += [_acta_link(a) for a in g.get("actas", [])[:2]]
+                lines.append("   " + " · ".join(links))
+            lines.append("<i>El video lo publica el canal oficial; el acta, con la transcripción de la sesión, se "
+                         "publica en la Gaceta del Congreso semanas después.</i>")
         # 2. Programado para ese día
         lines += ["", bold("Programado")]
         if not data.get("agenda_covered"):
@@ -631,8 +663,8 @@ class UiApplication:
         if videos:
             rows.insert(0, [Button(label=f"▶️ {_clip(_video_label(v), 30)}", intent=Intent.DAY_OVERVIEW, url=v["urls"][0][1])
                             for v in videos[:2]])
-        held_today = bool(data.get("votings") or videos)
-        empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs or videos)
+        held_today = bool(data.get("votings") or sessions)
+        empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs or sessions)
         # «Senado hoy»: el Senado no sesiona todos los días. Si se consulta hoy, o el día no tiene sesión
         # registrada, se dice cuál fue la última y cuál es la próxima publicada (datos reales con su fuente).
         if day == self.today() or not held_today:
@@ -702,11 +734,15 @@ class UiApplication:
         corp = {"senado": "Senado", "camara": "Cámara"}
         voted = [e for e in events if e.get("kind") == "votacion" and e.get("date")]
         plenary_video: dict[tuple[str, str], str] = {}
+        plenary_acta: dict[tuple[str, str], dict[str, Any]] = {}
         if voted:
             dates = [date.fromisoformat(str(e["date"])[:10]) for e in voted]
             for v in self._videos(None, min(dates), max(dates)):
                 if v.get("body_key") == "plenaria" and v.get("kind") == "sesion":
                     plenary_video.setdefault((str(v["session_date"])[:10], v.get("corporation")), v["url"])
+            for a in self._actas(None, min(dates), max(dates)):
+                if a.get("body_key") == "plenaria":
+                    plenary_acta.setdefault((str(a["session_date"])[:10], a.get("corporation")), a)
         lines = [bold(f"🗓 Trámite · {label}"), "<i>Hechos fechados en las fuentes, del más reciente al más antiguo. "
                                               "Los del mismo día no tienen orden horario.</i>", ""]
         for e in events[:25]:
@@ -714,9 +750,10 @@ class UiApplication:
             detail = escape(e["detail"])
             if e.get("url", "").startswith("https://") if e.get("url") else False:
                 detail = link(e["detail"], e["url"])
-            video = (plenary_video.get((str(e["date"])[:10], e.get("corporation")))
-                     if e.get("kind") == "votacion" else None)
-            watch = f" · {link('▶️ video de la plenaria', video)}" if video else ""
+            key = (str(e["date"])[:10], e.get("corporation"))
+            video = plenary_video.get(key) if e.get("kind") == "votacion" else None
+            acta = plenary_acta.get(key) if e.get("kind") == "votacion" else None
+            watch = (f" · {link('▶️ video de la plenaria', video)}" if video else "") + (f" · {_acta_link(acta)}" if acta else "")
             lines.append(f"• {fmt_date(e['date'])}{where} — {detail} <i>({e['source']})</i>{watch}")
         if not events:
             lines.append("No tengo hechos fechados para este proyecto en las fuentes cargadas.")
@@ -907,6 +944,12 @@ class UiApplication:
                 lines += ["", f"▶️ {link('Video oficial de esta sesión', match[0]['url'])} ({escape(match[0]['channel'])})"]
                 rows.insert(0, [Button(label="▶️ Ver la sesión", intent=Intent.VOTING_OPEN, url=match[0]["url"])])
                 evidence.append({"label": f"Video oficial · {match[0]['title']}", "url": match[0]["url"]})
+            actas = [a for a in self._actas(session.get("corporation"), day, day)
+                     if a.get("body_key") == body_key and a.get("corporation") == session.get("corporation")]
+            if actas:
+                lines += ["" if not match else "", f"{_acta_link(actas[0])}: transcripción oficial de la sesión, con el debate y la votación."]
+                evidence.append({"label": f"Acta {actas[0]['acta_number']}/{actas[0]['acta_year']} · Gaceta {actas[0]['gaceta']}",
+                                 "url": actas[0]["url"]})
         rows = [r for r in rows if r]
         return ViewModel(view_type="voting", title=subject, blocks=["\n".join(lines)], rows=rows, evidence=evidence)
 

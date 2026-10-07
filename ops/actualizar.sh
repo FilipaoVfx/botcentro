@@ -14,6 +14,7 @@ step normalize SRC-01
 step ingest SRC-06 --from "$from" --to "$today"
 step normalize SRC-06
 step index-fichas --batch 50
+step index-actas   # actas que la carga de gacetas registró desde la última corrida
 # Investigaciones: contratos SECOP II de los municipios piloto y planes de adquisiciones de sus entidades.
 PILOTO='{"territories":[{"departamento":"Caquetá","municipio":"Florencia"},{"departamento":"Valle del Cauca","municipio":"Buenaventura"},{"departamento":"Arauca","municipio":"Arauca"}]}'
 step ingest SRC-15 --from "$from" --to "$today" --max-pages 50 --filters "$PILOTO"

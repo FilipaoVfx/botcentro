@@ -22,6 +22,7 @@ from typing import Any
 from botcentro.connectors.gacetas_imprenta import GacetaListing, GacetaRef, download
 from botcentro.costs.budget import BudgetGuard
 from botcentro.documents.chunking import ExtractedText, PageText, chunk_extraction
+from botcentro.documents.acta_headers import heading_contexts, parse_acta_headers
 from botcentro.documents.gaceta_segments import segment_at, segment_gaceta
 from botcentro.documents.pdf_text import OCR_VERSION, extract_pages
 from botcentro.domain.enums import QualityStatus
@@ -94,6 +95,11 @@ def process(ref: GacetaRef, *, fetcher: SafeFetcher, embedder: E5SmallEmbedder, 
     page_texts = [PageText(p.pdf_page, p.text, quality=p.quality) for p in pages]
     doc = ExtractedText(page_texts)
     segments = segment_gaceta(doc.text)
+    # Actas y la sesión que registra cada una (encabezado, incluida la portada que no se indexa): se publican
+    # con `index-actas` para enlazar acta ↔ sesión ↔ video oficial.
+    page_pairs = [(p.pdf_page, p.text) for p in pages]
+    m["actas"] = [h.as_dict() for h in parse_acta_headers(page_pairs, ref.corporation)]
+    m["acta_contexts"] = heading_contexts(page_pairs)
     refs = {r for s in segments for r in s.refs}
     linked = {r: _project_of(r, identifiers) for r in refs}
     m.update(segments=len(segments), segment_kinds=sorted({s.kind for s in segments}),
@@ -207,3 +213,36 @@ def run_pilot(*, limit: int, out: Path, fetcher: SafeFetcher, client: InsForgeCl
               embedder: E5SmallEmbedder, budget: BudgetGuard, pause: float = 3.0) -> dict[str, Any]:
     return run_load(out=out, fetcher=fetcher, client=client, store=store, embedder=embedder, budget=budget,
                     limit=limit, pause=pause)
+
+
+def acta_headers_only(ref: GacetaRef, *, fetcher: SafeFetcher, ocr_pages: int = 2) -> dict[str, Any]:
+    """Recuperación para gacetas cargadas antes de registrar actas: lee el texto nativo de todas las páginas
+    y aplica OCR solo a las primeras `ocr_pages` si no tienen texto legible (portada e índice). El PDF no se
+    conserva (DEC-11)."""
+    import io
+
+    from pypdf import PdfReader
+
+    from botcentro.documents.pdf_text import legible, ocr_page
+
+    fetched = download(fetcher, ref)
+    reader = PdfReader(io.BytesIO(fetched.content))
+    texts: list[tuple[int, str]] = []
+    for i, page in enumerate(reader.pages, start=1):
+        try:
+            texts.append((i, page.extract_text() or ""))
+        except Exception:  # noqa: BLE001 — una página corrupta no invalida el resto
+            texts.append((i, ""))
+    unreadable = [i for i, t in texts[:ocr_pages] if not legible(t)]
+    if unreadable:
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+            tmp.write(fetched.content)
+            tmp.flush()
+            for i in unreadable:
+                texts[i - 1] = (i, ocr_page(tmp.name, i))
+    del fetched
+    return {"document_key": ref.document_key, "url": ref.permalink,
+            "actas": [h.as_dict() for h in parse_acta_headers(texts, ref.corporation)],
+            "acta_contexts": heading_contexts(texts), "pages_ocr": len(unreadable)}

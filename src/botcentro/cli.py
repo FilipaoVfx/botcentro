@@ -86,6 +86,60 @@ def muestra_secop(per_territory: int, seed: int) -> None:
                      ensure_ascii=False))
 
 
+def index_actas(manifest: str, backfill: int, pause: float) -> None:
+    """Publica las actas registradas por la carga de gacetas. Con --backfill N, recupera hasta N gacetas
+    cargadas antes de registrar actas (solo las que tienen segmento «acta»), sin conservar el PDF."""
+    import time as _time
+    from datetime import date as _date
+    from urllib.parse import parse_qs, urlparse
+
+    from botcentro.connectors.gacetas_imprenta import DOMAINS as GACETA_DOMAINS, GacetaRef
+    from botcentro.pilots.gacetas import acta_headers_only
+
+    client = account_client("ingest")
+    path, extra = Path(manifest), Path(manifest).with_suffix(".actas.jsonl")
+    seen: dict[str, dict[str, Any]] = {}
+    for file in (path, extra):
+        if file.exists():
+            for line in file.read_text().splitlines():
+                rec = json.loads(line)
+                if "actas" in rec or rec["document_key"] not in seen:
+                    seen[rec["document_key"]] = rec
+    todo = [r for r in seen.values() if "actas" not in r and "acta" in (r.get("segment_kinds") or [])][:backfill]
+    if todo:
+        with SafeFetcher(UrlGuard(UrlPolicy.for_domains(GACETA_DOMAINS))) as fetcher, extra.open("a") as sink:
+            for rec in todo:
+                _, corp, _, number = rec["document_key"].split(":")
+                d, m, y = (int(x) for x in parse_qs(urlparse(rec["url"]).query)["fec"][0].split("-"))
+                try:
+                    out = acta_headers_only(GacetaRef(corp, _date(y, m, d), number), fetcher=fetcher)
+                except Exception as exc:  # noqa: BLE001 — se registra y se sigue; se reintenta en otra pasada
+                    print(json.dumps({"document_key": rec["document_key"], "error": f"{type(exc).__name__}: {exc}"[:200]}),
+                          flush=True)
+                    continue
+                sink.write(json.dumps({**rec, **out}, ensure_ascii=False) + "\n")
+                sink.flush()
+                seen[rec["document_key"]] = {**rec, **out}
+                print(json.dumps({"document_key": rec["document_key"], "actas": len(out["actas"])}), flush=True)
+                _time.sleep(pause)
+    from botcentro.documents.acta_headers import parse_acta_headers
+
+    rows = []
+    for rec in seen.values():
+        if rec.get("acta_contexts") is not None:  # se reinterpreta con el analizador vigente, sin descargar
+            corp = rec["document_key"].split(":")[1]
+            rec["actas"] = [h.as_dict() for h in parse_acta_headers([(p, t) for p, t in rec["acta_contexts"]], corp)]
+        published = parse_qs(urlparse(rec["url"]).query).get("fec", [""])[0]
+        d, m, y = (published.split("-") + ["", "", ""])[:3]
+        for a in rec.get("actas") or []:
+            rows.append({**a, "document_key": rec["document_key"], "gaceta_url": rec["url"],
+                         "published_on": f"{y}-{int(m):02d}-{int(d):02d}" if y else None})
+    total = sum(client.call("ingest_session_actas", {"p_rows": rows[i:i + 500]}) for i in range(0, len(rows), 500))
+    print(json.dumps({"actas_publicadas": total, "gacetas_con_actas": sum(1 for r in seen.values() if r.get("actas")),
+                      "pendientes_de_recuperar": sum(1 for r in seen.values()
+                                                     if "actas" not in r and "acta" in (r.get("segment_kinds") or []))}))
+
+
 def db_bootstrap() -> None:
     from botcentro.db.migrate import bootstrap
 
@@ -433,6 +487,10 @@ def main(argv: list[str] | None = None) -> None:
     ms = sub.add_parser("muestra-secop", help="muestra de verificación de SECOP II contra datos.gov.co (en var/)")
     ms.add_argument("--por-municipio", type=int, default=7)
     ms.add_argument("--semilla", type=int, default=20260930)
+    ia = sub.add_parser("index-actas", help="publica las actas de las gacetas con la sesión que registra cada una")
+    ia.add_argument("--manifest", default="var/gacetas-manifest-local.jsonl")
+    ia.add_argument("--backfill", type=int, default=0, help="recupera hasta N gacetas cargadas antes (sin PDF)")
+    ia.add_argument("--pause", type=float, default=3.0)
     sub.add_parser("db-bootstrap", help="prepara roles, auth y extensiones en el PostgreSQL autoalojado")
     mg = sub.add_parser("migrate", help="aplica las migraciones pendientes en el PostgreSQL autoalojado")
     mg.add_argument("--record-only", action="store_true", help="solo registra (base restaurada con ese esquema)")
@@ -441,6 +499,8 @@ def main(argv: list[str] | None = None) -> None:
         verify_account(args.who, args.code)
     elif args.command == "muestra-secop":
         muestra_secop(args.por_municipio, args.semilla)
+    elif args.command == "index-actas":
+        index_actas(args.manifest, args.backfill, args.pause)
     elif args.command == "db-bootstrap":
         db_bootstrap()
     elif args.command == "migrate":
