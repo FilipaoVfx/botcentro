@@ -95,8 +95,8 @@ def test_start_opens_home_with_only_available_sections(bot) -> None:
     """UI-T01/UI-F05: el menú solo ofrece lo que responde con datos; lo pendiente se explica por texto."""
     [home] = bot.say("/start")
     labels = keyboard_texts(home["keyboard"])
-    assert labels == ["📚 Proyectos", "🏛 Senado hoy", "🗳 Votaciones", "🗓 Agenda", "💬 Debates", "🔗 Fuentes",
-                      "❓ Ayuda"]
+    assert labels == ["📚 Proyectos", "🏛 Senado hoy", "🗳 Votaciones", "🗓 Agenda", "💬 Debates",
+                      "📄 Buscar en actas", "🔗 Fuentes", "❓ Ayuda"]
     bot.run(bot.runtime.state.clear(OTHER_ALLOWED, OTHER_ALLOWED))
     [pending] = bot.say("documentos", user=OTHER_ALLOWED)
     assert "Todavía no tengo el explorador general de documentos" in pending["html"]
@@ -158,8 +158,8 @@ def test_stale_render_does_not_overwrite_newer_view(bot) -> None:
     [home] = bot.say("inicio")
     original = runtime.app.handle
 
-    def concurrent_handle(action, ctx, result_set=None):
-        view = original(action, ctx, result_set)
+    def concurrent_handle(action, ctx, result_set=None, **kwargs):
+        view = original(action, ctx, result_set, **kwargs)
         other = asyncio.run_coroutine_threadsafe(runtime.state.load(ALLOWED, ALLOWED), bot.loop).result()
         assert asyncio.run_coroutine_threadsafe(runtime.state.save(ALLOWED, ALLOWED, other), bot.loop).result()
         return view
@@ -358,3 +358,28 @@ def test_interaction_metrics_reach_the_panel(bot) -> None:
     client = sync_redis.Redis.from_url(URL)
     data = summarize(client, bot.runtime.metrics.prefix)
     assert data["counts"].get("ui.view_rendered", 0) >= 1 and "text" in data["p95_ms"]
+
+
+def test_page_view_is_sent_as_photo_and_arrows_edit_it(bot) -> None:
+    from pathlib import Path
+
+    from botcentro.documents.page_render import RenderedPage
+    from botcentro.telegram_ui.contracts import Intent, UiAction
+
+    class Pages:
+        def render(self, key, url, page):
+            return RenderedPage(Path(f"/cache/p{page}.png"), page, 9, "sha", True)
+
+    bot.runtime.app.pages = Pages()
+    who = bot.runtime.principal(ALLOWED, ALLOWED)
+    params = {"document_key": "gaceta:senado:2026:1382", "page": 3,
+              "url": "https://svrpubindc.imprenta.gov.co/senado/index2.xhtml?ent=Senado&fec=24-9-2026&num=1382"}
+    before = len(bot.transport.sent)
+    bot.run(bot.runtime._show(who, UiAction(intent=Intent.PAGE_VIEW, entry_point="button", parameters=params),
+                              None, 0.0))
+    [photo] = bot.transport.sent[before:]
+    assert photo["photo"] == "/cache/p3.png" and "página 3 de 9" in photo["html"]
+    bot.click(photo, "p. 4 ▶")
+    edit = bot.transport.edits[-1]
+    assert edit["id"] == photo["id"] and edit["photo"] == "/cache/p4.png"
+    assert bot.transport.answers[-1]["text"] == "Abriendo la página…"

@@ -34,9 +34,9 @@ IMPLEMENTED = frozenset({
     Intent.SEARCH_PROMPT, Intent.PAGE, Intent.PROJECT_OPEN, Intent.PROJECT_PARTICIPANTS, Intent.ORDINAL,
     Intent.VOTINGS, Intent.DOCUMENTS, Intent.DAY_OVERVIEW, Intent.PROJECT_TIMELINE, Intent.DISCUSSIONS,
     Intent.VOTING_OPEN, Intent.VOTINGS_PERSON, Intent.VOTE_PERSON_PROMPT, Intent.EVIDENCE,
-    Intent.ACTA_SEARCH, Intent.ACTA_SEARCH_PROMPT,
+    Intent.ACTA_SEARCH, Intent.ACTA_SEARCH_PROMPT, Intent.PAGE_VIEW,
 })
-_NO_EVIDENCE_VIEWS = {"home", "help", "sources", "evidence", "cancel", "filters", "search_prompt", "unavailable",
+_NO_EVIDENCE_VIEWS = {"home", "help", "sources", "evidence", "cancel", "filters", "search_prompt", "unavailable", "page",
                       "clarify", "expired", "subscribe_prompt", "subscribed", "subscriptions", "confirm", "coverage",
                       "territory_search"}
 _ENGINE_FALLBACK = frozenset({Intent.PROJECTS_SEARCH})
@@ -115,8 +115,10 @@ def _clip(text: str | None, limit: int) -> str:
 
 class UiApplication:
     def __init__(self, engine: AnswerEngine, *, is_available: Callable[[Intent], bool] | None = None,
-                 today: Callable[[], date] | None = None, investigations: InvestigationViews | None = None) -> None:
+                 today: Callable[[], date] | None = None, investigations: InvestigationViews | None = None,
+                 pages: Any = None) -> None:
         self.engine = engine
+        self.pages = pages  # PageRenderer: «📄 Ver página» de las gacetas
         self.rpc = engine.rpc
         self.investigations = investigations
         base = is_available or (lambda intent: intent in IMPLEMENTED)
@@ -263,6 +265,13 @@ class UiApplication:
             push = False
         elif intent is Intent.ACTA_SEARCH:
             view = self._acta_search(params)
+        elif intent is Intent.PAGE_VIEW:
+            view = self._page_view(params)
+            if ctx.current is not None and ctx.current.intent is Intent.PAGE_VIEW:
+                # ◀ ▶ dentro del mismo documento reemplazan la página sin alargar el historial: «Volver» regresa
+                # a la vista desde donde se abrió.
+                ctx.current = Frame(intent=intent, params=params, title=view.title)
+                push = False
         elif intent in (Intent.PROJECT_PARTICIPANTS, Intent.DOCUMENTS):
             project_id = params.get("project_id") or (ctx.active_project_id if params.get("contextual")
                                                       or action.entry_point == "text" else None)
@@ -352,6 +361,38 @@ class UiApplication:
         except Exception:  # noqa: BLE001
             return []
 
+    def _page_view(self, params: dict[str, Any]) -> ViewModel:
+        key, url, page = str(params["document_key"]), str(params["url"]), int(params.get("page") or 1)
+        _, corp, year, number = key.split(":")
+        gaceta = f"Gaceta {number}/{year} ({'Senado' if corp == 'senado' else 'Cámara'})"
+        official = Button(label="🔗 Gaceta oficial", intent=Intent.PAGE_VIEW, url=url)
+        if self.pages is None:
+            return ViewModel(view_type="unavailable", title="Página no disponible", status="unavailable",
+                             blocks=[f"La vista de páginas no está activa. Puedes abrir la {escape(gaceta)} en la fuente."],
+                             rows=[[official], [BACK_BUTTON, HOME_BUTTON]])
+        from botcentro.documents.page_render import PageUnavailable
+
+        try:
+            rendered = self.pages.render(key, url, page)
+        except PageUnavailable as exc:
+            return ViewModel(view_type="unavailable", title="Página no disponible", status="unavailable", blocks=[
+                f"No pude mostrar la página {page} de la {escape(gaceta)}: {escape(str(exc))}. "
+                "Puedes abrirla en la Imprenta Nacional."], rows=[[official], [BACK_BUTTON, HOME_BUTTON]])
+        label = f" · {escape(params['label'])}" if params.get("label") else ""
+        caption = (f"📄 {bold(escape(gaceta))} · página {page} de {rendered.pages}{label}\n"
+                   f"<i>Imagen de la página del PDF publicado por la Imprenta Nacional (la numeración impresa coincide "
+                   f"con la del PDF).</i>")
+        nav = []
+        base = {k: params[k] for k in ("document_key", "url", "label") if params.get(k)}
+        if page > 1:
+            nav.append(Button(label=f"◀ p. {page - 1}", intent=Intent.PAGE_VIEW, params={**base, "page": page - 1}))
+        if page < rendered.pages:
+            nav.append(Button(label=f"p. {page + 1} ▶", intent=Intent.PAGE_VIEW, params={**base, "page": page + 1}))
+        rows = [nav] if nav else []
+        rows += [[official], [BACK_BUTTON, HOME_BUTTON]]
+        return ViewModel(view_type="page", title=f"{gaceta} · p. {page}", blocks=[caption], rows=rows,
+                         photo={"path": str(rendered.path)}, evidence=[{"label": gaceta, "url": url}])
+
     def _acta_search(self, params: dict[str, Any]) -> ViewModel:
         query = str(params.get("query") or "").strip()
         scoped = bool(params.get("document_key"))
@@ -368,7 +409,10 @@ class UiApplication:
             items = [i for i in items if (i.get("session") or {}).get("acta_number") == str(params["acta_number"])
                      and str((i.get("session") or {}).get("acta_year")) == str(params.get("acta_year"))]
         where = escape(params["label"]) if scoped and params.get("label") else "las actas del Congreso"
-        mode = {"frase": "frase exacta", "palabras": "todas las palabras"}.get(data.get("mode") or "", "")
+        # La búsqueda ignora tildes y mayúsculas y reconoce variantes de cada palabra (votación/votaciones): no
+        # se llama «exacta» (la Mini App propuesta lo advirtió con razón).
+        mode = {"frase": "frase, con variantes de cada palabra", "palabras": "todas las palabras, en cualquier orden"
+                }.get(data.get("mode") or "", "")
         lines = [bold(f"🔎 «{escape(query)}» en {where}")]
         if items:
             total = len(items) if scoped else data.get("known_total", len(items))
@@ -391,13 +435,20 @@ class UiApplication:
             sess = it.get("session") or {}
             when = format_local_date(date.fromisoformat(str(sess["session_date"])[:10])) if sess.get("session_date") else ""
             head = (f"{_video_label({**sess, 'kind': 'sesion'})} · {when}" if sess else f"Gaceta {it['document_key'].split(':')[3]}")
-            lines.append(f"• {bold(escape(head))} — p. {it['pdf_page']}")
+            pages = (f"pp. {it['pdf_page']}–{it['pdf_page_end']}" if (it.get("pdf_page_end") or it["pdf_page"]) > it["pdf_page"]
+                     else f"p. {it['pdf_page']}")
+            lines.append(f"• {bold(escape(head))} — {pages}")
             lines.append(f"   «{_snippet(it.get('snippet'))}»")
             if it["more"]:
                 lines.append(f"   <i>+{it['more']} fragmento(s) más en esta acta</i>")
             if sess.get("url"):
                 lines.append(f"   {_acta_link({**sess, 'pdf_page': it['pdf_page']})}")
-            if not scoped and sess.get("session_date") and sess.get("corporation") in ("senado", "camara") and len(rows) < 3:
+            if sess.get("url") and sum(1 for r in rows for b in r if b.intent is Intent.PAGE_VIEW) < 3:
+                rows.append([Button(label=f"📄 Ver p. {it['pdf_page']} · {_clip(head, 24)}", intent=Intent.PAGE_VIEW,
+                                    params={"document_key": it["document_key"], "url": sess["url"], "page": it["pdf_page"],
+                                            "label": f"acta {sess.get('acta_number')}/{sess.get('acta_year')}"})])
+            if not scoped and sess.get("session_date") and sess.get("corporation") in ("senado", "camara") \
+                    and sum(1 for r in rows for b in r if b.intent is Intent.DAY_OVERVIEW) < 3:
                 rows.append([Button(label=f"🏛 {_clip(head, 30)}", intent=Intent.DAY_OVERVIEW,
                                     params={"corporation": sess["corporation"], "date": str(sess["session_date"])[:10]})])
         if not items:
@@ -706,6 +757,7 @@ class UiApplication:
                 lines.append("<i>Las votaciones de la Cámara aún no están en nuestras fuentes.</i>")
         # 1b. Sesiones con video oficial (SRC-26): confirma que hubo sesión y deja ver la fuente primaria.
         rows_search: list[Button] = []
+        view_rows: list[Button] = []
         sessions = _session_groups(self._videos(corp, day, day), self._actas(corp, day, day)) if not future else []
         videos = [g for g in sessions if g.get("urls")]
         if sessions:
@@ -725,6 +777,10 @@ class UiApplication:
                                               "acta_number": a["acta_number"], "acta_year": a["acta_year"],
                                               "label": f"acta {a['acta_number']}/{a['acta_year']} · {_video_label(g)}"})
                                for g, a in searchable]
+                view_rows = [Button(label=f"📄 Ver acta {a['acta_number']}/{a['acta_year']}", intent=Intent.PAGE_VIEW,
+                                    params={"document_key": a["document_key"], "url": a["url"], "page": a.get("pdf_page") or 1,
+                                            "label": f"acta {a['acta_number']}/{a['acta_year']}"})
+                             for g, a in searchable]
             else:
                 rows_search = []
         # 2. Programado para ese día
@@ -764,6 +820,7 @@ class UiApplication:
             rows.insert(0, [Button(label=f"▶️ {_clip(_video_label(v), 30)}", intent=Intent.DAY_OVERVIEW, url=v["urls"][0][1])
                             for v in videos[:2]])
         if sessions and rows_search:
+            rows.insert(0, view_rows)
             rows.insert(0, rows_search)
         held_today = bool(data.get("votings") or sessions)
         empty = not (data.get("votings") or data.get("filings") or data.get("agenda") or docs or sessions)
@@ -1049,6 +1106,10 @@ class UiApplication:
             actas = [a for a in self._actas(session.get("corporation"), day, day)
                      if a.get("body_key") == body_key and a.get("corporation") == session.get("corporation")]
             if actas:
+                rows.insert(0, [Button(label="📄 Ver el acta", intent=Intent.PAGE_VIEW,
+                                       params={"document_key": actas[0]["document_key"], "url": actas[0]["url"],
+                                               "page": actas[0].get("pdf_page") or 1,
+                                               "label": f"acta {actas[0]['acta_number']}/{actas[0]['acta_year']}"})])
                 lines += ["" if not match else "", f"{_acta_link(actas[0])}: transcripción oficial de la sesión, con el debate y la votación."]
                 evidence.append({"label": f"Acta {actas[0]['acta_number']}/{actas[0]['acta_year']} · Gaceta {actas[0]['gaceta']}",
                                  "url": actas[0]["url"]})

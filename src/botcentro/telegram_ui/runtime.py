@@ -25,7 +25,7 @@ from botcentro.telegram.render import split_message
 from botcentro.telegram.security import pseudonymize_user
 from botcentro.telegram.webhook import TelegramWebhook, TgUpdate
 from botcentro.telegram_ui.app import HOME_BUTTON, UiApplication
-from botcentro.telegram_ui.contracts import Button, CallbackRecord, SessionContext, UiAction, ViewModel
+from botcentro.telegram_ui.contracts import Button, CallbackRecord, Intent, SessionContext, UiAction, ViewModel
 from botcentro.telegram_ui.intents import parse_text
 from botcentro.telegram_ui.metrics import UiMetrics, metrics_prefix
 from botcentro.telegram_ui.state import UiState
@@ -39,6 +39,9 @@ class Transport(Protocol):
     async def send(self, chat_id: int, html: str, keyboard: Keyboard | None) -> int: ...
     async def edit(self, chat_id: int, message_id: int, html: str, keyboard: Keyboard | None) -> bool: ...
     async def answer_callback(self, callback_id: str, text: str | None = None, alert: bool = False) -> None: ...
+    async def send_photo(self, chat_id: int, path: str, caption: str, keyboard: Keyboard | None) -> int: ...
+    async def edit_photo(self, chat_id: int, message_id: int, path: str, caption: str,
+                         keyboard: Keyboard | None) -> bool: ...
 
 
 @dataclass
@@ -182,7 +185,8 @@ class UiRuntime:
             return
         # Acuse en paralelo con la vista (UI-O04): cierra el indicador de espera sin sumar un viaje de ida y
         # vuelta a Telegram (~80 ms) antes de construir y editar el mensaje.
-        ack = asyncio.create_task(self.transport.answer_callback(callback_id))
+        toast = "Abriendo la página…" if record.intent is Intent.PAGE_VIEW else None
+        ack = asyncio.create_task(self.transport.answer_callback(callback_id, toast))
         action = UiAction(intent=record.intent, entry_point="button", parameters=dict(record.params))
         try:
             await self._show(who, action, message_id, started)
@@ -206,10 +210,20 @@ class UiRuntime:
             return
         await self._store_result_set(who, view)
         keyboard = await self._keyboard(view, who, ctx)
-        html = split_message(view.blocks or [view.title], self.message_limit)[0]
         telegram_started = self.clock()
-        edited = message_id is not None and await self.transport.edit(who.chat_id, message_id, html, keyboard)
-        ctx.anchor_message_id = message_id if edited else await self.transport.send(who.chat_id, html, keyboard)
+        if view.photo:
+            # Foto con leyenda (≤1.024 caracteres en Telegram). Un mensaje de texto no se puede convertir en foto
+            # al editarlo: si el mensaje anterior era texto, el transporte no puede editarlo y se envía uno nuevo.
+            caption = split_message(view.blocks or [view.title], 1024)[0]
+            path = view.photo["path"]
+            edited = message_id is not None and await self.transport.edit_photo(who.chat_id, message_id, path,
+                                                                                caption, keyboard)
+            ctx.anchor_message_id = message_id if edited else await self.transport.send_photo(who.chat_id, path,
+                                                                                              caption, keyboard)
+        else:
+            html = split_message(view.blocks or [view.title], self.message_limit)[0]
+            edited = message_id is not None and await self.transport.edit(who.chat_id, message_id, html, keyboard)
+            ctx.anchor_message_id = message_id if edited else await self.transport.send(who.chat_id, html, keyboard)
         telegram_ms = int((self.clock() - telegram_started) * 1000)
         await self._save(who, ctx)
         self._event("ui.view_rendered", who, entry="button", intent=action.intent.value, view=view.view_type,

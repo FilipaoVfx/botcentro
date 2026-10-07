@@ -423,7 +423,7 @@ def run_bot() -> None:
         bot = make_bot(token)
         transport = AiogramTransport(bot)
         state = UiState(redis, bot_id=bot_id)
-        app = UiApplication(engine, investigations=InvestigationViews(client, bot_id=bot_id))
+        app = UiApplication(engine, investigations=InvestigationViews(client, bot_id=bot_id), pages=page_renderer())
         runtime = UiRuntime(transport=transport, state=state,
                             app=app, intake=TelegramWebhook(settings, client), rpc=client,
                             bot_id=bot_id, pseudonym_key=pseudonym_key, worker_id=f"bot-{socket.gethostname()}",
@@ -446,6 +446,29 @@ def run_bot() -> None:
             await redis.aclose()
 
     asyncio.run(main())
+
+
+def page_renderer():  # noqa: ANN201
+    """«📄 Ver página»: descarga transitoria de la gaceta desde la Imprenta Nacional (DEC-25)."""
+    import re as _re
+    from datetime import date
+    from pathlib import Path
+
+    from botcentro.connectors.gacetas_imprenta import DOMAINS, GacetaRef, download
+    from botcentro.documents.page_render import PageRenderer
+    from botcentro.http.fetcher import FetchLimits
+
+    def fetch(document_key: str, url: str) -> tuple[bytes, str]:
+        _, corp, _, number = document_key.split(":")
+        fec = _re.search(r"fec=(\d{1,2})-(\d{1,2})-(\d{4})", url)
+        if fec is None:
+            raise ValueError("enlace de gaceta sin fecha")
+        fetcher = SafeFetcher(UrlGuard(UrlPolicy.for_domains(DOMAINS)),
+                              limits=FetchLimits(max_bytes=120 * 1024 * 1024, timeout_seconds=120))
+        got = download(fetcher, GacetaRef(corp, date(int(fec[3]), int(fec[2]), int(fec[1])), number))
+        return got.content, got.content_hash
+
+    return PageRenderer(fetch, Path(os.environ.get("BOTCENTRO_PAGE_CACHE", "var/page-cache")))
 
 
 def pilot_gacetas(limit: int, out: str) -> None:

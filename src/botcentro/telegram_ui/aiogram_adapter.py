@@ -17,7 +17,8 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError, TelegramRetryAfter
-from aiogram.types import BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, Update
+from aiogram.types import (BotCommand, CallbackQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup,
+                           InputMediaPhoto, Message, Update)
 
 from botcentro.telegram_ui.runtime import Keyboard, UiRuntime
 
@@ -77,6 +78,25 @@ class AiogramTransport:
                 return True  # misma vista: no-op inocuo
             log.info("no se pudo editar el mensaje %s: %s", message_id, exc.message)
             return False  # borrado o demasiado antiguo: el llamador envía uno nuevo
+
+    async def send_photo(self, chat_id: int, path: str, caption: str, keyboard: Keyboard | None) -> int:
+        message = await self._retrying(lambda: self.bot.send_photo(chat_id, FSInputFile(path), caption=caption,
+                                                                    reply_markup=_markup(keyboard)))
+        return int(message.message_id)
+
+    async def edit_photo(self, chat_id: int, message_id: int, path: str, caption: str,
+                         keyboard: Keyboard | None) -> bool:
+        """Cambia la foto de un mensaje que ya es foto (◀ ▶). Un mensaje de texto no admite foto: False."""
+        try:
+            await self._retrying(lambda: self.bot.edit_message_media(
+                media=InputMediaPhoto(media=FSInputFile(path), caption=caption), chat_id=chat_id,
+                message_id=message_id, reply_markup=_markup(keyboard)))
+            return True
+        except TelegramBadRequest as exc:
+            if "not modified" in str(exc).lower():
+                return True
+            log.info("no se pudo cambiar la foto del mensaje %s: %s", message_id, exc.message)
+            return False
 
     async def answer_callback(self, callback_id: str, text: str | None = None, alert: bool = False) -> None:
         try:

@@ -41,6 +41,7 @@ class Intent(StrEnum):
     EVIDENCE = "evidence.show"
     ACTA_SEARCH = "actas.search"
     ACTA_SEARCH_PROMPT = "actas.search_prompt"
+    PAGE_VIEW = "document.page"
     SOURCES = "sources.catalog"
     PAGE = "page.goto"
     ORDINAL = "selection.ordinal"
@@ -141,6 +142,7 @@ class ViewModel(_Model):
     context_label: str | None = None
     new_result_set: ResultSet | None = None  # lista a guardar en Redis (no se muestra)
     evidence: list[dict[str, str]] = Field(default_factory=list)  # fuentes usadas en esta vista
+    photo: dict[str, Any] | None = None  # {"path": PNG local}: la vista se envía como foto con `blocks[0]` de leyenda
 
 
 class Frame(_Model):

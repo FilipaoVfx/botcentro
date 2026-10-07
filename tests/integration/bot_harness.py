@@ -37,6 +37,15 @@ class FakeTransport:
         self.edits.append({"chat": chat_id, "id": message_id, "html": html, "keyboard": keyboard})
         return True
 
+    async def send_photo(self, chat_id, path, caption, keyboard):
+        message_id = next(self._ids)
+        self.sent.append({"chat": chat_id, "html": caption, "photo": path, "keyboard": keyboard, "id": message_id})
+        return message_id
+
+    async def edit_photo(self, chat_id, message_id, path, caption, keyboard):
+        self.edits.append({"chat": chat_id, "id": message_id, "html": caption, "photo": path, "keyboard": keyboard})
+        return True
+
     async def answer_callback(self, callback_id, text=None, alert=False):
         self.answers.append({"id": callback_id, "text": text, "alert": alert})
 
